@@ -102,6 +102,23 @@
         } else {
           vm.wrapStyle = true
         }
+        // 
+        let href = window.location.search
+        let dataParams = new URLSearchParams(href)
+        let dossierNoParam = dataParams.get('dossierNo')
+        let secretKeyParam = dataParams.get('secretKey')
+        if (dossierNoParam && secretKeyParam) {
+          let queryString
+          queryString = '/tra-cuu-thong-tin-ho-so/' + dossierNoParam + '?secretKey=' + secretKeyParam
+          vm.$router.push({
+            path: queryString,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+          console.log('newQuery KIOS 2', queryString)
+        }
+        // 
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.govAgencyList = result
           vm.isDvc = vm.govAgencyList.length > 1

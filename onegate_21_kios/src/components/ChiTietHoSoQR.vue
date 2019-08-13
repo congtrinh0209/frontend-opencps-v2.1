@@ -395,6 +395,9 @@
         }
       })
     },
+    mounted () {
+      $('#content').css('padding-left', '0')
+    },
     watch: {},
     methods: {
       loadDossierActions () {

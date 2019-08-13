@@ -1,6 +1,5 @@
 <template>
   <div>
-    Tổ chức doanh nghiệp
     <v-form v-model="valid_thongtinchuhoso" ref="formChuHoSo" lazy-validation>
       <div>
         <div style="position: relative;">
