@@ -105,9 +105,13 @@
         // 
         let href = window.location.search
         let dataParams = new URLSearchParams(href)
-        let dossierNoParam = dataParams.get('dossierNo')
-        let secretKeyParam = dataParams.get('secretKey')
-        if (dossierNoParam && secretKeyParam) {
+        let paramsValue = dataParams.get('QRSCAN')
+        let dossierNoParam = paramsValue.split('-')[0]
+        let secretKeyParam = paramsValue.split('-')[1]
+        if (href.indexOf('QRSCAN') >=0 && paramsValue) {
+          if (vm.interVal) {
+            clearInterval(vm.interVal)
+          }
           let queryString
           queryString = '/tra-cuu-thong-tin-ho-so/' + dossierNoParam + '?secretKey=' + secretKeyParam
           vm.$router.push({
