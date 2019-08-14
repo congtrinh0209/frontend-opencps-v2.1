@@ -180,8 +180,8 @@
       </content-placeholders>
       <!--  -->
       <v-radio-group class="mt-1" v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
-        <v-radio label="Nhận kết quả trực tiếp" :value="1" ></v-radio>
-        <v-radio label="Nhận kết quả tại nhà" :value="2"></v-radio>
+        <v-radio :value="1" ><template slot="label"><span class="black--text">Nhận kết quả trực tiếp</span></template></v-radio>
+        <v-radio :value="2"><template slot="label"><span class="black--text">Nhận kết quả tại nhà</span></template></v-radio>
       </v-radio-group>
       <!--  -->
       <!-- <v-checkbox

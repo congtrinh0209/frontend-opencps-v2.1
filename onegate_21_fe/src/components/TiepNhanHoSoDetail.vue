@@ -51,8 +51,8 @@
           <v-expansion-panel-content>
             <div slot="header" style="display: flex; align-items: center;">
               <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-              <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
-              <span v-else>Tên hồ sơ</span>
+              <span v-if="formCode === 'NEW_GROUP'" class="text-bold">Tên nhóm hồ sơ</span>
+              <span class="text-bold" v-else>Tên hồ sơ</span>
               &nbsp;&nbsp;&nbsp;&nbsp;
             </div>
             <div>
@@ -76,8 +76,8 @@
           <v-expansion-panel-content>
             <div slot="header" style="display: flex; align-items: center;">
               <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-              <span v-if="formCode === 'NEW_GROUP'">Thành phần hồ sơ dùng chung</span>
-              <span v-else>Thành phần hồ sơ</span>
+              <span v-if="formCode === 'NEW_GROUP'" class="text-bold">Thành phần hồ sơ dùng chung</span>
+              <span class="text-bold" v-else>Thành phần hồ sơ</span>
               &nbsp;&nbsp;&nbsp;&nbsp;
               <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
               <v-text-field
@@ -98,7 +98,10 @@
       <div style="position: relative;" v-if="viaPortalDetail !== 0">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content hide-actions value="2">
-            <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
+            <div slot="header">
+              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+              <span class="text-bold">Dịch vụ chuyển phát kết quả</span> 
+            </div>
             <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
           </v-expansion-panel-content>
         </v-expansion-panel>
@@ -278,7 +281,7 @@
 
 import toastr from 'toastr'
 import $ from 'jquery'
-import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
+import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoNew.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
