@@ -42,26 +42,38 @@
                       </span>
                       <span v-else class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateName}} </span>
                     </div>
-                    <div class="xs12 sm12 py-1">
-                      <span class="pr-2">Địa chỉ:</span>
-                      <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
-                        {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}
-                        <span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
-                      </span>
-                      <span class="pl-0 text-bold" v-else> 
-                        {{thongTinChiTietHoSo.delegateAddress}} {{thongTinChiTietHoSo.delegateWardName}}
-                        <span v-if="thongTinChiTietHoSo.delegateWardName">, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}</span>
-                      </span>
+                    <div v-if="thongTinChiTietHoSo['delegateType'] !== 2">
+                      <div class="xs12 sm12 py-1">
+                        <span class="pr-2">Địa chỉ:</span>
+                        <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
+                          {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}
+                          <span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
+                        </span>
+                        <span class="pl-0 text-bold" v-else> 
+                          {{thongTinChiTietHoSo.delegateAddress}} {{thongTinChiTietHoSo.delegateWardName}}
+                          <span v-if="thongTinChiTietHoSo.delegateWardName">, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}</span>
+                        </span>
+                      </div>
+                      <div class="xs12 sm12 py-1">
+                        <span class="pr-2">Thư điện tử:</span>
+                        <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactEmail}} </span>
+                        <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateEmail}} </span>
+                      </div>
+                      <div class="xs12 sm12 py-1">
+                        <span class="pr-2">Số điện thoại:</span>
+                        <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactTelNo}} </span>
+                        <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateTelNo}} </span>
+                      </div>
                     </div>
-                    <div class="xs12 sm12 py-1">
-                      <span class="pr-2">Thư điện tử:</span>
-                      <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactEmail}} </span>
-                      <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateEmail}} </span>
-                    </div>
-                    <div class="xs12 sm12 py-1">
-                      <span class="pr-2">Số điện thoại:</span>
-                      <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactTelNo}} </span>
-                      <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateTelNo}} </span>
+                    <div v-else>
+                      <div class="xs12 sm12 py-1">
+                        <span class="pr-2">Số công văn:</span>
+                        <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.documentNo}} </span>
+                      </div>
+                      <div class="xs12 sm12 py-1">
+                        <span class="pr-2">Ngày ban hành:</span>
+                        <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.documentDate}} </span>
+                      </div>
                     </div>
                   </v-list>
                 </v-menu>

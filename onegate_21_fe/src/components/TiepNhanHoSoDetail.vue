@@ -44,9 +44,9 @@
         </v-expansion-panel>
       </div>
       <!--  -->
-      <thong-tin-chu-ho-so ref="thongtinchuhoso" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
+      <thong-tin-chu-ho-so ref="thongtinchuhoso" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
       <!--  -->
-      <div v-if="originality !== 1">
+      <div v-if="originality !== 1 && thongTinChiTietHoSo['delegateType'] && String(thongTinChiTietHoSo.delegateType) !== '2' ">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content>
             <div slot="header" style="display: flex; align-items: center;">

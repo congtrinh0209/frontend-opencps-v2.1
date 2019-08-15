@@ -208,7 +208,8 @@
                           append-icon="event"
                           slot="activator"
                           v-model="dateFormatted"
-                          @blur="thongTinNguoiNopHoSo.documentDate = parseDate(dateFormatted)"
+                          readonly
+                          @focus="thongTinNguoiNopHoSo.documentDate = parseDate(dateFormatted)"
                         ></v-text-field>
                         <v-date-picker locale="vi" v-model="thongTinNguoiNopHoSo.documentDate" no-title @input="menu1 = false"></v-date-picker>
                       </v-menu>
@@ -224,6 +225,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
+                      v-model="thongTinNguoiNopHoSo.dossierName"
                       multi-line
                       rows="3"
                       v-else
@@ -240,6 +242,7 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
+                      v-model="thongTinNguoiNopHoSo.delegateName"
                       v-else
                       ></v-text-field>
                     </v-flex>
@@ -266,7 +269,7 @@
           </div>
         </div>
         <!-- Thông tin chủ hồ sơ -->
-        <div style="position: relative;" v-if="thongTinNguoiNopHoSo.delegateType !== 0">
+        <div style="position: relative;" v-if="(originality === 1) || (originality !== 1 && thongTinNguoiNopHoSo.delegateType !== 0)">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="!showApplicant">
             <v-expansion-panel-content>
               <div slot="header"> 
@@ -514,7 +517,7 @@ export default {
     'suggestions': Suggestions,
     'vue-ctk-date-time-picker': VueCtkDateTimePicker
   },
-  props: ['showApplicant', 'showDelegate'],
+  props: ['formCode', 'showApplicant', 'showDelegate'],
   data: () => ({
     menu1: false,
     dateFormatted: '',
@@ -581,7 +584,8 @@ export default {
       delegateIdNo: '',
       delegateType: 0,
       documentNo: '',
-      documentDate: ''
+      documentDate: '',
+      dossierName: ''
     },
     applicantInfos: {
       applicantName: '',
@@ -701,22 +705,17 @@ export default {
             vm.onChangeDistrict(dataNguoiNopHoSo.delegateDistrictCode)
           }
           vm.thongTinChuHoSo = Object.assign(vm.thongTinChuHoSo, dataChuHoSo)
+        } else if (value.delegateType === 2) {
+          vm.thongTinNguoiNopHoSo.sameUser = false
+          // vm.thongTinNguoiNopHoSo.delegateCityCode = ''
+          // vm.thongTinNguoiNopHoSo.delegateAddress = ''
+          // vm.thongTinNguoiNopHoSo.delegateDistrictCode = ''
+          // vm.thongTinNguoiNopHoSo.delegateWardCode = ''
+          // vm.thongTinNguoiNopHoSo.delegateEmail = ''
+          // vm.thongTinNguoiNopHoSo.delegateTelNo = ''
+          // vm.thongTinNguoiNopHoSo.delegateIdNo = ''
         } else {
-          if (value.delegateType === 2) {
-            vm.thongTinNguoiNopHoSo = {
-              sameUser: false,
-              delegateName: '',
-              delegateCityCode: '',
-              delegateAddress: '',
-              delegateDistrictCode: '',
-              delegateWardCode: '',
-              delegateEmail: '',
-              delegateTelNo: '',
-              delegateIdNo: ''
-            }
-          } else {
-            vm.thongTinNguoiNopHoSo.sameUser = false
-          }
+          vm.thongTinNguoiNopHoSo.sameUser = false
         }
         console.log('thong tin nguoi nop =', vm.thongTinNguoiNopHoSo)
       },
@@ -744,10 +743,17 @@ export default {
         delegateWardCode: data.delegateWardCode,
         delegateEmail: data.delegateEmail,
         delegateTelNo: data.delegateTelNo,
-        delegateIdNo: data.delegateIdNo
+        delegateIdNo: data.delegateIdNo,
+        dossierName: data.dossierName,
+        delegateType: data.delegateType,
+        documentNo: data.documentNo,
+        documentDate: data.documentDate
       }
       let thongTinNguoiNopHoSoTemp = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
       vm.thongTinNguoiNopHoSo = thongTinNguoiNopHoSoTemp
+      if (data.documentDate) {
+        vm.dateFormatted = vm.formatDate(vm.thongTinNguoiNopHoSo.documentDate)
+      }
       let userTypeCondition = true
       if (data.applicantIdType === 'business') {
         userTypeCondition = false
@@ -824,7 +830,6 @@ export default {
     changeDelegateType () {
       let vm = this
       if (vm.thongTinNguoiNopHoSo.delegateType === 1) {
-
       }
     },
     onChangeCity (data) {
@@ -1125,6 +1130,8 @@ export default {
         }).catch(function () {
           vm.loadingVerify = false
         })
+      } else {
+        vm.bussinessExits = true
       }
     },
     getApplicantInfos () {
@@ -1144,8 +1151,12 @@ export default {
     },
     formatDate (date) {
       if (!date) return null
-      const [year, month, day] = date.split('-')
-      return `${day}/${month}/${year}`
+      if (String(date).indexOf('-') > 0) {
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      } else if (String(date).indexOf('/') > 0) {
+        return date.split(' ')[0]
+      }    
     },
     parseDate (date) {
       if (!date) return null
