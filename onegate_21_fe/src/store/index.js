@@ -1286,6 +1286,13 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
         dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
         dataPutdossier.append('applicantNote', state.applicantNote)
+        // 
+        dataPutdossier.append('delegateType', data.delegateType ? data.delegateType : '')
+        if (data.delegateType && data.delegateType === 2) {
+          dataPutdossier.append('documentNo', data.documentNo ? data.documentNo : '')
+          dataPutdossier.append('documentDate', data.documentDate ? data.documentDate : '')
+        }
+        // 
         if (data.originality !== 1) {
           dataPutdossier.append('dossierName', data.dossierName ? data.dossierName : '')
         }
@@ -3829,7 +3836,6 @@ export const store = new Vuex.Store({
       })
     },
     loadingInitData (state) {
-      console.log('loadingInitDataloadingInitDataloadingInitDataloadingInitData: ', state.initData)
       return state.initData
     },
     loadingDynamicBtn (state) {

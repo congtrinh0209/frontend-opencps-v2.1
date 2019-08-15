@@ -576,7 +576,7 @@ export default {
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
-      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
       if (validThongtinchuhoso['validForm']) {
         let passValid = false
@@ -617,6 +617,9 @@ export default {
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
+          if (tempData['documentDate']) {
+            tempData['documentDate'] = vm.parseDateToTimestamp(tempData['documentDate'])
+          }
           console.log('data put dossier -->', tempData)
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             vm.loadingAction = false
@@ -919,8 +922,13 @@ export default {
       if (!date) {
         return null
       }
-      let [day, month, year] = `${date}`.split('/')
-      let day2 = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      let day2
+      if (date.indexOf('/') > 0) {
+        let [day, month, year] = `${date}`.split('/')
+        day2 = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } else {
+        day2 = date
+      }
       if (new Date(day2) == 'Invalid Date') {
         return ''
       } else {

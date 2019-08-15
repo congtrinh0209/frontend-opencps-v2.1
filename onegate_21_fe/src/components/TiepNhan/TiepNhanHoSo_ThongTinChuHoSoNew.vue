@@ -12,7 +12,7 @@
               </div>
               <v-card>
                 <v-card-text>
-                  <v-layout wrap v-if="delegateType !== 2">
+                  <v-layout wrap v-if="thongTinNguoiNopHoSo.delegateType !== 2">
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
@@ -167,7 +167,7 @@
                     </v-flex>
                   </v-layout>
                   <!-- Thông tin công văn -->
-                  <v-layout wrap v-else-if="delegateType === 2">
+                  <v-layout wrap v-else-if="thongTinNguoiNopHoSo.delegateType === 2">
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
@@ -193,29 +193,25 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader style="float:left;height: 100%">
-                        <v-menu
-                          ref="menu1"
-                          v-model="menu1"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          lazy
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-text-field
-                              v-model="dateFormatted"
-                              @blur="thongTinNguoiNopHoSo.documentDate = parseDate(dateFormatted)"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker v-model="thongTinNguoiNopHoSo.documentDate" no-title @input="menu1 = false"></v-date-picker>
-                        </v-menu>
-                      </v-subheader>
+                      <v-menu
+                        v-else
+                        ref="menu1"
+                        v-model="menu1"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        lazy
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                      >
+                        <v-text-field
+                          append-icon="event"
+                          slot="activator"
+                          v-model="dateFormatted"
+                          @blur="thongTinNguoiNopHoSo.documentDate = parseDate(dateFormatted)"
+                        ></v-text-field>
+                        <v-date-picker locale="vi" v-model="thongTinNguoiNopHoSo.documentDate" no-title @input="menu1 = false"></v-date-picker>
+                      </v-menu>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -252,7 +248,7 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <div class="absolute__btn" style="width: 620px;margin-top: 4px;" v-if="!showApplicant">
+          <div class="absolute__btn" style="width: 520px;margin-top: 4px;" v-if="!showApplicant">
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -261,16 +257,16 @@
             label="Giống chủ hồ sơ"
             v-model="thongTinNguoiNopHoSo.sameUser"
             ></v-checkbox> -->
-            <v-radio-group class="mt-1" v-else v-model="delegateType" row @change="changeDelegateType">
+            <v-radio-group class="mt-1" v-else v-model="thongTinNguoiNopHoSo.delegateType" row @change="changeDelegateType">
               <v-radio :value="0"><template slot="label"><span class="black--text">Là chủ hồ sơ</span></template></v-radio>
               <v-radio :value="1"><template slot="label"><span class="black--text">Người được ủy quyền/ đại diện</span></template></v-radio>
               <v-radio :value="2"><template slot="label"><span class="black--text">Công văn</span></template></v-radio>
-              <v-radio :value="3"><template slot="label"><span class="black--text">Bưu chính</span></template></v-radio>
+              <!-- <v-radio :value="3"><template slot="label"><span class="black--text">Bưu chính</span></template></v-radio> -->
             </v-radio-group>
           </div>
         </div>
         <!-- Thông tin chủ hồ sơ -->
-        <div style="position: relative;" v-if="delegateType !== 0">
+        <div style="position: relative;" v-if="thongTinNguoiNopHoSo.delegateType !== 0">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="!showApplicant">
             <v-expansion-panel-content>
               <div slot="header"> 
@@ -520,7 +516,6 @@ export default {
   },
   props: ['showApplicant', 'showDelegate'],
   data: () => ({
-    delegateType: 0,
     menu1: false,
     dateFormatted: '',
     requiredOptions: {
@@ -584,6 +579,7 @@ export default {
       delegateEmail: '',
       delegateTelNo: '',
       delegateIdNo: '',
+      delegateType: 0,
       documentNo: '',
       documentDate: ''
     },
@@ -630,7 +626,6 @@ export default {
     },
     originality () {
       var vm = this
-      console.log('originality', vm.getOriginality())
       return vm.getOriginality()
     },
     viaPostal () {
@@ -666,50 +661,64 @@ export default {
           delegateTelNo: value.contactTelNo,
           delegateIdNo: value.applicantIdNo
         }
-        // if (!vm.thongTinChuHoSo.userType) {
-        //   vm.thongTinNguoiNopHoSo.sameUser = false
-        // } else {
-        //   vm.thongTinNguoiNopHoSo.sameUser = true
+        console.log('thong tin chu hs =', vm.thongTinChuHoSo)
+        // if (vm.thongTinNguoiNopHoSo.delegateType === 0) {
+        //   if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
+        //     vm.onChangeDelegateCity(value.cityCode)
+        //   }
+        //   if (value.districtCode && value.districtCode !== vm.thongTinNguoiNopHoSo['delegateDistrictCode']) {
+        //     vm.onChangeDelegateDistrict(value.districtCode)
+        //   }
+        //   vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         // }
-        if (vm.thongTinNguoiNopHoSo.sameUser) {
-          if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
-            vm.onChangeDelegateCity(value.cityCode)
-          }
-          if (value.districtCode && value.districtCode !== vm.thongTinNguoiNopHoSo['delegateDistrictCode']) {
-            vm.onChangeDelegateDistrict(value.districtCode)
-          }
-          vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
-        }
       },
       deep: true
     },
     thongTinNguoiNopHoSo: {
       handler: function (value) {
         var vm = this
-        let dataChuHoSo = vm.thongTinChuHoSo
-        if (value.sameUser) {
-          let dataNguoiNopHoSo = {
-            delegateName: dataChuHoSo.applicantName,
-            delegateCityCode: dataChuHoSo.cityCode,
-            delegateAddress: dataChuHoSo.address,
-            delegateDistrictCode: dataChuHoSo.districtCode,
-            delegateWardCode: dataChuHoSo.wardCode,
-            delegateEmail: dataChuHoSo.contactEmail,
-            delegateTelNo: dataChuHoSo.contactTelNo,
-            delegateIdNo: dataChuHoSo.applicantIdNo
+        let dataNguoiNopHoSo = vm.thongTinNguoiNopHoSo
+        // 
+        vm.dateFormatted = vm.formatDate(vm.thongTinNguoiNopHoSo.documentDate)
+        // 
+        if (value.delegateType === 0) {
+          vm.thongTinNguoiNopHoSo.sameUser = true
+          let dataChuHoSo = {
+            applicantName: dataNguoiNopHoSo.delegateName,
+            cityCode: dataNguoiNopHoSo.delegateCityCode,
+            address: dataNguoiNopHoSo.delegateAddress,
+            districtCode: dataNguoiNopHoSo.delegateDistrictCode,
+            wardCode: dataNguoiNopHoSo.delegateWardCode,
+            contactEmail: dataNguoiNopHoSo.delegateEmail,
+            contactTelNo: dataNguoiNopHoSo.delegateTelNo,
+            applicantIdNo: dataNguoiNopHoSo.delegateIdNo,
+            applicantIdType: 'citizen'
           }
-          if (dataChuHoSo.cityCode && dataChuHoSo.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
-            vm.onChangeDelegateCity(dataChuHoSo.cityCode)
+          if (dataNguoiNopHoSo.delegateCityCode && dataNguoiNopHoSo.delegateCityCode !== vm.thongTinChuHoSo['cityCode']) {
+            vm.onChangeCity(dataNguoiNopHoSo.delegateCityCode)
           }
-          if (dataChuHoSo.districtCode && dataChuHoSo.districtCode !== vm.thongTinNguoiNopHoSo['delegateDistrictCode']) {
-            vm.onChangeDelegateDistrict(dataChuHoSo.districtCode)
+          if (dataNguoiNopHoSo.delegateDistrictCode && dataNguoiNopHoSo.delegateDistrictCode !== vm.thongTinChuHoSo['districtCode']) {
+            vm.onChangeDistrict(dataNguoiNopHoSo.delegateDistrictCode)
           }
-          vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, dataNguoiNopHoSo)
-          // 
-          vm.dateFormatted = vm.formatDate(vm.thongTinNguoiNopHoSo.documentDate)
+          vm.thongTinChuHoSo = Object.assign(vm.thongTinChuHoSo, dataChuHoSo)
         } else {
-          this.$store.dispatch('resetThongTinNguoiNopHoSo')
+          if (value.delegateType === 2) {
+            vm.thongTinNguoiNopHoSo = {
+              sameUser: false,
+              delegateName: '',
+              delegateCityCode: '',
+              delegateAddress: '',
+              delegateDistrictCode: '',
+              delegateWardCode: '',
+              delegateEmail: '',
+              delegateTelNo: '',
+              delegateIdNo: ''
+            }
+          } else {
+            vm.thongTinNguoiNopHoSo.sameUser = false
+          }
         }
+        console.log('thong tin nguoi nop =', vm.thongTinNguoiNopHoSo)
       },
       deep: true
     },
@@ -814,7 +823,9 @@ export default {
     },
     changeDelegateType () {
       let vm = this
-      console.log('delegateType', vm.delegateType)
+      if (vm.thongTinNguoiNopHoSo.delegateType === 1) {
+
+      }
     },
     onChangeCity (data) {
       var vm = this
@@ -976,7 +987,7 @@ export default {
     onSearchItemSelected (item) {
       var vm = this
       vm.selectedSearchItem = item
-      console.log('selectedSearchItem', vm.selectedSearchItem)
+      // console.log('selectedSearchItem', vm.selectedSearchItem)
       // if (item['applicantIdType'] === 'business') {
       //   vm.thongTinChuHoSo.userType = false
       //   vm.thongTinNguoiNopHoSo.sameUser = false
@@ -1026,7 +1037,7 @@ export default {
     onSearchItemSelected1 (item) {
       var vm = this
       vm.selectedSearchItem = item
-      console.log('selectedSearchItem1', item)
+      // console.log('selectedSearchItem1', item)
       vm.thongTinNguoiNopHoSo['delegateIdNo'] = item.applicantIdNo.toString()
       //
       vm.thongTinNguoiNopHoSo['delegateName'] = item['applicantName'] ? item['applicantName'] : ''
@@ -1054,7 +1065,7 @@ export default {
           )
         })
       }
-      console.log('thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
+      // console.log('thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
       if (vm.thongTinNguoiNopHoSo['delegateCityCode'] && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
         changeCity(vm.thongTinNguoiNopHoSo['delegateCityCode']).then(function () {
           vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = item['districtCode'] ? item['districtCode'] : ''
@@ -1134,11 +1145,11 @@ export default {
     formatDate (date) {
       if (!date) return null
       const [year, month, day] = date.split('-')
-      return `${month}/${day}/${year}`
+      return `${day}/${month}/${year}`
     },
     parseDate (date) {
       if (!date) return null
-      const [month, day, year] = date.split('/')
+      const [day, month, year] = date.split('/')
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
     }
   }
