@@ -519,6 +519,7 @@ export default {
   },
   props: ['formCode', 'showApplicant', 'showDelegate'],
   data: () => ({
+    thongtinhoso: '',
     menu1: false,
     dateFormatted: '',
     requiredOptions: {
@@ -707,15 +708,25 @@ export default {
           vm.thongTinChuHoSo = Object.assign(vm.thongTinChuHoSo, dataChuHoSo)
         } else if (value.delegateType === 2) {
           vm.thongTinNguoiNopHoSo.sameUser = false
-          // vm.thongTinNguoiNopHoSo.delegateCityCode = ''
-          // vm.thongTinNguoiNopHoSo.delegateAddress = ''
-          // vm.thongTinNguoiNopHoSo.delegateDistrictCode = ''
-          // vm.thongTinNguoiNopHoSo.delegateWardCode = ''
-          // vm.thongTinNguoiNopHoSo.delegateEmail = ''
-          // vm.thongTinNguoiNopHoSo.delegateTelNo = ''
-          // vm.thongTinNguoiNopHoSo.delegateIdNo = ''
         } else {
           vm.thongTinNguoiNopHoSo.sameUser = false
+        }
+        if (vm.formCode === 'UPDATE') {
+          // 
+          let dataChuHoSo = {
+            applicantName: vm.thongtinhoso.applicantName,
+            cityCode: vm.thongtinhoso.cityCode,
+            address: vm.thongtinhoso.address,
+            districtCode: vm.thongtinhoso.districtCode,
+            wardCode: vm.thongtinhoso.wardCode,
+            contactEmail: vm.thongtinhoso.contactEmail,
+            contactTelNo: vm.thongtinhoso.contactTelNo,
+            applicantIdNo: vm.thongtinhoso.applicantIdNo,
+            applicantIdType: 'citizen'
+          }
+          vm.onChangeCity(vm.thongtinhoso.cityCode)
+          vm.onChangeDistrict(vm.thongtinhoso.districtCode)
+          vm.thongTinChuHoSo = Object.assign(vm.thongTinChuHoSo, dataChuHoSo)
         }
         console.log('thong tin nguoi nop =', vm.thongTinNguoiNopHoSo)
       },
@@ -734,6 +745,7 @@ export default {
   methods: {
     initData (data) {
       var vm = this
+      vm.thongtinhoso = data
       vm.$store.commit('setApplicantId', data.applicantIdNo)
       let tempData = {
         delegateName: data.delegateName,
