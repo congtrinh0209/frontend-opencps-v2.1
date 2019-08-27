@@ -16,6 +16,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    userPermission: false,
     groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
     snackbarerror: false,
     snackbarsocket: false,
@@ -30,7 +31,9 @@ export const store = new Vuex.Store({
         'role': ''
       }
     ],
-    user: null,
+    user: {
+      'role': ''
+    },
     socket: {
       isConnected: false,
       message: '',
@@ -46,7 +49,7 @@ export const store = new Vuex.Store({
     activeBindFormData: false
   },
   actions: {
-    loadInitResource ({state}) {
+    loadInitResource ({commit, state}) {
       return new Promise((resolve) => {
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
           state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
@@ -63,7 +66,21 @@ export const store = new Vuex.Store({
             'userId': 20103
           }
         }
-        resolve(state.initData)
+        if (state['user'].role === '') {
+          store.dispatch('getRoleUser').then(function (result) {
+            state['user'].role = result
+            commit('setInitData', state.initData)
+            resolve(state.initData)
+          }).catch(function (error) {
+            state['user'].role = ['default']
+            commit('setInitData', state.initData)
+            resolve(state.initData)
+            console.log(error)
+          })
+        } else {
+          commit('setInitData', state.initData)
+          resolve(state.initData)
+        }
       })
     },
     downloadServiceFileTemplate ({commit, state}, item) {
@@ -319,6 +336,33 @@ export const store = new Vuex.Store({
           reject(error)
         })
       })
+    },
+    getRoleUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get('/o/rest/v2/users/login', param).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                roles.push(serializable[key]['role'])
+              }
+            }
+            console.log('roles', roles)
+            resolve(roles)
+          } else {
+            resolve(['default'])
+          }
+        }).catch(function (error) {
+          console.log(error)
+          reject('default')
+        })
+      })
     }
   },
   mutations: {
@@ -348,6 +392,9 @@ export const store = new Vuex.Store({
     setInitData (state, payload) {
       state.initData = payload
     },
+    setUserPermission (state, payload) {
+      state.userPermission = payload
+    },
     setsnackbarerror (state, payload) {
       state.snackbarerror = payload
     },
@@ -371,6 +418,12 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    getUser (state) {
+      return state.user
+    },
+    getUserPermission (state) {
+      return state.userPermission
+    },
     getsnackbarerror (state) {
       return state.snackbarerror
     },

@@ -328,6 +328,7 @@ export default {
       }
       if (vm.isSignedIn) {
         vm.userData = {};
+        // kt
         vm.pullNotificationCount();
         setTimeout(() => {
           axios
@@ -342,6 +343,7 @@ export default {
                 className: vm.userData['className'] === 'org.opencps.usermgt.model.Applicant' ? 'org.opencps.usermgt.model.ApplicantAvatar' : vm.userData['className'],
                 classPK: vm.userData['classPK']
               }
+              // kt
               vm.getImageAvatar(filter)
               vm.userNameLogin = vm.userData["userName"];
               vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
@@ -357,6 +359,7 @@ export default {
     $route: function(newRoute, oldRoute) {
       let vm = this;
       if (vm.notificationCount < 5) {
+        // kt
         vm.pullNotificationCount();
       }
     }
@@ -518,12 +521,13 @@ export default {
             response.data !== "captcha"
           ) {
             if (response.data === "pending") {
+              let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
               window.location.href =
-                window.themeDisplay.getURLHome() +
+                url +
                 "/register#/xac-thuc-tai-khoan?active_user_id=" +
                 window.themeDisplay.getUserId() +
                 "&redirectURL=" +
-                window.themeDisplay.getURLHome();
+                url;
             } else {
               window.location.href = response.data;
             }

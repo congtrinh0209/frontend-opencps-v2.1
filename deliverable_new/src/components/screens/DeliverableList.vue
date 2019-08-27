@@ -99,7 +99,7 @@
         </div>
       </v-fade-transition> -->
     </div>
-    <div style="text-align: right;">
+    <div style="text-align: right;" v-if="getUser('QUAN_LY_GIAY_PHEP') || userPermission">
       <v-btn color="blue darken-3" dark
         :to="'/danh-sach-giay-to/' + index + '/editor/0'"
       >
@@ -235,6 +235,11 @@
               }, 100)
             }
             vm.pullData(vm.items[vm.index]['typeCode'])
+            // set permissionUser
+            if (vm.items.length > 0) {
+              vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
+            }
+            // 
           }, 100)
         })
       })
@@ -256,6 +261,11 @@
       },
       index (val) {
         var vm = this
+        // set permissionUser
+        if (vm.items.length > 0) {
+          vm.$store.commit('setUserPermission', vm.items[val]['moderator'])
+        }
+        // 
         if (vm.items[val]['dataConfig'] !== '') {
           vm.filters = eval('( ' + vm.items[val]['dataConfig'] + ' )')
         } else {
@@ -274,6 +284,14 @@
             vm.loadingTable = false
           }, 100)
         }
+      },
+      items () {
+        var vm = this
+        // set permissionUser
+        if (vm.items.length > 0) {
+          vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
+        }
+        // 
       },
       advSearchItems: {
         handler: function (val, oldVal) {
@@ -307,6 +325,9 @@
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes
+      },
+      userPermission () {
+        return this.$store.getters.getUserPermission
       }
     },
     methods: {
@@ -478,6 +499,15 @@
           vm.loadingTable = false
           console.log(reject)
         })
+      },
+      getUser (roleItem) {
+        let vm = this
+        let roles = vm.$store.getters.getUser.role
+        if (!roles) {
+          return false
+        }
+        let roleExits = roles.findIndex(item => String(item).indexOf(roleItem) >= 0)
+        return (roleExits >= 0)
       }
     }
   }

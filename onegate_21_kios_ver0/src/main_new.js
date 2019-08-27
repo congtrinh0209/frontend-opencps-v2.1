@@ -2,7 +2,7 @@ import 'vuetify/dist/vuetify.min.css'
 import 'toastr/build/toastr.min.css'
 import './stylus/main.css'
 import Vue from 'vue/dist/vue.min.js'
-import App from './App'
+import App from './App_new'
 import router from './router'
 import Vuetify from 'vuetify'
 import { store } from './store'
@@ -19,12 +19,12 @@ Vue.config.productionTip = true
 Vue.mixin({
   methods: {
     getOriginality: function () {
-      return 1
+      return 3
     }
   },
   created () {
     let vm = this
-    vm.$store.commit('setOriginality', 1)
+    vm.$store.commit('setOriginality', 3)
   }
 })
 
