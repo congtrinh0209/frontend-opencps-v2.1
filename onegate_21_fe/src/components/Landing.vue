@@ -1263,8 +1263,10 @@ export default {
             vm.trangThaiHoSoList = result
             vm.menuType = parseInt(vm.trangThaiHoSoList[vm.index]['menuType'])
             vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
-            vm.processListTTHC(currentQuery)
-            vm.processListDomain(currentQuery)
+            if (vm.originality !== 1) {
+              vm.processListTTHC(currentQuery)
+              vm.processListDomain(currentQuery)
+            }
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('headers')) {
               vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
@@ -1383,7 +1385,7 @@ export default {
             }
           }
         }
-        if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
+        if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0 && vm.originality !== 1)) {
           vm.processListTTHC(currentQuery)
         } else {
           vm.doLoadingDataHoSo()

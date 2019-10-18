@@ -329,7 +329,7 @@ export default {
       if (vm.isSignedIn) {
         vm.userData = {};
         // kt
-        vm.pullNotificationCount();
+        // vm.pullNotificationCount();
         setTimeout(() => {
           axios
             .get("/o/v1/opencps/users/" + window.themeDisplay.getUserId())
@@ -360,7 +360,7 @@ export default {
       let vm = this;
       if (vm.notificationCount < 5) {
         // kt
-        vm.pullNotificationCount();
+        // vm.pullNotificationCount();
       }
     }
   },

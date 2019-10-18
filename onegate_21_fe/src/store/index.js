@@ -27,7 +27,7 @@ export const store = new Vuex.Store({
     fileTypePAYMENT: ['png', 'jpg', 'jpeg'],
     error: null,
     user: {
-      'role': ''
+      'role': ['APPLICANT', 'User']
     },
     index: 0,
     kysoSuccess: false,
