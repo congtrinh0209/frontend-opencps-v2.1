@@ -939,10 +939,10 @@ export default {
       vm.activeTab2 = 'tabs-2b'
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
-        vm.loadThanhToan()
-        vm.loadHoSoLienThong()
+        // vm.loadThanhToan()
+        // vm.loadHoSoLienThong()
         vm.getNextActions()
-        vm.getPreAction()
+        // vm.getPreAction()
         if (resultDossier['dossierSubStatus']) {
           vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
             vm.btnStepsDynamics = result
@@ -970,14 +970,8 @@ export default {
           vm.listDossierFiles = result
           // console.log('listDossierFiles', vm.listDossierFiles)
         })
-        if (vm.$refs.thanhphanhoso) {
-          vm.$refs.thanhphanhoso.initData(resultDossier)
-        }
-        // if (vm.$refs.thanhphanhoso1) {
-        //   vm.$refs.thanhphanhoso1.initData(resultDossier)
-        // }
-        // if (vm.$refs.thanhphanhoso2) {
-        //   vm.$refs.thanhphanhoso2.initData(resultDossier)
+        // if (vm.$refs.thanhphanhoso) {
+        //   vm.$refs.thanhphanhoso.initData(resultDossier)
         // }
       })
     },
@@ -1194,15 +1188,15 @@ export default {
           vm.stepModel = null
         })
       } else {
-        let filter = {
-          dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionId: item.processActionId
-        }
-        vm.$store.dispatch('loadPlugin', filter).then(resultPlugin => {
-          vm.stepModel = resultPlugin
-        }).catch(reject => {
-          vm.stepModel = null
-        })
+        // let filter = {
+        //   dossierId: vm.thongTinChiTietHoSo.dossierId,
+        //   actionId: item.processActionId
+        // }
+        // vm.$store.dispatch('loadPlugin', filter).then(resultPlugin => {
+        //   vm.stepModel = resultPlugin
+        // }).catch(reject => {
+        //   vm.stepModel = null
+        // })
       }
     },
     processPullBtnplugin (item, index) {
@@ -2178,13 +2172,13 @@ export default {
         // lấy danh sách user reAsign
         vm.loadUserReAsign()
       })
-      vm.$store.dispatch('loadPlugins', {
-        dossierId: vm.thongTinChiTietHoSo.dossierId
-      }).then(results => {
-        vm.btnPlugins = results
-      }).catch(xhr => {
-        vm.btnPlugins = []
-      })
+      // vm.$store.dispatch('loadPlugins', {
+      //   dossierId: vm.thongTinChiTietHoSo.dossierId
+      // }).then(results => {
+      //   vm.btnPlugins = results
+      // }).catch(xhr => {
+      //   vm.btnPlugins = []
+      // })
       if (vm.thongTinChiTietHoSo.online && !vm.thongTinChiTietHoSo.originDossierNo && 
         ((vm.originality === 1 && vm.thongTinChiTietHoSo['dossierStatus'] !== 'new') || vm.originality === 3)) {
         vm.loadDossierSyncs(vm.thongTinChiTietHoSo.dossierId)

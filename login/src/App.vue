@@ -344,7 +344,7 @@ export default {
                 classPK: vm.userData['classPK']
               }
               // kt
-              vm.getImageAvatar(filter)
+              // vm.getImageAvatar(filter)
               vm.userNameLogin = vm.userData["userName"];
               vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
             })

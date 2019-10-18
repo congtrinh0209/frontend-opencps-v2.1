@@ -537,13 +537,13 @@ export default {
     applicantBussinessExit (val) {
       let vm = this
       if (val && vm.fileTemplateNoString) {
-        vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+        // vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
       }
     },
     applicantId (val) {
       let vm = this
       if (val && vm.fileTemplateNoString) {
-        vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+        // vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
       }
     }
   },
@@ -633,7 +633,7 @@ export default {
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
           if (vm.applicantId && !vm.onlyView) {
-            vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
+            // vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
           }
         }
       }).catch(reject => {

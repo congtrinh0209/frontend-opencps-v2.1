@@ -271,24 +271,24 @@ export default {
       level: 0,
       parent: 0
     }
-    var data = vm.dichVuChuyenPhatKetQua
-    vm.$store.getters.getDictItems(filter).then(function (result) {
-      vm.citys = result.data
-    })
-    if (data.postalCityCode) {
-      filter.parent = data.postalCityCode
-      filter.level = 1
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultDistricts = result.data
-      })
-    }
-    if (data.postalDistrictCode) {
-      filter.parent = data.postalDistrictCode
-      filter.level = 1
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultWards = result.data
-      })
-    }
+    // var data = vm.dichVuChuyenPhatKetQua
+    // vm.$store.getters.getDictItems(filter).then(function (result) {
+    //   vm.citys = result.data
+    // })
+    // if (data.postalCityCode) {
+    //   filter.parent = data.postalCityCode
+    //   filter.level = 1
+    //   vm.$store.getters.getDictItems(filter).then(function (result) {
+    //     vm.resultDistricts = result.data
+    //   })
+    // }
+    // if (data.postalDistrictCode) {
+    //   filter.parent = data.postalDistrictCode
+    //   filter.level = 1
+    //   vm.$store.getters.getDictItems(filter).then(function (result) {
+    //     vm.resultWards = result.data
+    //   })
+    // }
   },
   methods: {
     initData (data) {

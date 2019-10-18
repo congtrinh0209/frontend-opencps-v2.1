@@ -383,99 +383,159 @@ export default {
       let filter = {
         dossierTemplateNo: currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
       }
-      vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
-        vm.templateName = result['templateName']
-        if (result['newFormScript']) {
-          vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
-          console.log('data_form_template', vm.data_form_template)
-          vm.formTemplate = 'version_2.0'
-          vm.loadingForm = true
-          let filterServiceConfig = {
-            serviceConfigId: currentQuery.hasOwnProperty('service_config') && currentQuery.service_config ? currentQuery.service_config : ''
-          }
-          vm.$store.dispatch('getServiceConfigDetail', filterServiceConfig).then(function (data) {
-            vm.loadingForm = false
-            vm.serviceName_hidden = data.serviceName
-            vm.serviceCode_hidden = data.serviceCode
-            vm.govAgencyCode_hidden = data.govAgencyCode
-            vm.dossierTemplateNo_hidden = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
-            vm.eformCode_hidden = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
-            setTimeout (function () {
-              if (vm.data_form_template) {
-                let formScript, formData
-                /* eslint-disable */
+      if (filter['dossierTemplateNo']) {
+        vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
+          vm.templateName = result['templateName']
+          if (result['newFormScript']) {
+            vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
+            console.log('data_form_template', vm.data_form_template)
+            vm.formTemplate = 'version_2.0'
+            vm.loadingForm = true
+            let filterServiceConfig = {
+              serviceConfigId: currentQuery.hasOwnProperty('service_config') && currentQuery.service_config ? currentQuery.service_config : ''
+            }
+            vm.$store.dispatch('getServiceConfigDetail', filterServiceConfig).then(function (data) {
+              vm.loadingForm = false
+              vm.serviceName_hidden = data.serviceName
+              vm.serviceCode_hidden = data.serviceCode
+              vm.govAgencyCode_hidden = data.govAgencyCode
+              vm.dossierTemplateNo_hidden = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
+              vm.eformCode_hidden = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
+              setTimeout (function () {
                 if (vm.data_form_template) {
-                  formScript = vm.data_form_template
-                } else {
-                  formScript = {}
+                  let formScript, formData
+                  /* eslint-disable */
+                  if (vm.data_form_template) {
+                    formScript = vm.data_form_template
+                  } else {
+                    formScript = {}
+                  }
+                  formData = {}
+                  /* eslint-disable */
+                  formScript.data = formData
+                  window.$('#formAlpacaNewTemplate').alpaca(formScript)
                 }
-                formData = {}
-                /* eslint-disable */
-                formScript.data = formData
-                window.$('#formAlpacaNewTemplate').alpaca(formScript)
-              }
-            }, 200)
-          })
-        } else {
-          vm.formTemplate = 'version_1.0'
-          vm.$store.dispatch('getDetailDossier', data).then(result => {
-            vm.dossierId = result.dossierId
-            vm.briefNote = result.dossierName ? result.dossierName : ''
-            result['editable'] = false
-            if (result.dossierStatus === '') {
-              vm.$store.dispatch('pullNextactions', result).then(result2 => {
-                if (result2) {
-                  var actionDetail = result2.filter(function (item) {
-                    return (item.actionCode === 1100 || item.actionCode === '1100')
-                  })
-                  vm.$store.dispatch('processPullBtnDetail', {
-                    dossierId: result.dossierId,
-                    actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
-                  }).then(resAction => {
-                    result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
-                    result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
-                    result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                    vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
-                    vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
-                    vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                    if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
-                      vm.showThuPhi = true
-                      vm.payments = resAction.payment
-                    }
+              }, 200)
+            })
+          } else {
+            vm.formTemplate = 'version_1.0'
+            vm.$store.dispatch('getDetailDossier', data).then(result => {
+              vm.dossierId = result.dossierId
+              vm.briefNote = result.dossierName ? result.dossierName : ''
+              result['editable'] = false
+              if (result.dossierStatus === '') {
+                vm.$store.dispatch('pullNextactions', result).then(result2 => {
+                  if (result2) {
+                    var actionDetail = result2.filter(function (item) {
+                      return (item.actionCode === 1100 || item.actionCode === '1100')
+                    })
+                    vm.$store.dispatch('processPullBtnDetail', {
+                      dossierId: result.dossierId,
+                      actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+                    }).then(resAction => {
+                      result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+                      result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
+                      result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                      vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
+                      vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
+                      vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                      if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                        vm.showThuPhi = true
+                        vm.payments = resAction.payment
+                      }
+                      // call initData thong tin chung ho so
+                      if (vm.$refs.thongtinchunghoso) {
+                        vm.$refs.thongtinchunghoso.initData(result)
+                      }
+                    })
+                  } else {
                     // call initData thong tin chung ho so
                     if (vm.$refs.thongtinchunghoso) {
                       vm.$refs.thongtinchunghoso.initData(result)
                     }
-                  })
-                } else {
+                  }
+                })
+              } else {
+                if (vm.$refs.thongtinchunghoso) {
+                  console.log('has thong tin chung ho so')
+                  vm.$refs.thongtinchunghoso.initData(result)
+                }
+              }
+              vm.thongTinChiTietHoSo = result
+              vm.$refs.thongtinchuhoso.initData(result)
+              vm.$refs.thanhphanhoso.initData(result)
+              vm.viaPortalDetail = result.viaPostal
+              if (result.viaPostal > 0) {
+                let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
+                if (vm.formCode === 'NEW' && vm.originality === 1) {
+                  result['postalAddress'] = postalAddress
+                  result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+                }
+                vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+              }
+            }).catch(reject => {
+            })
+          }
+        })
+      } else {
+        vm.formTemplate = 'version_1.0'
+        vm.$store.dispatch('getDetailDossier', data).then(result => {
+          vm.dossierId = result.dossierId
+          vm.briefNote = result.dossierName ? result.dossierName : ''
+          result['editable'] = false
+          if (result.dossierStatus === '') {
+            vm.$store.dispatch('pullNextactions', result).then(result2 => {
+              if (result2) {
+                var actionDetail = result2.filter(function (item) {
+                  return (item.actionCode === 1100 || item.actionCode === '1100')
+                })
+                vm.$store.dispatch('processPullBtnDetail', {
+                  dossierId: result.dossierId,
+                  actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+                }).then(resAction => {
+                  result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+                  result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
+                  result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                  vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
+                  vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
+                  vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                  if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                    vm.showThuPhi = true
+                    vm.payments = resAction.payment
+                  }
                   // call initData thong tin chung ho so
                   if (vm.$refs.thongtinchunghoso) {
                     vm.$refs.thongtinchunghoso.initData(result)
                   }
+                })
+              } else {
+                // call initData thong tin chung ho so
+                if (vm.$refs.thongtinchunghoso) {
+                  vm.$refs.thongtinchunghoso.initData(result)
                 }
-              })
-            } else {
-              if (vm.$refs.thongtinchunghoso) {
-                console.log('has thong tin chung ho so')
-                vm.$refs.thongtinchunghoso.initData(result)
               }
+            })
+          } else {
+            if (vm.$refs.thongtinchunghoso) {
+              console.log('has thong tin chung ho so')
+              vm.$refs.thongtinchunghoso.initData(result)
             }
-            vm.thongTinChiTietHoSo = result
-            vm.$refs.thongtinchuhoso.initData(result)
-            vm.$refs.thanhphanhoso.initData(result)
-            vm.viaPortalDetail = result.viaPostal
-            if (result.viaPostal > 0) {
-              let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
-              if (vm.formCode === 'NEW' && vm.originality === 1) {
-                result['postalAddress'] = postalAddress
-                result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
-              }
-              vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+          }
+          vm.thongTinChiTietHoSo = result
+          vm.$refs.thongtinchuhoso.initData(result)
+          vm.$refs.thanhphanhoso.initData(result)
+          vm.viaPortalDetail = result.viaPostal
+          if (result.viaPostal > 0) {
+            let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
+            if (vm.formCode === 'NEW' && vm.originality === 1) {
+              result['postalAddress'] = postalAddress
+              result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
             }
-          }).catch(reject => {
-          })
-        }
-      })
+            vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+          }
+        }).catch(reject => {
+        })
+      }
     },
     luuHoSo () {
       var vm = this

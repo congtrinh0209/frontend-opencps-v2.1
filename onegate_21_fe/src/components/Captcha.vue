@@ -51,7 +51,7 @@ export default {
   },
   created () {
     var vm = this
-    vm.makeImageCap()
+    // vm.makeImageCap()
   },
   watch: {
   },
