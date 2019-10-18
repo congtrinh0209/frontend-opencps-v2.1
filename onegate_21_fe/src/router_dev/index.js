@@ -30,6 +30,93 @@ const routes = [
   { path: '/thanh-toan-thanh-cong', name: 'ThanhToanThanhCong', component: ThanhToanThanhCong, props: true },
   { path: '/import-ho-so/:id', name: 'ImportHoSo', component: ImportHoSo, props: true},
   { path: '*', name: 'NotFound', component: NotFound }
+
+  //
+
+  // {
+  //   path: '/danh-sach-ho-so/:index',
+  //   name: 'Landing',
+  //   component: () => import('@/components/Landing.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/m/danh-sach-ho-so/:index',
+  //   name: 'LandingMobile',
+  //   component: () => import('@/components/LandingMobile.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/tra-cuu-ho-so',
+  //   name: 'TraCuuHoSo',
+  //   component: () => import('@/components/TraCuuHoSo.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode',
+  //   name: 'TiepNhanHoSoDetail',
+  //   component: () => import('@/components/TiepNhanHoSoDetail.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/danh-sach-ho-so/:index/nhom-ho-so/:id',
+  //   name: 'TiepNhanNhomHoSo',
+  //   component: () => import('@/components/TiepNhanHoSoTheoNhom.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/danh-sach-ho-so/:index/chi-tiet-ho-so/:id',
+  //   name: 'XemChiTietHoSoDetailCanBo',
+  //   component: () => import('@/components/XemChiTietHoSoDetailCanBo.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/danh-sach-ho-so/:index/xu-ly-ho-so',
+  //   name: 'XuLyHoSo',
+  //   component: () => import('@/components/XuLyHoSo.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id',
+  //   name: 'HoanThienBoSungHoSoDetail',
+  //   component: () => import('@/components/HoanThienBoSungHoSoDetail.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode',
+  //   name: 'DetailForward',
+  //   component: () => import('@/components/DetailForward.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/add-dvc/:serviceCode',
+  //   name: 'DanhSachThuTuc',
+  //   component: () => import('@/components/DanhSachThuTuc.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/danh-sach-ho-so/:index/nop-thanh-cong/:id',
+  //   name: 'NopThanhCong',
+  //   component: () => import('@/components/NopThanhCong.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/thanh-toan-thanh-cong',
+  //   name: 'ThanhToanThanhCong',
+  //   component: () => import('@/components/ThanhToanThanhCong.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '/import-ho-so/:id',
+  //   name: 'ImportHoSo',
+  //   component: () => import('@/components/ImportHoSo.vue'),
+  //   props: true
+  // },
+  // {
+  //   path: '*',
+  //   name: 'NotFound',
+  //   component: () => import('@/components/NotFound.vue'),
+  //   props: true
+  // }
 ]
 
 Vue.use(Router)

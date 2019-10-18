@@ -1,4 +1,5 @@
 if (process.env.NODE_ENV === 'production') {
+  var HtmlWebpackPlugin = require('html-webpack-plugin');
   module.exports = {
     runtimeCompiler: true,
     chainWebpack: config => {

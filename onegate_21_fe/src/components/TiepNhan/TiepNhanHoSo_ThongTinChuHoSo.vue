@@ -820,12 +820,11 @@ export default {
         return null
       }
       let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
-      // test local
-      // const url = 'http://127.0.0.1:8081/api/applicants'
-      if (vm.functionTimeOutApplicant) {
-        clearTimeout(vm.functionTimeOutApplicant)
-      }
-      vm.functionTimeOutApplicant = setTimeout(function () {
+
+      // if (vm.functionTimeOutApplicant) {
+      //   clearTimeout(vm.functionTimeOutApplicant)
+      // }
+      // vm.functionTimeOutApplicant = setTimeout(function () {
         return new Promise(resolve => {
           vm.$store.dispatch('loadInitResource').then(result => {
             let param = {
@@ -842,7 +841,7 @@ export default {
             })
           })
         })
-      }, 1000)
+      // }, 1000)
     },
     onInputChange1 (query) {
       let vm = this
@@ -850,12 +849,11 @@ export default {
         return null
       }
       let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
-      // test local
-      // const url = 'http://127.0.0.1:8081/api/applicants'
-      if (vm.functionTimeOutApplicant) {
-        clearTimeout(vm.functionTimeOutApplicant)
-      }
-      vm.functionTimeOutApplicant = setTimeout(function () {
+
+      // if (vm.functionTimeOutApplicant) {
+      //   clearTimeout(vm.functionTimeOutApplicant)
+      // }
+      // vm.functionTimeOutApplicant = setTimeout(function () {
         return new Promise(resolve => {
           vm.$store.dispatch('loadInitResource').then(result => {
             let param = {
@@ -872,7 +870,7 @@ export default {
             })
           })
         })
-      }, 1000)
+      // }, 1000)
     },
     onSearchItemSelected (item) {
       var vm = this
