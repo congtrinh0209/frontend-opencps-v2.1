@@ -954,7 +954,7 @@ export default {
         }
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {
           vm.activeTab2 = 'tabs-3b'
-          vm.loadDossierLogs()
+          // vm.loadDossierLogs()
         }
         if (vm.originality === 3) {
           vm.runComment()
@@ -966,10 +966,9 @@ export default {
         //     vm.documents.push(resultDocuments)
         //   }
         // })
-        vm.$store.dispatch('getListDossierFiles', data).then(result => {
-          vm.listDossierFiles = result
-          // console.log('listDossierFiles', vm.listDossierFiles)
-        })
+        // vm.$store.dispatch('getListDossierFiles', data).then(result => {
+        //   vm.listDossierFiles = result
+        // })
         // if (vm.$refs.thanhphanhoso) {
         //   vm.$refs.thanhphanhoso.initData(resultDossier)
         // }
@@ -2170,7 +2169,7 @@ export default {
           }
         }
         // lấy danh sách user reAsign
-        vm.loadUserReAsign()
+        // vm.loadUserReAsign()
       })
       // vm.$store.dispatch('loadPlugins', {
       //   dossierId: vm.thongTinChiTietHoSo.dossierId

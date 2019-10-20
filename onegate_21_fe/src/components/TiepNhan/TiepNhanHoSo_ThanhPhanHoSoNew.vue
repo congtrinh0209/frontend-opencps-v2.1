@@ -580,31 +580,31 @@ export default {
         vm.sampleCount = data['sampleCount']
       }
       arrTemp.push(vm.$store.dispatch('loadDossierTemplates', data))
-      arrTemp.push(vm.$store.dispatch('loadDossierMark', data))
+      // arrTemp.push(vm.$store.dispatch('loadDossierMark', data))
       arrTemp.push(vm.$store.dispatch('loadDossierFiles', data.dossierId))
       arrTemp.push(vm.$store.dispatch('getServiceInfo', {
         serviceInfoId: data.serviceCode
       }))
       Promise.all(arrTemp).then(values => {
         var dossierTemplates = values[0]
-        var dossierMarks = values[1]
-        var dossierFiles = values[2]
+        // var dossierMarks = values[1]
+        var dossierFiles = values[1]
         var fileTemplates = []
-        if (values[3].hasOwnProperty('serviceInfoId')) {
-          vm.serviceInfoId = values[3].serviceInfoId
+        if (values[2].hasOwnProperty('serviceInfoId')) {
+          vm.serviceInfoId = values[2].serviceInfoId
         }
-        if (values[3].fileTemplates) {
-          if (Array.isArray(values[3].fileTemplates)) {
-            fileTemplates = values[3].fileTemplates
+        if (values[2].fileTemplates) {
+          if (Array.isArray(values[2].fileTemplates)) {
+            fileTemplates = values[2].fileTemplates
           } else {
-            fileTemplates.push(values[3].fileTemplates)
+            fileTemplates.push(values[2].fileTemplates)
           }
         }
         var dossierTemplateItems = vm.mergeDossierTemplateVsDossierFiles(dossierTemplates, dossierFiles)
-        dossierTemplateItems = vm.mergeDossierTemplateVsDossierMark(dossierTemplateItems, dossierMarks)
+        // dossierTemplateItems = vm.mergeDossierTemplateVsDossierMark(dossierTemplateItems, dossierMarks)
         dossierTemplateItems = vm.mergeDossierTemplateVsFileTemplates(dossierTemplateItems, fileTemplates)
         vm.dossierFilesItems = dossierFiles
-        vm.dossierMarksItems = dossierMarks
+        // vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
         vm.dossierTemplateItems = dossierTemplateItems
         if ((vm.partTypes.includes(2) || vm.partTypes.includes(7)) && vm.dossierTemplateItems.length > 0) {
