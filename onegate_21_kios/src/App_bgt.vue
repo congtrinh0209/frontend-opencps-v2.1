@@ -125,10 +125,13 @@
           }
         }
         // 
-        vm.$store.dispatch('getGovAgency').then(function (result) {
-          vm.govAgencyList = result
-          vm.isDvc = vm.govAgencyList.length > 1
-        }).catch(reject => {})
+        if (current['path'] && current['path'] !== '/tra-cuu-ho-so-homepage') {
+          vm.$store.dispatch('getGovAgency').then(function (result) {
+            vm.govAgencyList = result
+            vm.isDvc = vm.govAgencyList.length > 1
+          }).catch(reject => {})
+        } else {
+        }
       })
     },
     beforeDestroy () {

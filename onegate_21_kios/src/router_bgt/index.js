@@ -1,6 +1,5 @@
 import Vue from 'vue/dist/vue.min.js'
 import Router from 'vue-router'
-import Landing from '@/components/Landing'
 import TraCuuHoSo from '@/components/TraCuuHoSo'
 import TrangChu from '@/components/TrangChu'
 import ChiTietHoSo from '@/components/ChiTietHoSo'

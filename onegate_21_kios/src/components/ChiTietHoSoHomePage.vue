@@ -174,7 +174,6 @@
 </template>
 <script>
   import router from '@/router'
-  import Vue from 'vue/dist/vue.min.js'
   export default {
     props: ['index'],
     components: {
