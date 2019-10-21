@@ -714,7 +714,7 @@ export const store = new Vuex.Store({
             formData.append('fileType', file.type)
             formData.append('fileSize', file.size)
             formData.append('isSync', 'false')
-            formData.append('file', file, fileName)
+            // formData.append('file', file, fileName)
             formData.append('dossierPartNo', data.partNo)
             formData.append('dossierTemplateNo', data.dossierTemplateNo)
             formData.append('fileTemplateNo', data.fileTemplateNo)
@@ -1562,9 +1562,8 @@ export const store = new Vuex.Store({
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           commit('setLoading', false)
-          store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+          // store.dispatch('getActiveGetCounter', !state.activeGetCounter)
         }).catch(function (xhr) {
           reject(xhr)
           toastr.clear()

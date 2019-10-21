@@ -209,9 +209,9 @@
         } else {
           vm.currentStep = '0'
         }
-        if (currentQuery.hasOwnProperty('recount')) {
-          vm.loadingCounter()
-        }
+        // if (currentQuery.hasOwnProperty('recount')) {
+        //   vm.loadingCounter()
+        // }
         if (currentParams.hasOwnProperty('id')) {
           vm.detailState = 1
         } else {
@@ -221,7 +221,7 @@
       activeGetCounter (val) {
         var vm = this
         setTimeout(function () {
-          vm.loadingCounter()
+          // vm.loadingCounter()
         }, 300)
       }
     },

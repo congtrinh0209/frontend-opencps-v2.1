@@ -52,14 +52,14 @@
         vm.$store.dispatch('getDetailDossier', vm.id).then(resultDossier => {
           vm.thongTinChungHoSo = resultDossier
           let arrTemp = []
-          arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
-          arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
-          Promise.all(arrTemp).then(results => {
-            vm.dossierTemplateItems = results[0]
-            vm.dossierFilesItems = results[1]
-            vm.dossierTemplateSendItems = vm.filterDossierTemplateSend()
-          }).catch(xhr => {
-          })
+          // arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
+          // arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
+          // Promise.all(arrTemp).then(results => {
+          //   vm.dossierTemplateItems = results[0]
+          //   vm.dossierFilesItems = results[1]
+          //   vm.dossierTemplateSendItems = vm.filterDossierTemplateSend()
+          // }).catch(xhr => {
+          // })
         })
       })
     },
