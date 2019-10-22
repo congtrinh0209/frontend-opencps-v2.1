@@ -41,6 +41,7 @@
 
 <script>
   import GoTop from '@inotom/vue-go-top'
+  import dataSource from './store/data.json'
   export default {
     data: () => ({
       active: null,
@@ -179,19 +180,20 @@
         let filterDomain = {
           agencyCode: ''
         }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.menuServiceInfos[1].children = result
-          vm.$store.commit('setDomainList', result)
+        // vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.menuServiceInfos[1].children = dataSource['domains']
+          vm.$store.commit('setDomainList', dataSource['domains'])
           vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-        })
-        vm.$store.dispatch('getLevelList').then(function (result) {
-          vm.menuServiceInfos[2].children = result
-          vm.$store.commit('setLevelList', result)
+        // })
+        // vm.$store.dispatch('getLevelList').then(function (result) {
+          vm.menuServiceInfos[2].children = dataSource['levels']
+          vm.$store.commit('setLevelList', dataSource['levels'])
           vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
-        })
+        // })
         vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
         vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
-        vm.getCountAll()
+        // vm.getCountAll()
+        vm.countAllService = 329
       })
     },
     watch: {

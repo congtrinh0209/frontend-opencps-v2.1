@@ -1,0 +1,78 @@
+{
+  "domains": [
+    {
+      "domainCode": "BGTVT_DB",
+      "domainName": "Đường bộ",
+      "count": "65"
+    },
+    {
+      "domainCode": "BGTVT_HK",
+      "domainName": "Hàng không",
+      "count": "136"
+    },
+    {
+      "domainCode": "BGTVT_HH",
+      "domainName": "Hàng hải",
+      "count": "20"
+    },
+    {
+      "domainCode": "BGTVT_DTND",
+      "domainName": "Đường thủy nội địa",
+      "count": "61"
+    },
+    {
+      "domainCode": "BGTVT_DS",
+      "domainName": "Đường sắt",
+      "count": "15"
+    },
+    {
+      "domainCode": "BGTVT_DK",
+      "domainName": "Đăng kiểm",
+      "count": "30"
+    },
+    {
+      "domainCode": "BGTVT_LVK",
+      "domainName": "Lĩnh vực khác",
+      "count": "2"
+    }
+  ],
+  "domainsVPB": [
+    {
+      "domainCode": "BGTVT_DB",
+      "domainName": "Đường bộ",
+      "count": "3"
+    },
+    {
+      "domainCode": "BGTVT_HH",
+      "domainName": "Hàng hải",
+      "count": "10"
+    },
+    {
+      "domainCode": "BGTVT_DS",
+      "domainName": "Đường sắt",
+      "count": "4"
+    },
+    {
+      "domainCode": "BGTVT_LVK",
+      "domainName": "Lĩnh vực khác",
+      "count": "2"
+    }
+  ],
+  "levels": [
+    {
+      "level": 2,
+      "count": 193,
+      "levelName": 2
+    },
+    {
+      "level": 3,
+      "count": 131,
+      "levelName": 3
+    },
+    {
+      "level": 4,
+      "count": 5,
+      "levelName": 4
+    }
+  ]
+}

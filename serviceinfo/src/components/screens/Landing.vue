@@ -357,6 +357,7 @@
 import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
+import dataSource from '../../store/data.json'
 import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
 Vue.use(toastr)
@@ -437,19 +438,33 @@ export default {
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       if (currentQuery.hasOwnProperty('agency')) {
-        let filterDomain = {
-          agencyCode: currentQuery['agency']
+        // let filterDomain = {
+        //   agencyCode: currentQuery['agency']
+        // }
+        // vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+        //   vm.domainListCurrent = result
+        // })
+        if (currentQuery['agency'] === 'BGTVT_VPB') {
+          vm.domainListCurrent = dataSource['domainsVPB']
+        } else if (currentQuery['agency'] === 'CDSVN') {
+          vm.domainListCurrent = [{
+            "domainCode": "BGTVT_DS",
+            "domainName": "Đường sắt",
+            "count": "15"
+          }]
+        } else {
+          vm.domainListCurrent = dataSource['domains'].filter(function(item) {
+            return item['domainCode'] === currentQuery['agency']
+          })
         }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
       } else {
-        let filterDomain = {
-          agencyCode: ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
+        // let filterDomain = {
+        //   agencyCode: ''
+        // }
+        // vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+        //   vm.domainListCurrent = result
+        // })
+        vm.domainListCurrent = dataSource['domains']
       }
       vm.doLoadingThuTuc()
     })
@@ -466,15 +481,25 @@ export default {
       let currentQuery = newRoute.query
       vm.domainListCurrent = []
       if (currentQuery.hasOwnProperty('agency')) {
-        let filterDomain = {
-          agencyCode: currentQuery['agency']
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
-        // vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
-        //   return (itemLinhVuc.domainCode.indexOf(currentQuery.agency) === 0)
+        // let filterDomain = {
+        //   agencyCode: currentQuery['agency']
+        // }
+        // vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+        //   vm.domainListCurrent = result
         // })
+        if (currentQuery['agency'] === 'BGTVT_VPB') {
+          vm.domainListCurrent = dataSource['domainsVPB']
+        } else if (currentQuery['agency'] === 'CDSVN') {
+          vm.domainListCurrent = [{
+            "domainCode": "BGTVT_DS",
+            "domainName": "Đường sắt",
+            "count": "15"
+          }]
+        } else {
+          vm.domainListCurrent = dataSource['domains'].filter(function(item) {
+            return item['domainCode'] === currentQuery['agency']
+          })
+        }
       } else {
         vm.domainListCurrent = vm.domainList
       }
