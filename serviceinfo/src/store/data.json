@@ -62,17 +62,17 @@
     {
       "level": 2,
       "count": 193,
-      "levelName": 2
+      "levelName": "Mức độ 2"
     },
     {
       "level": 3,
       "count": 131,
-      "levelName": 3
+      "levelName": "Mức độ 3"
     },
     {
       "level": 4,
       "count": 5,
-      "levelName": 4
+      "levelName": "Mức độ 4"
     }
   ]
 }
