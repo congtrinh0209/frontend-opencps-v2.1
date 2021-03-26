@@ -3302,7 +3302,30 @@ export const store = new Vuex.Store({
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {
-            console.log(error)
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    printPayVnpt ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            responseType: 'blob'
+          }
+          let formData = new URLSearchParams()
+          formData.append('dossierId', filter.dossierId)
+          axios.post('/o/rest/v2/postal/downloadInvPDFFkeyNoPay', formData, param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
@@ -5307,10 +5330,12 @@ export const store = new Vuex.Store({
         applicantIdNo: payload.applicantIdNo,
         applicantName: payload.applicantName,
         address: payload.address,
-        // cityCode: payload.cityCode,
         cityCode: payload.cityCode,
         districtCode: payload.districtCode,
         wardCode: payload.wardCode,
+        cityName: payload.hasOwnProperty('cityName') ? payload.cityName : '',
+        districtName: payload.hasOwnProperty('districtName') ? payload.districtName : '',
+        wardName: payload.hasOwnProperty('wardName') ? payload.wardName : '',
         contactEmail: payload.contactEmail,
         contactTelNo: payload.contactTelNo,
         userType: userTypeCondition
