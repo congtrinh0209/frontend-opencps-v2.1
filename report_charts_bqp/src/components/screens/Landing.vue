@@ -320,25 +320,8 @@ export default {
     agencyLists: [],
     agencyListsMonth: [],
     group: '',
-    years: [
-      {
-        'value': '2020',
-        'name': 'Năm 2020'
-      },
-      {
-        'value': '2019',
-        'name': 'Năm 2019'
-      },
-      {
-        'value': '2018',
-        'name': 'Năm 2018'
-      },
-      {
-        'value': '2017',
-        'name': 'Năm 2017'
-      }
-    ],
-    year: (new Date()).getFullYear() + '',
+    years: [],
+    year: (new Date()).getFullYear(),
     months: [
       {
         'value': '0',
@@ -705,6 +688,16 @@ export default {
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
       let currentQuerys = vm.$router.history.current.query
+      let arr = [];
+      let year = new Date().getFullYear();
+      for (let i = 0; i <= 3; i++) {
+        arr.push({ name: "Năm " + (year - i), value: year - i });
+      }
+      vm.years = arr
+      try {
+        vm.years = yearsConfig
+      } catch (error) {
+      }
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
         vm.isCallBack = false
         vm.reportGovName = ''
