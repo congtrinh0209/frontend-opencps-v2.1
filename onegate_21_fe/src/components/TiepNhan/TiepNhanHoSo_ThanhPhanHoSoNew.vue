@@ -353,7 +353,7 @@
                 <span>Xem</span>
               </v-tooltip>
 
-              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && !khoTaiLieuCongDan">
+              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
                     <v-icon size="24" color="#004b94">cloud_upload</v-icon>
@@ -362,40 +362,13 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                 <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
-              <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView && !khoTaiLieuCongDan">
+              <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
                   <v-badge>
                     <v-icon size="24" color="orange darken-3">folder</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>
-              </v-tooltip>
-              <!-- <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
-                  <v-badge>
-                    <v-icon size="24" color="orange darken-3">folder</v-icon>
-                  </v-badge>
-                </v-btn>
-                <span>Giấy tờ đã nộp</span>
-              </v-tooltip> -->
-
-              <!-- Sử dụng kho tài liệu công dân -->
-              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
-                  <v-badge>
-                    <v-icon size="24" color="#004b94">cloud_upload</v-icon>
-                  </v-badge>
-                </v-btn>
-                <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ từ máy</span>
-                <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
-              </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView && khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
-                  <v-badge>
-                    <v-icon size="20" color="orange darken-3">storage</v-icon>
-                  </v-badge>
-                </v-btn>
-                <span>Tải giấy tờ từ kho</span>
               </v-tooltip>
               <!-- end -->
 
@@ -501,21 +474,6 @@
         </div>
         <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="dialog_documentApplicant" scrollable persistent max-width="1300px">
-      <v-card>
-        <v-toolbar dark color="primary">
-          <v-toolbar-title>Kho tài liệu công dân, tổ chức, doanh nghiệp</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialog_documentApplicant = false">
-            <v-icon>close</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-card-text class="py-1">
-          <kho-tai-lieu ref="khotailieu" :index="applicantId" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
-        </v-card-text>
       </v-card>
     </v-dialog>
     <!-- ký số điện tử -->
@@ -836,7 +794,6 @@ export default {
         }
       },
     },
-    khoTaiLieuCongDan: false,
     allFileMark: false,
     render: true,
     showKySo: false,
@@ -849,10 +806,6 @@ export default {
     let vm = this
     vm.receiveMessage = function (event) {
       vm.saveAlpacaFormCallBack(event)
-    }
-    try {
-      vm.khoTaiLieuCongDan = khoTaiLieuCongDan
-    } catch (error) {
     }
     try {
       vm.showKySo = showKySoDvc
@@ -1076,11 +1029,7 @@ export default {
         vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
-          // setTimeout(function () {
-            if (vm.applicantId && !vm.onlyView && !vm.khoTaiLieuCongDan) {
-              vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
-            }
-          // }, 500)
+          vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
         }
         // autoExpand form
         setTimeout(function () {
@@ -2098,9 +2047,6 @@ export default {
         if (!vm.onlyView) {
           divPx += 90
         }
-        if (vm.khoTaiLieuCongDan) {
-          divPx += 40
-        }
         return 'calc(100% - ' + divPx + 'px)'
       }
     },
@@ -2265,20 +2211,11 @@ export default {
         applicantIdNo: applicantIdNo,
         fileTemplateNo: fileTemplateNo
       }
-      if (!vm.khoTaiLieuCongDan) {
-        vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
-          vm.dossierFilesApplicant = result
-        }).catch(reject => {
-          console.log('error')
-        })
-      } else {
-        filter['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
-        vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
-          vm.dossierFilesApplicant = result
-        }).catch(reject => {
-          console.log('error')
-        })
-      }
+      vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+        vm.dossierFilesApplicant = result
+      }).catch(reject => {
+        console.log('error')
+      })
     },
     showFilesApplicant (partNo) {
       let vm = this
