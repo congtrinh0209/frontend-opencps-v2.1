@@ -22,7 +22,7 @@
                       Tra cứu CSDL Quốc Gia
                     </v-btn>
                   </v-flex>
-                  <!-- <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '1' && traCuuLgspCongDan">
+                  <v-flex xs12 class="text-right" v-if="originality === 3 && thongTinChuHoSo.userType === '1' && traCuuLgspCongDan">
                     <v-btn :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary" @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -32,7 +32,7 @@
                       <span v-if="!loadingSearchLgsp">Kiểm tra thông tin công dân</span>
                       <span v-if="loadingSearchLgsp">Đang kiểm tra thông tin công dân</span>
                     </v-btn>
-                  </v-flex> -->
+                  </v-flex>
                   <v-layout wrap>
                     <v-flex xs12 v-if="originality == '3' && thongTinChuHoSo.userType == '1' && traCuuLgspCongDan && warningLgsp" class="mb-2">
                       <v-alert
@@ -2207,9 +2207,12 @@ export default {
         applicantIdNo: vm.applicantIdNoLgsp.trim()
       }
       if (vm.applicantIdNoLgsp.trim()) {
+        vm.loadingSearchLgsp = true
         vm.$store.dispatch('searchLgspDoanhNghiep', filter).then(result => {
+          vm.loadingSearchLgsp = false
           vm.applicantLgspInfomation = result
         }).catch(xhr => {
+          vm.loadingSearchLgsp = false
           vm.applicantLgspInfomation = false
         })
       } else {
