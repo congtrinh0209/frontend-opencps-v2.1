@@ -969,7 +969,7 @@
       },
       formatDataInput (item) {
         let vm = this
-        vm.data[item['model']] = String(vm.data[item['model']]).trim()
+        vm.data[item['model']] = vm.data[item['model']] ? String(vm.data[item['model']]).trim() : ''
       },
       getCurrentDate () {
         let date1 = new Date()
