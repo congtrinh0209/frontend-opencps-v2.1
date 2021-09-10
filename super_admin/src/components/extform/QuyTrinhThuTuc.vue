@@ -57,7 +57,7 @@
                       :rules="[rules.required, rules.varchar75, rules.syntaxError]"
                       :maxlength="75"
                       :counter="75"
-                      @blur="formatDataInput()"
+                      @blur="formatDataInput('currentProcess', 'processNo')"
                       required
                     >
                       <template slot="label">Số hiệu quy trình <span class="red--text darken-3">*</span></template>
@@ -72,6 +72,7 @@
                       :maxlength="500"
                       :counter="500"
                       required
+                      @blur="formatDataInput('currentProcess', 'processName')"
                     >
                       <template slot="label">Tên quy trình <span class="red--text darken-3">*</span></template>
                     </v-text-field>
@@ -85,6 +86,7 @@
                       :rules="[rules.varchar2000, rules.syntaxError]"
                       :maxlength="2000"
                       :counter="2000"
+                      @blur="formatDataInput('currentProcess', 'description')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -98,6 +100,7 @@
                           :maxlength="75"
                           :counter="75"
                           required
+                          @blur="formatDataInput('currentProcess', 'durationCount')"
                         >
                         <template slot="label">Thời gian xử lý <span class="red--text darken-3">*</span></template>
                         </v-text-field>
@@ -150,6 +153,7 @@
                           :rules="[rules.varchar500, rules.syntaxError]"
                           :maxlength="500"
                           :counter="500"
+                          @blur="formatDataInput('processCondition')"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2 text-xs-right">
@@ -198,6 +202,7 @@
                           :rules="[rules.varchar500, rules.syntaxError]"
                           :maxlength="500"
                           :counter="500"
+                          @blur="formatDataInput('sequenceName')"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2">
@@ -208,6 +213,7 @@
                           :rules="[rules.varchar75, rules.syntaxError]"
                           :maxlength="75"
                           :counter="75"
+                          @blur="formatDataInput('sequenceNo')"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2">
@@ -218,6 +224,7 @@
                           :rules="[rules.varchar500, rules.syntaxError]"
                           :maxlength="500"
                           :counter="500"
+                          @blur="formatDataInput('sequenceRole')"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2">
@@ -229,6 +236,7 @@
                           :rules="[rules.varchar75]"
                           :maxlength="75"
                           :counter="75"
+                          @blur="formatDataInput('sequenceDurationCount')"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2 text-xs-right">
@@ -280,6 +288,7 @@
                           :disabled="currentProcess.generateDossierNo?false:true"
                           :maxlength="500"
                           :counter="500"
+                          @blur="formatDataInput('currentProcess', 'dossierNoPattern')"
                         >
                           <template slot="label">Cấu hình sinh mã số hồ sơ <span v-if="currentProcess.generateDossierNo" class="red--text darken-3">*</span></template>
                         </v-text-field>
@@ -294,6 +303,7 @@
                           :disabled="currentProcess.generateDueDate?false:true"
                           :maxlength="500"
                           :counter="500"
+                          @blur="formatDataInput('currentProcess', 'dueDatePattern')"
                         >
                           <template slot="label">Cấu hình sinh ngày hẹn trả <span v-if="currentProcess.generateDueDate" class="red--text darken-3">*</span></template>
                         </v-text-field>
@@ -320,6 +330,7 @@
                         :rules="[rules.varchar500, rules.syntaxError]"
                         :maxlength="500"
                         :counter="500"
+                        @blur="formatDataInput('currentProcess', 'dossierGroupPattern')"
                       >
                         <template slot="label">Cấu hình sinh mã nhóm hồ sơ</template>
                       </v-text-field>
@@ -332,6 +343,7 @@
                         :rules="[rules.required, rules.varchar75, rules.syntaxError]"
                         :maxlength="75"
                         :counter="75"
+                        @blur="formatDataInput('currentProcess', 'serverNo')"
                       >
                         <template slot="label">Server đồng bộ  <span class="red--text darken-3">*</span></template>
                       </v-text-field>
@@ -448,6 +460,7 @@
                       :maxlength="500"
                       :counter="500"
                       required
+                      @blur="formatDataInput('currentStep', 'stepName')"
                     >
                       <template slot="label">Tên bước  <span class="red--text darken-3">*</span></template>
                     </v-text-field>
@@ -460,6 +473,7 @@
                       :rules="[rules.varchar75, rules.syntaxError]"
                       :maxlength="75"
                       :counter="75"
+                      @blur="formatDataInput('currentStep', 'sequenceNo')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -493,6 +507,7 @@
                       :maxlength="75"
                       :counter="75"
                       required
+                      @blur="formatDataInput('currentStep', 'stepCode')"
                     >
                       <template slot="label">Mã bước quy trình <span class="red--text darken-3">*</span></template>
                     </v-text-field>
@@ -525,6 +540,7 @@
                       :rules="[rules.varchar500, rules.syntaxError]"
                       :maxlength="500"
                       :counter="500"
+                      @blur="formatDataInput('currentStep', 'durationCount')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -536,6 +552,7 @@
                       :rules="[rules.varchar500, rules.syntaxError]"
                       :maxlength="500"
                       :counter="500"
+                      @blur="formatDataInput('currentStep', 'roleAsStep')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -575,6 +592,7 @@
                           :rules="[rules.varchar500, rules.syntaxError]"
                           :maxlength="500"
                           :counter="500"
+                          @blur="formatDataInput('stepCondition')"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="pl-2 text-xs-right">
@@ -626,6 +644,7 @@
                       v-model="currentStep.stepInstruction"
                       box
                       row
+                      @blur="formatDataInput('currentStep', 'stepInstruction')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -634,6 +653,7 @@
                       label="Tóm tắt hồ sơ"
                       v-model="currentStep.briefNote"
                       box
+                      @blur="formatDataInput('currentStep', 'briefNote')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -642,6 +662,7 @@
                       label="Nhúng ajax của phần nghiệp vụ"
                       v-model="currentStep.customProcessUrl"
                       box
+                      @blur="formatDataInput('currentStep', 'customProcessUrl')"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6>
@@ -773,6 +794,7 @@
                       :rules="[rules.required, rules.varchar500, rules.syntaxError]"
                       :maxlength="500"
                       :counter="500"
+                      @blur="formatDataInput('currentAction', 'actionName')"
                     >
                       <template slot="label">Tên thao tác <span class="red--text darken-3">*</span></template>
                     </v-text-field>
@@ -784,6 +806,7 @@
                       :rules="[rules.required, rules.varchar75, rules.syntaxError]"
                       :maxlength="75"
                       :counter="75"
+                      @blur="formatDataInput('currentAction', 'actionCode')"
                     >
                       <template slot="label">Mã thao tác <span class="red--text darken-3">*</span></template>
                     </v-text-field>
@@ -797,6 +820,7 @@
                       :rules="[rules.varchar500, rules.syntaxError]"
                       :maxlength="500"
                       :counter="500"
+                      @blur="formatDataInput('currentAction', 'preCondition')"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
@@ -948,6 +972,7 @@
                       label="Chuỗi cấu hình tính phí"
                       v-model="currentAction.paymentFee"
                       box
+                      @blur="formatDataInput('currentAction', 'paymentFee')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -956,6 +981,7 @@
                       label="Mã đồng bộ"
                       v-model="currentAction.syncActionCode"
                       box
+                      @blur="formatDataInput('currentAction', 'syncActionCode')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -975,6 +1001,7 @@
                       label="Cấu hình cơ quan"
                       v-model="currentAction.createDossier"
                       box
+                      @blur="formatDataInput('currentAction', 'createDossier')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -983,6 +1010,7 @@
                       label="Cấu hình panel nhập ý kiến"
                       v-model="currentAction.configNote"
                       box
+                      @blur="formatDataInput('currentAction', 'configNote')"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12>
@@ -993,6 +1021,7 @@
                       :rules="[rules.varchar500, rules.syntaxError]"
                       :maxlength="500"
                       :counter="500"
+                      @blur="formatDataInput('currentAction', 'postAction')"
                     ></v-text-field>
                   </v-flex>
                   <!--  -->
@@ -1482,6 +1511,10 @@
       }
     },
     methods: {
+      formatDataInput (model, key) {
+        let vm = this
+        vm[model][key] = vm[model][key] ? String(vm[model][key]).trim() : ''
+      },
       getJobpos () {
         var vm = this
         vm.$store.dispatch('getJobposList').then(function (result) {

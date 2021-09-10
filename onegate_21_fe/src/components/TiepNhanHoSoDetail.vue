@@ -1,5 +1,6 @@
 <template>
   <div>
+    <vue-confirm-dialog></vue-confirm-dialog>
     <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
       <div v-if="formTemplate === 'version_1.0'">
         <div class="row-header">
@@ -614,6 +615,7 @@
 
 <script>
 
+import Vue from 'vue'
 import toastr from 'toastr'
 import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
@@ -626,6 +628,12 @@ import DichVuChuyenPhatHoSo from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatHoSo.v
 // import ThongTinCongVan from './TiepNhan/TiepNhanHoSo_ThongTinCongVan.vue'
 // import ThongTinChuHoSoCongVan from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSoCongVan.vue'
 import TinyPagination from './pagging/opencps_pagination.vue'
+
+import VueConfirmDialog from 'vue-confirm-dialog'
+Vue.use(VueConfirmDialog)
+Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
+
+
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -1356,24 +1364,51 @@ export default {
                   dueDate: tempData.dueDate
                 }
                 if (type && type === 'send') {
-                  let x = confirm('Bạn có chắc chắn gửi hồ sơ này?')
-                  if (x) {
-                    vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-                      vm.loadingAction = false
-                      // cập nhật notify config
-                      vm.updateMetaData()
-                      vm.$router.push({
-                        path: '/danh-sach-ho-so/' + vm.index,
-                        query: {
-                          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                          q: vm.menuConfigsToDo[vm.index]['queryParams']
-                        }
-                      })
-                      vm.tiepNhanState = false
-                    })
-                  } else {
-                    vm.loadingAction = false
-                  }
+                  // let x = confirm('Bạn có chắc chắn gửi hồ sơ này?')
+                  vm.$confirm({
+                    title: 'Xác nhận gửi hồ sơ',
+                    message: 'Bạn có chắc chắn gửi hồ sơ này?',
+                    button: {
+                      yes: 'Có',
+                      no: 'Không'
+                    },
+                    callback: confirm => {
+                      if (confirm == true) {
+                        vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                          vm.loadingAction = false
+                          // cập nhật notify config
+                          vm.updateMetaData()
+                          vm.$router.push({
+                            path: '/danh-sach-ho-so/' + vm.index,
+                            query: {
+                              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                              q: vm.menuConfigsToDo[vm.index]['queryParams']
+                            }
+                          })
+                          vm.tiepNhanState = false
+                        })
+                      } else {
+                        vm.loadingAction = false
+                      }
+                    }
+                  })
+                  // if (x) {
+                  //   vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                  //     vm.loadingAction = false
+                  //     // cập nhật notify config
+                  //     vm.updateMetaData()
+                  //     vm.$router.push({
+                  //       path: '/danh-sach-ho-so/' + vm.index,
+                  //       query: {
+                  //         renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                  //         q: vm.menuConfigsToDo[vm.index]['queryParams']
+                  //       }
+                  //     })
+                  //     vm.tiepNhanState = false
+                  //   })
+                  // } else {
+                  //   vm.loadingAction = false
+                  // }
                 } else {
                   vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
                     vm.loadingAction = false
