@@ -398,8 +398,7 @@ export const store = new Vuex.Store({
             }
           }
           axios.get('/o/v1/opencps/users/avatar/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
-            let seriable = response.data
-            resolve(seriable)
+            resolve()
           }).catch(function (xhr) {
             reject(xhr)
             commit('setsnackbarerror', true)

@@ -1,6 +1,6 @@
 <template>
 <div>
-  <v-form ref="form" v-model="valid" lazy-validation>
+  <v-form ref="form" v-model="valid" lazy-validation v-if="showActive">
     <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
       margin-bottom: 100px;
     ">
@@ -538,6 +538,7 @@
     },
     data() {
       return {
+        showActive: true,
         alertFail: false,
         alertSuccess: false,
         dialogChangeMail: false,
@@ -864,7 +865,7 @@
               vm.processDataSource()
             }
             vm.loading = false
-            if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
+            if (dataObj['status'] == '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
               let current = vm.$router.history.current
               let newQuery = current.query
               let currentPath = current.path
@@ -880,9 +881,20 @@
               vm.$router.push({
                 path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
               })
-            } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
-              vm.snackbarsuccess = true
-              vm.data = {}
+            } else if (dataObj['status'] == '200' && dataObj['cmd'] === 'cmd_ide') {
+              setTimeout(function () {
+                window.location.reload()
+              }, 300)
+              // vm.snackbarsuccess = true
+              // vm.showActive = false
+              // vm.data = {}
+              // vm.showActive = true
+              $('html, body').animate({
+                    scrollTop: $('#toTop').offset().top,
+                  },
+                  200,
+                  'linear'
+                )
             }
             if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
               vm.pullCounter = vm.pullCounter - 1
