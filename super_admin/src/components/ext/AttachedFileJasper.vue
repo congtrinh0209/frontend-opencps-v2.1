@@ -21,15 +21,26 @@
                   line-height: 10px;
                 ">
                 <span :class="['icon sf-icon-txt']"></span>
-                <div class='name file-name' style="
+                <div class='name file-name fileNameJasper' style="
                       line-height: 42px;
                       padding-left: 10px;
                   ">
                   File cấu hình JASPER
                 </div>
-                <v-btn flat icon color="primary" 
+                <v-btn flat icon color="primary" v-if="!formReportIdDeliverableType"
                   :href="avatarData"
                   target="_blank"
+                    :loading="loading"
+                    :disabled="loading"
+                    style="
+                      position: absolute;
+                      right: 5px;
+                      top: 8px;
+                    ">
+                    <v-icon size="14">link</v-icon>
+                  </v-btn>
+                  <v-btn flat icon color="primary" v-else
+                  @click="loadFile(formReportIdDeliverableType)"
                     :loading="loading"
                     :disabled="loading"
                     style="
@@ -42,8 +53,8 @@
                   </span>
                 </div>
               </li>
-            </ul>
-          </div>
+          </ul>
+        </div>
       </div>
     </v-flex>
   </v-layout>
@@ -51,6 +62,7 @@
 
 <script>
   import Vue from 'vue'
+  import axios from 'axios'
   /* eslint-disable */
   import {
     UploaderPlugin
@@ -78,7 +90,8 @@
         extensions: '.txt',
         dropAreaJasper: "dropAreaJasper",
         rawData: [],
-        className: ''
+        className: '',
+        formReportIdDeliverableType: ''
       }
     },
     props: ['pickItem', 'pk', 'code'],
@@ -108,28 +121,57 @@
       loadImageComponent() {
         let vm = this
         vm.fileTotal = 0
-        let filter = {
-          pk: vm.pk,
-          className: vm.className
-        }
-        vm.noAvatar = true
-        vm.avatarData = ''
-        vm.$store.dispatch('getImageComponent', filter).then(function (data) {
-          if (data !== '' && data !== null) {
-            vm.noAvatar = false
-            let portalURL = ''
-            if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-              portalURL = themeDisplay.getPortalURL()
-            }
-            vm.avatarData = portalURL + data
-            vm.fileTotal = 1
+        if (vm.code === 'opencps_deliverabletype') {
+          let textPost = {
+            'type': 'admin',
+            'cmd': 'get',
+            'code': 'opencps_deliverabletype',
+            'respone': 'detail',
+            'responeType': 'detail',
+            'filter': [
+              {
+                'key': 'id',
+                'value_filter': vm.pk,
+                'compare': '=',
+                'type': 'number'
+              }
+            ]
           }
-        })
+          let dataPost = new URLSearchParams();
+          dataPost.append('text', JSON.stringify(textPost))
+          axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+            let dataObj = response.data['detail'][0]
+            vm.formReportIdDeliverableType = dataObj['formReportFileId']
+            if (vm.formReportIdDeliverableType) {
+              vm.fileTotal = 1
+            }
+          }).catch(function (error) {
+          })
+        } else {
+          let filter = {
+            pk: vm.pk,
+            className: vm.className
+          }
+          vm.noAvatar = true
+          vm.avatarData = ''
+          vm.$store.dispatch('getImageComponent', filter).then(function (data) {
+            if (data !== '' && data !== null) {
+              vm.noAvatar = false
+              let portalURL = ''
+              if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+                portalURL = themeDisplay.getPortalURL()
+              }
+              vm.avatarData = portalURL + data
+              vm.fileTotal = 1
+            }
+          })
+        }
       },
       onSuccess: function() {
         setTimeout(() => {
           document.getElementById('dropAreaJasper').querySelectorAll(".e-upload-success").forEach(e => e.parentNode.removeChild(e))
-          this.loadImageComponent()
+          $(".fileNameJasper").html($('#dropAreaJasper .e-file-select input')[0].files[0]['name'])
+          // this.loadImageComponent()
         }, 2000)
       },
       onFileRemove: function(args) {
@@ -144,6 +186,10 @@
           vm.loading = false
           alert('Tải file xảy ra lỗi.' + reject)
         })
+      },
+      loadFile(id) {
+        let vm = this
+
       }
     }
   }
