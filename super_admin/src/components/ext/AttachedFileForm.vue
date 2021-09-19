@@ -177,9 +177,18 @@
       onFileRemove: function(args) {
         args.postRawFile = false
       },
-      loadFile(id) {
+      loadFile(idFile) {
         let vm = this
-        
+        vm.loading = true
+        let filter = {
+          id: idFile,
+          type: 'formScript'
+        }
+        vm.$store.dispatch('downLoadFileFormDeliverable', filter).then(function () {
+          vm.loading = false
+        }).catch(reject => {
+          vm.loading = false
+        })
       }
     }
   }

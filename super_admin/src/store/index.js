@@ -2680,6 +2680,37 @@ export const store = new Vuex.Store({
         })
       })
     },
+    downLoadFileFormDeliverable ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+             'Content-Type': 'x-www-form-urlencoded',
+             'Accept': 'application/json',
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob',
+            params: {}
+          }
+          axios.get('/o/rest/v2/dossiers/lgsp/download/' + filter.id, param).then(function (response) {
+            let fileNames = response.headers['content-disposition']
+            let fileName = fileNames.split('filename=')[1] || 'danhsach'
+            fileName = fileName.split('"').join('')
+            let a = document.createElement('a')
+            document.body.appendChild(a)
+            a.style = 'display: none'
+            let url = window.URL.createObjectURL(response.data)
+            a.href = url
+            a.download = fileName
+            a.click()
+            window.URL.revokeObjectURL(url)
+            resolve(response.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
   },
   mutations: {
     SOCKET_ONOPEN (state, event)  {

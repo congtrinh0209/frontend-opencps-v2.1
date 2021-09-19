@@ -187,9 +187,18 @@
           alert('Tải file xảy ra lỗi.' + reject)
         })
       },
-      loadFile(id) {
+      loadFile(idFile) {
         let vm = this
-
+        vm.loading = true
+        let filter = {
+          id: idFile,
+          type: 'formJasper'
+        }
+        vm.$store.dispatch('downLoadFileFormDeliverable', filter).then(function () {
+          vm.loading = false
+        }).catch(reject => {
+          vm.loading = false
+        })
       }
     }
   }
