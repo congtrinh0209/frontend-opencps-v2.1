@@ -1,6 +1,6 @@
 <template>
 <div>
-  <v-form ref="form" v-model="valid" lazy-validation v-if="showActive">
+  <v-form ref="form" v-model="valid" lazy-validation>
     <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
       margin-bottom: 100px;
     ">
@@ -882,13 +882,15 @@
                 path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
               })
             } else if (dataObj['status'] == '200' && dataObj['cmd'] === 'cmd_ide') {
-              setTimeout(function () {
-                window.location.reload()
-              }, 300)
-              // vm.snackbarsuccess = true
-              // vm.showActive = false
-              // vm.data = {}
-              // vm.showActive = true
+              // setTimeout(function () {
+              //   window.location.reload()
+              // }, 300)
+              vm.snackbarsuccess = true
+              vm.data = {}
+              $('.trumbowyg-editor').html("")
+              $('.CodeMirror').each(function(i, el){
+                  el.CodeMirror.setValue("")
+              });
               $('html, body').animate({
                     scrollTop: $('#toTop').offset().top,
                   },

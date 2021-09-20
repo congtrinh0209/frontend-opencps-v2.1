@@ -118,6 +118,12 @@
       }
     },
     props: ['value', 'item', 'dataValue', 'min', 'max'],
+    created () {
+      let vm = this
+      if (vm.dataValue) {
+        vm.toDate = vm.dataValue
+      }
+    },
     watch: {
         toDate (val) {
             this.toDateFormatted = this.formatDate(val)

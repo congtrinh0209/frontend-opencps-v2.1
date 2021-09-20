@@ -51,6 +51,7 @@ Vue.use(VueCodemirror, {
   theme: 'base16-light',
   lineNumbers: true,
   line: true,
+  autoRefresh: true
 })
 
 Vue.mixin({
