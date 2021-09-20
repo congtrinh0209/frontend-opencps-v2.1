@@ -177,7 +177,7 @@
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('LoaiThe') >= 0">
                 <v-text-field label="Loại thẻ" v-model="user['applicantProfile']['LoaiThe']" box></v-text-field>
               </v-flex>
-              <v-flex xs12 sm4>
+              <v-flex xs12 sm4 style="pointer-events: none;">
                 <!-- <v-text-field label="Ngày cấp" v-model="user['applicantIdDate']" box disabled></v-text-field> -->
                 <v-menu
                   ref="menuBirthDate"
@@ -190,6 +190,7 @@
                   full-width
                   max-width="290px"
                   min-width="290px"
+                  readonly
                 >
                   <v-text-field
                     slot="activator"
