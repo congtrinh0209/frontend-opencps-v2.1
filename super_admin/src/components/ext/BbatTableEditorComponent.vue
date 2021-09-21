@@ -721,6 +721,10 @@
 
           } else {
             vm.data = {}
+            if (vm.$refs.form) {
+              vm.$refs.form.reset()
+              vm.$refs.form.resetValidation()
+            }
           }
           vm.processDataSource()
         } else {
@@ -766,6 +770,10 @@
                 if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && Array.isArray(vm.dataSocket['detail'])) {
                   if (vm.dataSocket['detail'].length === 0) {
                     vm.data = {}
+                    if (vm.$refs.form) {
+                      vm.$refs.form.reset()
+                      vm.$refs.form.resetValidation()
+                    }
                   } else {
                     vm.data = vm.dataSocket[dataObj.respone][0]
                     console.log('data1', vm.data)
@@ -773,6 +781,10 @@
                   vm.processDataSourceVerify()
                 } else {
                   vm.data = {}
+                  if (vm.$refs.form) {
+                    vm.$refs.form.reset()
+                    vm.$refs.form.resetValidation()
+                  }
                 }
               } else if (dataObj.respone === 'loginUser') {
                 vm.$store.commit('setloginUser', dataObj['loginUser'])
@@ -878,12 +890,20 @@
               if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && Array.isArray(vm.dataSocket['detail'])) {
                 if (vm.dataSocket['detail'].length === 0) {
                   vm.data = {}
+                  if (vm.$refs.form) {
+                    vm.$refs.form.reset()
+                    vm.$refs.form.resetValidation()
+                  }
                 } else {
                   vm.data = vm.dataSocket[dataObj.respone][0]
                 }
                 vm.processDataSourceVerify()
               } else {
                 vm.data = {}
+                if (vm.$refs.form) {
+                  vm.$refs.form.reset()
+                  vm.$refs.form.resetValidation()
+                }
               }
             } else if (dataObj.respone === 'loginUser') {
               vm.$store.commit('setloginUser', dataObj['loginUser'])
@@ -1074,6 +1094,10 @@
               } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
                 vm.snackbarsuccess = true
                 vm.data = {}
+                if (vm.$refs.form) {
+                  vm.$refs.form.reset()
+                  vm.$refs.form.resetValidation()
+                }
               }
               if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
                 vm.pullCounter = vm.pullCounter - 1
@@ -1147,6 +1171,10 @@
                 } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
                   vm.snackbarsuccess = true
                   vm.data = {}
+                  if (vm.$refs.form) {
+                    vm.$refs.form.reset()
+                    vm.$refs.form.resetValidation()
+                  }
                 }
                 if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
                   vm.pullCounter = vm.pullCounter - 1
