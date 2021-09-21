@@ -15,6 +15,9 @@
             @blur="toDate = parseDate(toDateFormatted)"
             :rules="processRules(item.rules)"
             :value="formatDate(dataValue)"
+            readonly
+            clearable
+            @click:clear="resetDate"
         >
             <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
@@ -127,10 +130,15 @@
     watch: {
         toDate (val) {
             this.toDateFormatted = this.formatDate(val)
-            this.$emit('input', new Date(val).getTime())
+            this.$emit('input', val ? new Date(val).getTime() : '')
         }
     },
     methods: {
+        resetDate () {
+          let vm = this
+          vm.toDate = null
+          vm.dataValue = null
+        },
         formatDate (date) {
             if (!date) return null
             let dateObj = new Date(date)

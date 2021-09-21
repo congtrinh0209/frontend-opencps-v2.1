@@ -9,7 +9,7 @@
         <trumbowyg v-if="item.type === 'ricktext'" v-model="data[item.model]" :config="config" @tbw-blur="formatDataInput(item)" @tbw-change="validateMaxlength(item)"></trumbowyg>
         <div v-if="item.type === 'ricktext' && item.hasOwnProperty('maxLength') && item.maxLength" class="px-0 mt-2" style="text-align: right;"><span>{{String(data[item.model]).length}}/{{item.maxLength}}</span></div>
         <!-- <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item" :current-data="data"></attached-file-avatar> -->
-        <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" :min="item.minDate ? getCurrentDate() : null" :max="item.maxDate ? getCurrentDate() : null" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
+        <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" :min="getMinDate(item)" :max="getMaxDate(item)" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
         <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['link'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + data[item.pk] + '&col=' + (item.hasOwnProperty('pk_foreign') ? item.pk_foreign : item.pk) + '&pk_type=' + (item.hasOwnProperty('pk_type') ? item.pk_type : 'number') ">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
@@ -792,6 +792,36 @@
       })
     },
     methods: {
+      getMinDate (item) {
+        let vm = this
+        if (item.model === 'leaveDate' && vm.data['recruitDate']) {
+          return vm.getDateTimeStamp(vm.data['recruitDate'])
+        }
+        if (item.hasOwnProperty('minDate') && item.minDate) {
+          return vm.getCurrentDate()
+        } else {
+          return null
+        }
+      },
+      getMaxDate (item) {
+        let vm = this
+        if (item.model === 'recruitDate' && vm.data['leaveDate']) {
+          if (item.hasOwnProperty('maxDate') && item.maxDate) {
+            if (vm.getDateTimeStamp(vm.data['leaveDate']) <= (new Date()).getTime()) {
+              return vm.getDateTimeStamp(vm.data['leaveDate'])
+            } else {
+              return vm.getCurrentDate()
+            }
+          } else {
+            return vm.getDateTimeStamp(vm.data['leaveDate'])
+          }
+        }
+        if (item.hasOwnProperty('maxDate') && item.maxDate) {
+          return vm.getCurrentDate()
+        } else {
+          return null
+        }
+      },
       clearLoading () {
         this.loading = false
       },
@@ -891,6 +921,8 @@
               $('.CodeMirror').each(function(i, el){
                   el.CodeMirror.setValue("")
               });
+              vm.$refs.form.reset()
+              vm.$refs.form.resetValidation()
               $('html, body').animate({
                     scrollTop: $('#toTop').offset().top,
                   },
@@ -987,6 +1019,10 @@
       },
       getCurrentDate () {
         let date1 = new Date()
+        return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
+      },
+      getDateTimeStamp (date) {
+        let date1 = new Date(date)
         return `${date1.getFullYear()}-${(date1.getMonth() + 1).toString().padStart(2, '0')}-${date1.getDate().toString().padStart(2, '0')}`
       },
       validateMaxlength (item) {
@@ -1162,27 +1198,27 @@
       },
       doChangeStatusAccount (dataLock) {
         let vm = this
-        let labelStatus = 'Bạn có muốn khoá tài khoản này?'
-        if (dataLock) {
-          labelStatus = 'Bạn có muốn mở khoá tài khoản này?'
-        }
-        var result = confirm(labelStatus)
-        if (result) {
-          let postData = {
-            id: vm.detailData[0]['mappingUserId'] ? vm.detailData[0]['mappingUserId'] : vm.mappingUserIdCurrent,
-            data: {
-              locked: !dataLock
-            }
-          }
-          vm.$store.dispatch('doChangeStatusAccount', postData).then(function (data) {
-            vm.snackbarsuccess = true
-            console.log(data)
-          })
-        } else {
-          setTimeout(function() {
-            vm.deactiveAccountFlagBoolean = !dataLock
-          }, 10)
-        }
+        // let labelStatus = 'Bạn có muốn khóa tài khoản này?'
+        // if (dataLock) {
+        //   labelStatus = 'Bạn có muốn mở khóa tài khoản này?'
+        // }
+        // var result = confirm(labelStatus)
+        // if (result) {
+        //   let postData = {
+        //     id: vm.detailData[0]['mappingUserId'] ? vm.detailData[0]['mappingUserId'] : vm.mappingUserIdCurrent,
+        //     data: {
+        //       locked: !dataLock
+        //     }
+        //   }
+        //   vm.$store.dispatch('doChangeStatusAccount', postData).then(function (data) {
+        //     vm.snackbarsuccess = true
+        //     console.log(data)
+        //   })
+        // } else {
+        //   setTimeout(function() {
+        //     vm.deactiveAccountFlagBoolean = !dataLock
+        //   }, 10)
+        // }
       },
       showAccount (item) {
         let vm = this
