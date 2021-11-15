@@ -150,7 +150,8 @@
                           
                   </div>
                 </div>
-                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
+                <div v-if="dossierFilesApplicant && dossierFilesApplicant.length" class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" 
+                  style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
                   <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
@@ -203,7 +204,7 @@
                       </v-tooltip>
                     </div>
                   </div>
-                  <v-btn class="mx-0 my-0" flat icon color="red" style="position:absolute;right:0px;top:0px"
+                  <v-btn v-if="!khoTaiLieuCongDan" class="mx-0 my-0" flat icon color="red" style="position:absolute;right:0px;top:0px"
                   @click.stop="showFilesApplicant(item.partNo)"
                   >
                     <v-icon>clear</v-icon>
@@ -224,14 +225,14 @@
                         <v-icon color="white" v-else>save</v-icon>&nbsp;
                         Lưu lại
                       </v-btn>
-                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm"
+                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm && !item.embed"
                         :disabled="loadingApacal"
                       >
                         <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
                         <v-icon color="white" v-else>print</v-icon>&nbsp;
                         Xem
                       </v-btn>
-                      <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView">
+                      <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView && !item.embed">
                         <v-icon color="white">edit</v-icon>&nbsp;
                         Sửa
                       </v-btn>
@@ -310,7 +311,7 @@
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '120px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <v-flex :style="{width: !onlyView ? (khoTaiLieuCongDan && partNoApplicantHasFile(item.partNo) && item.hasForm ? '150px' : '120px') : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input v-if="item['multiple']"
               type="file"
               multiple
@@ -338,22 +339,24 @@
               v-if="progressUploadPart === item.partNo"
               ></v-progress-circular>
 
-              <v-tooltip top v-if="progressUploadPart !== item.partNo && !onlyView & item.hasForm">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
+              <v-tooltip top v-if="progressUploadPart !== item.partNo && item.hasForm">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item, 'viewform')">
                   <v-badge>
-                    <v-icon size="24" color="#004b94">edit</v-icon>
+                    <v-icon v-if="onlyView" size="24" color="#004b94">description</v-icon>
+                    <v-icon v-else size="24" color="#004b94">edit</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Khai trực tuyến</span>
+                <span v-if="onlyView">Xem bản khai</span>
+                <span v-else>Cập nhật bản khai</span>
               </v-tooltip>
-              <v-tooltip top v-if="progressUploadPart !== item.partNo && onlyView & item.hasForm">
+              <v-tooltip top v-if="progressUploadPart !== item.partNo && onlyView & item.hasForm && !nghiepvuhanghai">
                 <v-btn slot="activator" class="mx-1 my-0" fab dark small color="primary" @click="loadAlpcaFormClick(item)" style="height:25px;width:25px">
                   <v-icon style="font-size: 14px;">visibility</v-icon>
                 </v-btn>
                 <span>Xem</span>
               </v-tooltip>
 
-              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
+              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && !khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
                     <v-icon size="24" color="#004b94">cloud_upload</v-icon>
@@ -362,7 +365,7 @@
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                 <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
-              <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
+              <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView && !khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
                   <v-badge>
                     <v-icon size="24" color="orange darken-3">folder</v-icon>
@@ -370,7 +373,6 @@
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>
               </v-tooltip>
-              <!-- end -->
 
             </v-flex>
           </v-layout>
@@ -474,6 +476,21 @@
         </div>
         <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialog_documentApplicant" scrollable persistent max-width="1300px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Giấy tờ, tài liệu</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_documentApplicant = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1" style="min-height: 350px">
+          <kho-tai-lieu ref="khotailieu" :index="applicantId" :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
+        </v-card-text>
       </v-card>
     </v-dialog>
     <!-- ký số điện tử -->
@@ -618,6 +635,7 @@
 
 <script>
 import $ from 'jquery'
+import axios from 'axios'
 import toastr from 'toastr'
 import KhoTaiLieu from '../TiepNhan/KhoTaiLieu'
 toastr.options = {
@@ -798,9 +816,7 @@ export default {
     render: true,
     showKySo: false,
     dialogSignDigital: false,
-    fileKySo: '',
-    indexFileSelect: '',
-    fileEditor: ''
+    fileKySo: ''
   }),
   created () {
     let vm = this
@@ -873,14 +889,20 @@ export default {
   watch: {
     applicantBussinessExit (val) {
       let vm = this
-      if (val && vm.fileTemplateNoString) {
+      if (val && vm.fileTemplateNoString && !vm.khoTaiLieuCongDan) {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+      }
+      if (vm.khoTaiLieuCongDan) {
+        vm.getDossierFileApplicants(val)
       }
     },
     applicantId (val) {
       let vm = this
       if (val && vm.fileTemplateNoString) {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+      }
+      if (vm.khoTaiLieuCongDan) {
+        vm.getDossierFileApplicants(val)
       }
     },
     dossierTemplateItemsFilter () {
@@ -1027,9 +1049,16 @@ export default {
           }
         }
         vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
-        if (fileTemplateNoArr.length > 0) {
-          vm.fileTemplateNoString = fileTemplateNoArr.toString()
+        if (vm.khoTaiLieuCongDan) {
           vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
+        }
+        if (fileTemplateNoArr.length > 0 && !vm.khoTaiLieuCongDan) {
+          vm.fileTemplateNoString = fileTemplateNoArr.toString()
+          // setTimeout(function () {
+            if (vm.applicantId && !vm.onlyView && !vm.khoTaiLieuCongDan) {
+              vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
+            }
+          // }, 500)
         }
         // autoExpand form
         setTimeout(function () {
@@ -1117,19 +1146,28 @@ export default {
           template['editForm'] = true
           template['daKhai'] = false
           template['passRequired'] = false
-          var itemFind = dossierFiles.find(file => {
-            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed && file.fileSize !== 0
-          })
-          if (itemFind) {
-            template['daKhai'] = true
-            template['hasForm'] = true
-            template['referenceUid'] = itemFind['referenceUid']
-          }
           dossierFiles.forEach(dossierFile => {
             if (template.partNo === dossierFile.dossierPartNo) {
               template['passRequired'] = true
             }
           })
+          var itemFindEfom = dossierFiles.find(file => {
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed && file.fileSize !== 0
+          })
+          var itemFindEfomAttack = dossierFiles.find(file => {
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && !file.eForm && !file.removed && file.fileSize !== 0
+          })
+          if (itemFindEfom) {
+            template['daKhai'] = true
+            template['hasForm'] = true
+            template['referenceUid'] = itemFindEfom['referenceUid']
+          } else {
+            if (itemFindEfomAttack && template['multiple']) {
+              template['passRequired'] = true
+            } else {
+              template['passRequired'] = false
+            }
+          }
         })
       } else {
         dossierTemplates.forEach(template => {
@@ -1243,7 +1281,8 @@ export default {
             submitDate: vm.thongTinHoSo.submitDate,
             govAgencyCode: vm.thongTinHoSo.govAgencyCode,
             govAgencyName: vm.thongTinHoSo.govAgencyName,
-            dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo
+            dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo,
+            dossierId: vm.thongTinHoSo.dossierId
           }
           if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
             paramsEmbed = Object.assign(paramsEmbed, {
@@ -1261,7 +1300,9 @@ export default {
               userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
             })
           }
-
+          if (vm.onlyView) {
+            paramsEmbed['view_mode'] = 'view'
+          }
           let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
           for (let key in paramsEmbed) {
             urlEmbed += ('&' + key + '=' + paramsEmbed[key])
@@ -1387,11 +1428,11 @@ export default {
               // gen lại sau cập nhật
               vm.dossierTemplateItemsFilter[index].daKhai = true
               vm.showAlpacaJSFORM(vm.dossierTemplateItemsFilter[index])
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
             }, 3000)
-            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
-              vm.dossierFilesItems = resFiles
-            }).catch(reject => {
-            })
             
           }).catch(reject => {
             vm.loadingApacal = false
@@ -1413,12 +1454,12 @@ export default {
               // gen lại sau cập nhật
               console.log('dossierTemplateItemsFilter-1', vm.dossierTemplateItemsFilter[index])
               vm.showAlpacaJSFORM(vm.dossierTemplateItemsFilter[index])
+              vm.dossierTemplateItemsFilter[index]['passRequired'] = true
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+                vm.dossierFilesItems = resFiles
+              }).catch(reject => {
+              })
             }, 3000)
-            vm.dossierTemplateItemsFilter[index]['passRequired'] = true
-            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
-              vm.dossierFilesItems = resFiles
-            }).catch(reject => {
-            })
           }).catch(reject => {
             vm.loadingApacal = false
             toastr.clear()
@@ -1462,21 +1503,27 @@ export default {
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
           })
+          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && !vm.dossierTemplateItemsFilter[index]['multiple']) {
+            return
+          }
+          vm.dossierTemplateItemsFilter[index]['passRequired'] = true
         }).catch(function (data) {
+          vm.progressUploadPart = ''
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
+          if (vm.dossierTemplateItemsFilter[index]['hasForm'] && !vm.dossierTemplateItemsFilter[index]['multiple']) {
+            return
+          }
           if (data.length > 0) {
             vm.dossierTemplateItemsFilter[index]['passRequired'] = true
           }
-          vm.progressUploadPart = ''
-          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
-            vm.dossierFilesItems = result
-            vm.recountFileTemplates()
-          })
         })
       } else {
         if (window.$('input[id="file' + data.partNo + '"]')[0].files.length === 0) {
@@ -1506,7 +1553,7 @@ export default {
         })
       }
     },
-    loadAlpcaFormClick (data) {
+    loadAlpcaFormClick (data, viewform) {
       let vm = this
       window.removeEventListener('message', vm.receiveMessage)
       window.addEventListener('message', vm.receiveMessage)
@@ -1530,7 +1577,7 @@ export default {
       let fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })
-      if (fileFind) {
+      if (fileFind && !viewform) {
         console.log('fileFind', fileFind)
         if (fileFind.fileSize) {
           fileFind['id'] = vm.id
@@ -1587,7 +1634,8 @@ export default {
           submitDate: vm.thongTinHoSo.submitDate,
           govAgencyCode: vm.thongTinHoSo.govAgencyCode,
           govAgencyName: vm.thongTinHoSo.govAgencyName,
-          dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo
+          dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo,
+          dossierId: vm.thongTinHoSo.dossierId
         }
         if (vm.thongTinHoSo.dossierStatus === '' || vm.thongTinHoSo.dossierStatus === 'new') {
           paramsEmbed = Object.assign(paramsEmbed, {
@@ -1604,6 +1652,9 @@ export default {
             contactTelNo: vm.thongTinChuHoSo['contactTelNo'],
             userType: vm.thongTinChuHoSo['userType'] == '1' ? 'citizen' : 'business'
           })
+        }
+        if (vm.onlyView) {
+          paramsEmbed['view_mode'] = 'view'
         }
         let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?originURL=' + encodeURIComponent(document.location.origin)
         for (let key in paramsEmbed) {
@@ -1653,6 +1704,9 @@ export default {
                     vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                   }
                 } else {
+                  vm.dossierTemplateItemsFilter[index]['passRequired'] = false
+                }
+                if (vm.dossierTemplateItemsFilter[index]['hasForm'] && !vm.dossierTemplateItemsFilter[index]['multiple']) {
                   vm.dossierTemplateItemsFilter[index]['passRequired'] = false
                 }
               })
@@ -2047,6 +2101,9 @@ export default {
         if (!vm.onlyView) {
           divPx += 90
         }
+        if (vm.khoTaiLieuCongDan) {
+          divPx += 80
+        }
         return 'calc(100% - ' + divPx + 'px)'
       }
     },
@@ -2211,11 +2268,23 @@ export default {
         applicantIdNo: applicantIdNo,
         fileTemplateNo: fileTemplateNo
       }
-      vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
-        vm.dossierFilesApplicant = result
-      }).catch(reject => {
-        console.log('error')
-      })
+      if (applicantIdNo) {
+        if (!vm.khoTaiLieuCongDan) {
+          vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+            vm.dossierFilesApplicant = result
+          }).catch(reject => {
+            console.log('error')
+          })
+        } else {
+          filter['templateNo'] = vm.thongTinHoSo.dossierTemplateNo
+          vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
+            vm.dossierFilesApplicant = result
+            console.log('hasFile', vm.dossierFilesApplicant)
+          }).catch(reject => {
+            console.log('error')
+          })
+        }
+      }
     },
     showFilesApplicant (partNo) {
       let vm = this
@@ -2243,10 +2312,21 @@ export default {
     partNoApplicantHasFile (partNo) {
       let vm = this
       let hasFile = vm.dossierFilesApplicant.find(file => {
-        return (file.dossierTemplateNo === vm.thongTinHoSo['dossierTemplateNo'] && file.dossierPartNo === partNo)
+        return file.partNo === partNo
       })
-      if (hasFile) {
-        return true
+      // console.log('hasFile', hasFile)
+      if (hasFile && hasFile.hasOwnProperty('applicantDataModels') && hasFile.applicantDataModels) {
+        let fileArr = Array.isArray(hasFile.applicantDataModels) ? hasFile.applicantDataModels : [hasFile.applicantDataModels]
+        console.log('fileArrApplicant', fileArr)
+        let hasFileStatus1 = fileArr.find(file => {
+          return file.status == 1
+        })
+        console.log('hasFileStatus1', hasFileStatus1)
+        if (hasFileStatus1) {
+          return true
+        } else {
+          return false
+        }
       } else {
         return false
       }
@@ -2367,6 +2447,8 @@ export default {
     },
     showDocumentApplicant (part, index) {
       let vm = this
+      vm.fileTemplateNoScope = part.fileTemplateNo
+      vm.statusApplicantData = 1
       vm.dossierPartAttach = part
       vm.indexPart = index
       vm.dialog_documentApplicant = true
