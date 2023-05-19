@@ -171,6 +171,51 @@
             </v-expansion-panel>
           </div>
           <!--  -->
+          <div style="position: relative;border-top:1px solid #ddd" v-if="originality == 3 && thongTinChiTietHoSo.hasOwnProperty('postAtmService') && thongTinChiTietHoSo.postAtmService">
+            <v-expansion-panel :value="[true]" readonly expand  class="expansion-pl">
+              <v-expansion-panel-content hide-actions value="2">
+                <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+                  Hồ sơ tiếp nhận qua ATM
+                </div>
+                <div class="absolute__btn" style="width: 200px">
+                  <content-placeholders class="mt-1" v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <v-checkbox
+                    v-model="fromATM"
+                    label="Hồ sơ tiếp nhận qua ATM"
+                    color="primary"
+                    hide-details
+                    class="d-inline-block mt-2"
+                  ></v-checkbox>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
+          <!--  -->
+          <div style="position: relative;border-top:1px solid #ddd" v-if="thongTinChiTietHoSo.hasOwnProperty('receiveATMService') && thongTinChiTietHoSo.receiveATMService">
+            <v-expansion-panel :value="[true]" expand readonly class="expansion-pl">
+              <v-expansion-panel-content hide-actions value="2">
+                <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+                  Nhận kết quả qua ATM
+                </div>
+                <div class="absolute__btn" style="width: 220px">
+                  <content-placeholders class="mt-1" v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <v-checkbox
+                    v-model="receiveFromATM"
+                    label="Hồ sơ nhận kết quả qua ATM"
+                    color="primary"
+                    hide-details
+                    class="d-inline-block mt-2"
+                  ></v-checkbox>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+          <!--  -->
           <div style="position: relative;" v-if="viaPortalDetail !== 0 && originality === 1">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content hide-actions value="2">
@@ -688,6 +733,8 @@ export default {
     loadingForm: false,
     notifyConfig: false,
     fromViaPostal: false,
+    fromATM: false,
+    receiveFromATM: false,
     fromViaPostalConfig: false,
     smsNotify: true,
     emailNotify: true,
@@ -1115,6 +1162,12 @@ export default {
             vm.briefNote = result.serviceName ? result.serviceName : ''
             if (vm.formCode === 'UPDATE') {
               vm.fromViaPostal = String(result.fromViaPostal) === '1' ? true : false
+              if (result.hasOwnProperty('fromATM')) {
+                vm.fromATM = result.fromATM == 2 ? true : false
+              }
+              if (result.hasOwnProperty('receiveFromATM')) {
+                vm.receiveFromATM = result.receiveFromATM == 2 ? true : false
+              }
             }
             result['editable'] = false
             if (result.dossierStatus === '') {
@@ -1501,6 +1554,12 @@ export default {
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
           tempData['fromViaPostal'] = vm.fromViaPostal ? 1 : 0
+          if (vm.thongTinChiTietHoSo.hasOwnProperty('fromATM') && vm.thongTinChiTietHoSo.hasOwnProperty('postAtmService') && vm.thongTinChiTietHoSo.postAtmService) {
+            tempData['fromATM'] = vm.fromATM ? 2 : 1
+          }
+          if (vm.thongTinChiTietHoSo.hasOwnProperty('receiveATMService') && vm.thongTinChiTietHoSo.hasOwnProperty('receiveFromATM') && vm.thongTinChiTietHoSo.receiveATMService) {
+            tempData['receiveFromATM'] = vm.receiveFromATM ? 2 : 1
+          }
           
           console.log('tempData_PUT', tempData)
           let doAction = function () {

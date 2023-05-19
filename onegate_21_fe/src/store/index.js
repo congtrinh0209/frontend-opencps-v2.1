@@ -1842,6 +1842,12 @@ export const store = new Vuex.Store({
         if (data.viaPostal && String(data.vnpostalStatus) === '1') {
           dataPutdossier.append('vnpostalProfile', JSON.stringify(data.vnpostalProfile))
         }
+        if (data.hasOwnProperty('fromATM')) {
+          dataPutdossier.append('fromATM', data.fromATM)
+        }
+        if (data.hasOwnProperty('receiveFromATM')) {
+          dataPutdossier.append('receiveFromATM', data.receiveFromATM)
+        }
         dataPutdossier.append('fromViaPostal', data.hasOwnProperty('fromViaPostal') ? data.fromViaPostal : '')
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         if (data.formMeta) {

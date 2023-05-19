@@ -126,12 +126,18 @@
             <v-flex xs12 sm6>
               <v-switch class="" label="Dịch vụ công dành cho doanh nghiệp" v-model="forBusiness"></v-switch>
             </v-flex>
-            <v-flex xs12 sm6>
+            <v-flex xs12 sm4>
               <v-switch class="" label="Áp dụng phương thức nộp bưu điện" v-model="postalService"></v-switch>
             </v-flex>
-            <v-flex xs12 sm6>
-              <v-switch class="" label="Yêu cầu đăng ký hồ sơ thương nhân" v-model="registration"></v-switch>
+            <v-flex xs12 sm4 v-if="cauHinhAtmHoSo">
+              <v-switch class="" label="Áp dụng nhận hồ sơ qua ATM" v-model="postAtmService"></v-switch>
             </v-flex>
+            <v-flex xs12 sm4 v-if="cauHinhAtmHoSo">
+              <v-switch class="" label="Áp dụng nhận kết quả hồ sơ qua ATM" v-model="receiveATMService"></v-switch>
+            </v-flex>
+            <!-- <v-flex xs12 sm6>
+              <v-switch class="" label="Yêu cầu đăng ký hồ sơ thương nhân" v-model="registration"></v-switch>
+            </v-flex> -->
             <!--  -->
           </v-layout>
           <v-flex xs12 class="text-right pr-3" style="
@@ -211,6 +217,9 @@ export default {
     forBusiness: false,
     postalService: false,
     registration: false,
+    cauHinhAtmHoSo: false,
+    postAtmService: false,
+    receiveATMService: false,
     rules: {
       required: value => !!value || 'Bắt buộc phải nhập.',
       number: value => {
@@ -302,6 +311,10 @@ export default {
     }
     try {
       vm.isDvc = isDvc
+    } catch (error) {
+    }
+    try {
+      vm.cauHinhAtmHoSo = cauHinhAtmHoSo
     } catch (error) {
     }
     vm.$nextTick(() => {
@@ -412,6 +425,8 @@ export default {
           vm.serviceUrl = res.serviceUrl
           vm.forCitizen = res.forCitizen
           vm.forBusiness = res.forBusiness
+          vm.postAtmService = res.postAtmService
+          vm.receiveATMService = res.receiveATMService
           vm.postalService = res.postalService
           vm.registration = res.registration
           vm.getDomains()
@@ -435,6 +450,8 @@ export default {
         serviceUrl: vm.serviceUrl,
         forCitizen: vm.forCitizen,
         forBusiness: vm.forBusiness,
+        postAtmService: vm.postAtmService,
+        receiveATMService: vm.receiveATMService,
         postalService: vm.postalService,
         registration: vm.registration,
         receptionReport: '',

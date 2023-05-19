@@ -422,7 +422,7 @@
             </v-btn>
           </v-toolbar>
           <v-card-text class="py-1 pt-3" style="min-height: 200px;">
-            <form-tra-cuu ref="tracuudancu" :employeeEmail="staffEmail" :hoVaTen="thongTinCongDan.hoVaTen" :maSoCaNhan="thongTinCongDan.maSoCaNhan" :ngaySinh="ngaySinhCreate"></form-tra-cuu>
+            <form-tra-cuu ref="tracuudancu" @layThongTinTraCuu="addApplicantLgsp" :employeeEmail="staffEmail" :hoVaTen="thongTinCongDan.hoVaTen" :maSoCaNhan="thongTinCongDan.maSoCaNhan" :ngaySinh="ngaySinhCreate"></form-tra-cuu>
             <!-- <v-flex xs12 class="text-right my-2">
               <v-btn color="primary"
                 @click="addApplicantLgsp"
@@ -737,10 +737,12 @@ export default {
           toastr.error('Vui lòng nhập đầy đủ Họ tên, Số CMND/CCCD và Ngày sinh để tra cứu')
         }
       },
-      addApplicantLgsp () {
+      addApplicantLgsp (data) {
         let vm = this
+        vm.applicantLgspInfomation = data
         vm.thongTinCongDan.hoVaTen = vm.applicantLgspInfomation.HoVaTen.Ten
         vm.thongTinCongDan.maSoCaNhan = vm.applicantLgspInfomation.SoDinhDanh ? vm.applicantLgspInfomation.SoDinhDanh : vm.applicantLgspInfomation.SoCMND
+        vm.ngaySinhCreate = vm.formatNgaySinh(vm.applicantLgspInfomation.NgayThangNamSinh.NgayThangNam)
         vm.diaChiThuongTruCuThe = vm.applicantLgspInfomation.ThuongTru.ChiTiet
         vm.noiOHienTaiCuThe = vm.applicantLgspInfomation.NoiOHienTai.ChiTiet
         
@@ -769,6 +771,12 @@ export default {
             })[0]
           } catch (error) {
           }
+        }
+        try {
+          vm.quocTichCreate = vm.itemsQuocTich.find(function (item) {
+            return item.maMuc == vm.applicantLgspInfomation.QuocTich
+          })
+        } catch (error) {
         }
         if (vm.applicantLgspInfomation.ThuongTru.MaTinhThanh) {
           try {
@@ -1311,6 +1319,12 @@ export default {
         str = str.replace(/Đ/g, 'D')
         str = str.toLocaleLowerCase().replace(/\s/g, '')
         return str
+      },
+      formatNgaySinh (date) {
+        if (!date) {
+          return ''
+        }
+        return date.slice(6,8) + '/' + date.slice(4,6) + '/' + date.slice(0,4)
       },
     }
 }

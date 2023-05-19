@@ -116,6 +116,18 @@
                   <span class="pr-2">Trạng thái: </span>
                   <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
                 </div>
+                <div class="xs12 sm12" v-if="thongTinChiTietHoSo.hasOwnProperty('fromATM') && thongTinChiTietHoSo.fromATM == 2"
+                  style="display: flex; align-items: center;"
+                >
+                  <v-icon color="blue" size="32" class="mr-2" style="color: blue !important">atm</v-icon>
+                  <span class="pl-0 text-bold "> Hồ sơ tiếp nhận qua ATM </span>
+                </div>
+                <div class="xs12 sm12" v-if="thongTinChiTietHoSo.hasOwnProperty('receiveFromATM') && thongTinChiTietHoSo.receiveFromATM == 2"
+                style="display: flex; align-items: center;"
+                >
+                  <v-icon color="orange" size="32" class="mr-2" style="color: orange !important">atm</v-icon>
+                  <span class="pl-0 text-bold "> Hồ sơ nhận kết quả qua ATM </span>
+                </div>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm4 v-if="originality !== 1" style="word-break: break-word;">
@@ -179,6 +191,18 @@
                 <div class="xs12 sm12 pb-1">
                   <span class="pr-2">Trạng thái: </span>
                   <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+                </div>
+                <div class="xs12 sm12" v-if="thongTinChiTietHoSo.hasOwnProperty('fromATM') && thongTinChiTietHoSo.fromATM == 2"
+                  style="display: flex; align-items: center;"
+                >
+                  <v-icon color="blue" size="32" class="mr-2" style="color: blue !important">atm</v-icon>
+                  <span class="pl-0 text-bold "> Hồ sơ tiếp nhận qua ATM </span>
+                </div>
+                <div class="xs12 sm12" v-if="thongTinChiTietHoSo.hasOwnProperty('receiveFromATM') && thongTinChiTietHoSo.receiveFromATM == 2"
+                style="display: flex; align-items: center;"
+                >
+                  <v-icon color="orange" size="32" class="mr-2" style="color: orange !important">atm</v-icon>
+                  <span class="pl-0 text-bold "> Hồ sơ nhận kết quả qua ATM </span>
                 </div>
                 <div class="xs12 sm12 pb-1" v-if="checkSoBan(thongTinChiTietHoSo) && thongTinChiTietHoSo.dossierStatus === 'paying' && xacthuc_BNG">
                   <span class="pr-2">Số bản: </span>

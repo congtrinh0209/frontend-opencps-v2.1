@@ -47,14 +47,19 @@
                 ></v-text-field>
             </v-flex>
             <v-flex xs12 class="text-center">
-                <v-btn color="primary" class="mt-3 mx-2  text-white" @click.native="checkCsdldc()" :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp">
-                    <v-icon
-                        left
-                        dark
-                        size="20"
-                    >
-                      save
+                <v-btn color="primary" class="mt-3 mr-3  text-white" @click.native="checkCsdldc()" :loading="loadingSearchLgsp" :disabled="loadingSearchLgsp">
+                    <v-icon size="20">
+                    search
                     </v-icon> &nbsp;Tra cứu thông tin
+                </v-btn>
+                <v-btn color="primary"
+                  @click="addApplicantLgsp"
+                  class="mx-0 mt-3 mr-2"
+                  v-if="applicantLgspInfomation"
+                >
+                  <v-icon size="20">save_alt</v-icon>
+                  &nbsp;
+                  Lấy thông tin
                 </v-btn>
             </v-flex>
             <v-layout wrap v-if="applicantLgspInfomation">
@@ -578,6 +583,10 @@ export default {
           toastr.remove()
           toastr.error('Vui lòng nhập đầy đủ Họ tên, Số CMND/CCCD và Ngày sinh để tra cứu')
         }
+      },
+      addApplicantLgsp () {
+        let vm = this
+        vm.$emit('layThongTinTraCuu', vm.applicantLgspInfomation)
       },
       getDanhMucTinhThanh () {
         let vm = this

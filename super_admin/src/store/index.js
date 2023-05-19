@@ -1841,6 +1841,12 @@ export const store = new Vuex.Store({
           dataPostServiceConfig.append('postalService', data.postalService)
           dataPostServiceConfig.append('registration', data.registration)
           dataPostServiceConfig.append('receptionReport', data.receptionReport)
+          if (data.hasOwnProperty('postAtmService')) {
+            dataPostServiceConfig.append('postAtmService', data.postAtmService)
+          }
+          if (data.hasOwnProperty('receiveATMService')) {
+            dataPostServiceConfig.append('receiveATMService', data.receiveATMService)
+          }
           if (data.type === 'add') {
             axios.post(state.endPointApi + '/serviceconfigs', dataPostServiceConfig, options).then(function (response) {
               resolve(response.data)

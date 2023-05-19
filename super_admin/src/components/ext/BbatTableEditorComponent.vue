@@ -212,6 +212,11 @@
             v-model="data[itemChild.model]"
           ></v-switch>
         </div>
+        <!-- Lấy mã thành phần theo cổng DVCQG -->
+        <v-btn class="mx-0" color="blue darken-3" dark v-if="item.type === 'getFileTemplateNoDVCQG'"
+         @click.stop="showDialogSearchMaThanhPhanDVCQG()">
+          <span>Lấy mã tài liệu cổng DVCQG</span>
+        </v-btn>
         <!-- Phân quyền truy cập CSDL Dân cư -->
         <v-btn class="mx-0" color="blue darken-3" dark v-if="index === (detailForm.length - 1) && data.modelClassName === 'org.opencps.usermgt.model.Employee' && cauHinhTruyCapCsdlDanCu" v-on:click.native="showCapQuyenCsdlDanCu()">
           <v-icon class="mr-1" size="14">lock_open</v-icon>
@@ -478,7 +483,7 @@
                 </v-col>
               </v-row>
             </v-container>
-          <v-form>
+          </v-form>
         </v-card-text>
         <v-card-actions class="px-3">
           <v-spacer></v-spacer>
@@ -672,6 +677,110 @@
     </v-card>
   </v-dialog>
   <!--  -->
+  <v-dialog v-model="dialog_searchMaTaiLieuDVCQG" scrollable persistent max-width="900px">
+    <v-card>
+      <v-toolbar dark color="blue">
+        <v-toolbar-title class="mx-3">Chọn thủ tục hành chính</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon dark @click.native="dialog_searchMaTaiLieuDVCQG = false">
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-card-text class="py-1">
+        <v-form ref="formLgsp" v-model="valid" class="py-3 px-0 grid-list">
+          <v-layout row wrap class="px-0 py-0">
+            <v-flex xs12>
+              <v-text-field label="Tên thủ tục, mã thủ tục" :rules="[rules.required]" v-model="serviceSearch" box clearable></v-text-field>
+            </v-flex>
+            <v-flex xs12 class="text-right">
+              <v-btn color="blue darken-3"
+                @click="searchThuTucHanhChinh"
+                :loading="loadingMaTaiLieu"
+                :disabled="loadingMaTaiLieu"
+                class="mx-0 my-0 white--text"
+              >
+                <v-icon size="20">search</v-icon>
+                &nbsp;
+                Tìm kiếm
+                <span slot="loader">Đang tải...</span>
+              </v-btn>
+            </v-flex>
+            <v-card-text class="pt-3 px-0">
+              <v-layout class="py-2" wrap v-for="(item, index) in serviceinfoList" :key="index" :style="index == 0 ? 'border-bottom: 1px solid #dedede; border-top: 1px solid #dedede' : 'border-bottom: 1px solid #dedede'">
+                <v-flex style="align-self: center; width: calc(100% - 110px)">
+                  <span style="font-weight: 500">{{item.serviceCodeDVCQG ? item.serviceCodeDVCQG : item.serviceCode}} - </span>
+                  <span>{{item.serviceName}}</span>
+                </v-flex>
+                <v-flex style="width: 100px">
+                  <v-btn :loading="loadingMaTaiLieu" :disabled="loadingMaTaiLieu" class="mx-0 right" color="blue darken-3 white--text"
+                   @click="searchThongTinTthcDVCQG(item)">
+                    Chọn
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+              <div class="py-3" style="text-align: center" v-if="showError && serviceinfoList.length == 0">
+                <span>Không có thủ tục hành chính nào</span>
+              </div>
+            </v-card-text>
+          </v-layout>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <!--  -->
+  <v-dialog v-model="dialogDsGiayTo" scrollable persistent max-width="1000px">
+    <v-card>
+      <v-toolbar dark color="blue">
+        <v-toolbar-title class="mx-3">Danh sách giấy tờ DVCQG</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon dark @click.native="dialogDsGiayTo = false">
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+        <v-card-text class="pt-3">
+          <div class="mb-2" style="font-weight: 600">
+            <span style="color: #1565c0">Thủ tục: </span>
+            <span>{{ thuTucHanhChinhSelected ? thuTucHanhChinhSelected.serviceName : '' }}</span>
+          </div>
+          <div class="" style="color: #1565c0;font-weight: 600">
+            <v-icon class="mr-2" size="16" color="#1565c0">keyboard_double_arrow_right</v-icon>
+            <span>THÀNH PHẦN HỒ SƠ:</span>
+          </div>
+          <div wrap v-for="(item, index) in danhSachTphsDVCQG" :key="index" :class="index == 0 ? 'pb-2' : 'py-0'">
+            <v-flex xs12 v-if="item.TRUONGHOP">
+              <div>{{ item.TRUONGHOP }}</div>
+            </v-flex>
+            <v-layout class="py-2" wrap v-for="(item2, index2) in item.GIAYTO" :key="index2" style="border-bottom: 1px solid #dedede;">
+              <v-flex style="align-self: center; width: calc(100% - 110px)">
+                <span style="font-weight: 500">{{item2.MAGIAYTO}} - </span>
+                <span>{{item2.TENGIAYTO}}</span>
+              </v-flex>
+              <v-flex style="width: 100px">
+                <v-btn class="px-3 mx-0 right" color="blue darken-3 white--text" @click="bindMaTaiLieu(item2.MAGIAYTO)">
+                  Chọn
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </div>
+          <div class="mt-2" style="color: #1565c0;font-weight: 600">
+            <v-icon class="mr-2" size="16" color="#1565c0">keyboard_double_arrow_right</v-icon>
+            <span>GIẤY TỜ KẾT QUẢ:</span>
+          </div>
+          <v-layout wrap v-for="(item, index) in danhSachGiayToKqDVCQG" :key="index" :class="index == 0 ? 'pb-2' : 'py-0'" style="border-bottom: 1px solid #dedede;">
+            <v-flex style="align-self: center; width: calc(100% - 110px)">
+              <span style="font-weight: 500">{{item.MAKETQUA}} - </span>
+              <span>{{item.TENKETQUA}}</span>
+            </v-flex>
+            <v-flex style="width: 100px">
+              <v-btn class="px-3 mx-0 right" color="blue darken-3 white--text" @click="bindMaTaiLieu(item.MAKETQUA)">
+                Chọn
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+    </v-card>
+  </v-dialog>
+  <!--  -->
 </div>
 </template>
 
@@ -852,7 +961,16 @@
         messageLgsp: 'Tra cứu Cơ sở dữ liệu dân cư',
         lgspAlertColor: 'blue',
         dialog_searchLgsp: false,
-        loadingSearchLgsp: false
+        dialog_searchMaTaiLieuDVCQG: false,
+        dialogDsGiayTo: false,
+        serviceSearch: '',
+        serviceinfoList: [],
+        thuTucHanhChinhSelected: '',
+        danhSachTphsDVCQG: [],
+        danhSachGiayToKqDVCQG: [],
+        loadingMaTaiLieu: false,
+        loadingSearchLgsp: false,
+        showError: false
       }
     },
     computed: {
@@ -1552,6 +1670,79 @@
         } else {
           toastr.error('Vui lòng nhập đầy đủ số CCCD/ CMND, họ tên và ngày sinh để tra cứu')
         }
+      },
+      showDialogSearchMaThanhPhanDVCQG () {
+        let vm = this
+        vm.serviceSearch = ''
+        vm.serviceinfoList = []
+        vm.danhSachTphsDVCQG = []
+        vm.danhSachGiayToKqDVCQG = []
+        vm.dialog_searchMaTaiLieuDVCQG = true
+        vm.showError = false
+      },
+      searchThuTucHanhChinh () {
+        let vm = this
+        if (String(vm.serviceSearch).trim().length > 5) {
+          vm.loadingMaTaiLieu = true
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            },
+            params: {
+              keyword: vm.serviceSearch
+            }
+          }
+          let url = '/o/rest/v2/serviceinfos'
+          axios.get(url, param).then(function (response) {
+            vm.loadingMaTaiLieu = false
+            vm.showError = true
+            let serializable = response.data
+            vm.serviceinfoList = serializable.hasOwnProperty('data') ? serializable.data : []
+          }).catch(function (err) {
+            vm.showError = true
+            vm.loadingMaTaiLieu = false
+          })
+        } else {
+          toastr.error('Từ khóa tìm kiếm ít nhất 5 ký tự')
+        }
+      },
+      searchThongTinTthcDVCQG (service) {
+        let vm = this
+        vm.thuTucHanhChinhSelected = service
+        let data = JSON.stringify({
+          "service": "LayThuTuc",
+          "maTTHC": service.serviceCodeDVCQG ? service.serviceCodeDVCQG : service.serviceCode
+        });
+
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/nps/getsharingdata',
+          headers: { 
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          data : data
+        };
+        vm.loadingMaTaiLieu = true
+        axios.request(config)
+        .then((response) => {
+          vm.loadingMaTaiLieu = false
+          let thongtinthutuc = response.data.result[0]
+          vm.dialogDsGiayTo = true
+          vm.danhSachTphsDVCQG = thongtinthutuc['THANHPHANHOSO']
+          vm.danhSachGiayToKqDVCQG = thongtinthutuc['KETQUATHUCHIEN']
+        })
+        .catch((error) => {
+          vm.loadingMaTaiLieu = false
+          console.log(error);
+        });
+      },
+      bindMaTaiLieu (maTaiLieu) {
+        let vm = this
+        vm.dialog_searchMaTaiLieuDVCQG = false
+        vm.dialogDsGiayTo = false
+        vm.data['fileTemplateNoDVCQG'] = maTaiLieu
       },
       getQuyenTruyCap () {
         let vm = this

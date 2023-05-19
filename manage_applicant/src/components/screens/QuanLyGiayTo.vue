@@ -405,7 +405,8 @@
               <v-text-field
                 v-model="applicantIdNoCreate"
                 box
-                clearable
+                :clearable="typeCreate == 'create'"
+                :readonly="typeCreate == 'update'"
                 :rules="[v => !!v || 'Thông tin bắt buộc']"
                 required
               >
@@ -419,7 +420,8 @@
               <v-text-field
                 v-model="applicantNameCreate"
                 box
-                clearable
+                :clearable="typeCreate == 'create'"
+                :readonly="typeCreate == 'update'"
                 :rules="[v => !!v || 'Chủ sở hữu giấy tờ là bắt buộc']"
                 required
                 
@@ -1046,8 +1048,13 @@ export default {
             }
 
             vm.fileTemplateList.push(vm.ortherFileTemplate)
-            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1) {
+            if (result.hasOwnProperty('dossierParts') && result.dossierParts.length === 1 && vm.typeCreate == 'create') {
               vm.fileTemplateNoCreate = vm.fileTemplateList[0]
+            }
+            if (vm.typeCreate == 'update') {
+              vm.fileTemplateNoCreate = vm.fileTemplateList.filter(function (items) {
+                return items.fileTemplateNo === vm.documentSelect.fileTemplateNo
+              })[0]
             }
           }).catch(function () {
           })
@@ -1085,6 +1092,11 @@ export default {
     },
     showCreatedocument () {
       let vm = this
+      vm.serviceInfoCreate = ''
+      vm.optionCreate = ''
+      vm.optionList = []
+      vm.fileTemplateList = []
+      vm.fileTemplateNoCreate = ''
       vm.showDetail = true
       vm.typeCreate = 'create'
       vm.pathNameFileESign = ''
@@ -1094,6 +1106,10 @@ export default {
       vm.fileNo = ''
       vm.applicantIdNoCreate = vm.index != 0 ? vm.applicantInfos.applicantIdNo : ''
       vm.applicantNameCreate = vm.index != 0 ? vm.applicantInfos.applicantName : ''
+      if (vm.serviceInfoSearch) {
+        vm.serviceInfoCreate = Object.assign({}, vm.serviceInfoSearch)
+        vm.changeService('create')
+      }
     },
     createDocument () {
       let vm = this
@@ -1429,16 +1445,17 @@ export default {
       )
       vm.documentSelect = item
       vm.typeCreate = 'update'
+      vm.optionCreate = ''
       vm.fileNameView = item.fileEntryId ? item.fileName : ''
-      if (!vm.fileTemplateList || vm.fileTemplateList.length == 0) {
-        vm.fileTemplateList = [{
-          partName: item.fileName,
-          fileTemplateNo: item.fileTemplateNo
-        }]
-      }
-      vm.fileTemplateNoCreate = vm.fileTemplateList.filter(function (items) {
-        return items.fileTemplateNo === item.fileTemplateNo
-      })[0]
+      // if (!vm.fileTemplateList || vm.fileTemplateList.length == 0) {
+      //   vm.fileTemplateList = [{
+      //     partName: item.fileName,
+      //     fileTemplateNo: item.fileTemplateNo
+      //   }]
+      // }
+      // vm.fileTemplateNoCreate = vm.fileTemplateList.filter(function (items) {
+      //   return items.fileTemplateNo === item.fileTemplateNo
+      // })[0]
       vm.statusCreate = item.status
       vm.fileName = item.fileName
       vm.fileNo = item.fileNo
@@ -1462,8 +1479,10 @@ export default {
         vm.optionCreate = vm.optionList.filter(function (items) {
           return items.templateNo === item.templateNo
         })[0]
+        vm.changeOption()
       } catch (error) {
       }
+      console.log('vm.fileTemplateNoCreate', vm.fileTemplateNoCreate)
       // vm.dialog_createDocument = true
       vm.showDetail = true
     },
