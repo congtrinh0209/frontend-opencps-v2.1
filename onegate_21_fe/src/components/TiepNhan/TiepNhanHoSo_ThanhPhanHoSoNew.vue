@@ -23,7 +23,7 @@
       <div class="d-inline-block" v-if="originality === 1 && !onlyView" 
         :style="formCodeInput ? 'position: absolute;left: 165px;top: -37px' : 'position: absolute;left: 210px;top: -37px'">
         <v-tooltip top>
-          <v-btn slot="activator" :disabled="loadingFile" icon class="mx-0 my-0" @click.stop="loadFiles()">
+          <v-btn aria-label="Tải lại" slot="activator" :disabled="loadingFile" icon class="mx-0 my-0" @click.stop="loadFiles()" name="Tải lại">
             <v-badge>
               <v-icon size="24" color="#004b94">autorenew</v-icon>
             </v-badge>
@@ -87,7 +87,7 @@
                   class="ml-3"
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
-                    <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
+                    <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0" name="Gửi">
                       <v-icon size="16" class="mx-0" color="primary">send</v-icon>
                     </v-btn>
                     <span>Gửi</span>
@@ -102,31 +102,31 @@
                   v-if="item.partNo === itemFileView.dossierPartNo" :style="loadingFile ? 'opacity: 0.6' : ''">
                   <div v-if="originality === 1 && itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
-                      <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
-                        :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
-                        {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                      <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView)['color']"
+                        :size="getDocumentTypeIcon(itemFileView)['size']">
+                        {{getDocumentTypeIcon(itemFileView)['icon']}}
                       </v-icon>
                       {{'TÀI LIỆU KHAI TRỰC TUYẾN'}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
-                    <v-btn title="Tải xuống" icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
+                    <v-btn title="Tải xuống" icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0" name="Tải xuống">
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
 
-                    <v-btn class="my-0" title="Ký số giấy tờ" flat icon color="indigo"
-                      v-if="originality === 1 && !onlyView && showKySo && !kySoSavis && String(itemFileView.fileType).toLowerCase() === 'pdf'" 
-                      @click.stop="showSelectDigitalSign(itemFileView, index)"
+                    <v-btn class="my-0" title="Ký số giấy tờ" flat icon color="indigo" name="Ký số"
+                      v-if="originality === 1 && !onlyView && showKySo && !kySoSavis" 
+                      @click.stop="mySignViettel(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
                     <!--  -->
-                    <v-btn title="Ký số giấy tờ" class="my-0" flat icon color="indigo"
+                    <v-btn title="Ký số giấy tờ" class="my-0" flat icon color="indigo" name="Ký số"
                       v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck != 1 && kySoSavis" 
                       @click.stop="kySoPdfUrlSavis(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
-                    <v-btn title="Giấy tờ đã được ký số" class="my-0" flat icon color="green"
+                    <v-btn title="Giấy tờ đã được ký số" class="my-0" flat icon color="green" name="Ký số"
                       v-if="originality === 1 && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck == 1 && kySoSavis" 
                     >
                       <v-icon style="color: green !important" size="18">verified</v-icon>
@@ -135,7 +135,7 @@
                     <v-menu @click.native.stop right offset-y 
                       transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
                       v-if="originality === 3 && showKySoMotCua && String(itemFileView.fileType).toLowerCase() === 'pdf'">
-                      <v-btn slot="activator" flat icon color="indigo">
+                      <v-btn slot="activator" flat icon color="indigo" name="Ký số">
                         <v-icon size="18">fa fa-pencil-square-o</v-icon>
                       </v-btn>
                       <v-list>
@@ -172,17 +172,17 @@
                   </div>
                   <div v-if="!itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
-                      <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
-                        :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
-                        {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                      <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView)['color']"
+                        :size="getDocumentTypeIcon(itemFileView)['size']">
+                        {{getDocumentTypeIcon(itemFileView)['icon']}}
                       </v-icon>
                       {{itemFileView.displayName}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
-                    <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
+                    <v-btn title="Xóa" name="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
                       <v-icon style="color: red">delete_outline</v-icon>
                     </v-btn>
-                    <v-btn title="Tải xuống" icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
+                    <v-btn title="Tải xuống" name="Tải xuống" icon ripple v-on:click.stop="downloadSingleFile(itemFileView)" class="mx-0 my-0">
                       <v-icon size="14" color="primary">fas fa fa-download</v-icon>
                     </v-btn>
                     <!--  -->
@@ -194,8 +194,8 @@
                     </v-tooltip>
                     <!--  -->
                     <v-btn title="Ký số giấy tờ đính kèm" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && !kySoSavis && !kySoVnptSmartCa" 
-                      @click.stop="showSelectDigitalSign(itemFileView, index)"
+                      v-if="originality === 1 && !onlyView && showKySo  && !kySoSavis && !kySoVnptSmartCa" 
+                      @click.stop="mySignViettel(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
@@ -453,7 +453,7 @@
               accept=".pdf,application/pdf"
               >
               <v-tooltip top v-if="item.partType === 3 && originality === 3 && !onlyView">
-                <v-btn slot="activator" @click="addFileOther(item)" icon class="mx-0 my-0">
+                <v-btn slot="activator" @click="addFileOther(item)" icon class="mx-0 my-0" name="Thêm giấy tờ khác">
                   <v-icon size="16" class="mx-0" color="primary">add</v-icon>
                 </v-btn>
                 <span>Thêm giấy tờ khác</span>
@@ -467,7 +467,7 @@
               ></v-progress-circular>
 
               <v-tooltip top v-if="progressUploadPart !== item.partNo && item.hasForm">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item, 'viewform')">
+                <v-btn slot="activator" aria-label="Cập nhật bản khai" name="Cập nhật bản khai" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item, 'viewform')">
                   <v-badge>
                     <v-icon v-if="onlyView" size="24" color="#004b94">description</v-icon>
                     <v-icon v-else size="24" color="#004b94">edit</v-icon>
@@ -477,14 +477,14 @@
                 <span v-else>Cập nhật bản khai</span>
               </v-tooltip>
               <v-tooltip top v-if="progressUploadPart !== item.partNo && onlyView & item.hasForm && !nghiepvuhanghai">
-                <v-btn slot="activator" class="mx-1 my-0" fab dark small color="primary" @click="loadAlpcaFormClick(item)" style="height:25px;width:25px">
+                <v-btn name="Xem bản khai" slot="activator" class="mx-1 my-0" fab dark small color="primary" @click="loadAlpcaFormClick(item)" style="height:25px;width:25px">
                   <v-icon style="font-size: 14px;">visibility</v-icon>
                 </v-btn>
                 <span>Xem</span>
               </v-tooltip>
 
               <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && !khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)" aria-label="Tải giấy tờ lên" name="Tải lên giấy tờ">
                   <v-badge>
                     <v-icon size="24" color="#004b94">cloud_upload</v-icon>
                   </v-badge>
@@ -494,7 +494,7 @@
               </v-tooltip>
               <!--  -->
               <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && !khoTaiLieuCongDan && kySoSavis">
-                <v-btn slot="activator" icon class="mx-0 my-0 ml-2" @click="pickFileSavis(item)">
+                <v-btn aria-label="Tải lên và ký số" slot="activator" icon class="mx-0 my-0 ml-2" @click="pickFileSavis(item)" name="Tải lên và ký số">
                   <v-badge>
                     <v-icon size="24" color="#004b94">fa-pencil-square-o</v-icon>
                   </v-badge>
@@ -513,7 +513,7 @@
 
               <!-- Sử dụng kho tài liệu công dân -->
               <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView && khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)" name="Tải lên">
                   <v-badge>
                     <v-icon size="24" color="#004b94">cloud_upload</v-icon>
                   </v-badge>
@@ -523,12 +523,12 @@
               </v-tooltip>
               <!-- <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan"> -->
               <v-tooltip class="pl-1 pt-1" top v-if="applicantId && khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)" name="Giấy tờ trong kho">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">storage</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Giấy tờ trong kho</span>
+                <span>Sử dụng giấy tờ trong kho</span>
               </v-tooltip>
               <!-- <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa">
                 <v-btn :disabled="progress_sohoa" slot="activator" icon class="mx-0 my-0" @click="guiYeuCauSoHoa(item, index)">
@@ -615,7 +615,7 @@
         @change="changeAllFileMark($event)"
       ></v-checkbox>
     </div>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+    <v-dialog v-model="dialogPDF" max-width="1000" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title>
@@ -648,51 +648,64 @@
     <v-dialog v-model="dialog_documentApplicant" scrollable persistent max-width="1300px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>Giấy tờ, tài liệu</v-toolbar-title>
+          <v-toolbar-title>Kho giấy tờ, tài liệu</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialog_documentApplicant = false">
+          <v-btn icon dark @click.native="cancelDialogKhoTaiLieu">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text class="py-1" style="min-height: 350px">
-          <kho-tai-lieu ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage"></kho-tai-lieu>
+        <v-card-text class="py-1" style="min-height: 500px">
+          <kho-tai-lieu-tap-trung v-if="khoTaiLieuTapTrung" ref="khotailieutaptrung" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
+          <kho-tai-lieu v-else  ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" 
+            :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage">
+          </kho-tai-lieu>
         </v-card-text>
       </v-card>
     </v-dialog>
     <!-- ký số điện tử -->
     <v-dialog
       v-model="dialogSignDigital"
-      max-width="450"
+      max-width="650"
     >
       <v-card>
-        <v-card-title class="white--text py-3">LỰA CHỌN DỊCH VỤ KÝ SỐ ĐIỆN TỬ</v-card-title>
+        <v-card-title class="py-3 primary--text" style="font-size: 16px; font-weight: 600;">LỰA CHỌN DỊCH VỤ KÝ SỐ ĐIỆN TỬ</v-card-title>
         <v-divider class="my-0"></v-divider>
-        <v-card-text class="px-0">
+        <v-card-text class="px-0" style="height: 157px">
           <v-layout wrap>
             <v-flex xs12 sm6 class="text-xs-center" style="cursor: pointer">
               <v-hover>
-                <div slot-scope="{ hover }" style="position: relative;">
-                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-viettel-ca.png" alt="trevor" style="background: #fff;"><br>
-                  <span class="text-bold" style="color: #3a877e">KÝ SỐ VIETTEL CA</span>
+                <div slot-scope="{ hover }" style="position: relative;" @click="mySignViettel(fileKySo, indexFileSelect)">
+                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-viettel-ca.png" style="background: #fff;"><br>
+                  <span class="text-bold" style="color: #3a877e">CHỮ KÝ SỐ CÔNG CỘNG</span>
                   <v-expand-transition>
                     <div
                       v-if="hover"
                       class="d-flex slide-x-transition blue darken-2 display-3 white--text"
-                      style="height: 115px;align-items: center;
-                      bottom: -10px;
+                      style="height: 155px;align-items: center;
+                      bottom: -40px;
                       background-color: #3a877e26 !important;
                       justify-content: center;
                       position: absolute;
                       width: 100%;"
                     >
-                      <div class="d-flex" style="position: absolute; bottom: 0px; width: 100%;">
-                        <v-btn small color="indigo" class="white--text" @click="getHashStringFile">
-                          <v-icon style="color: #fff !important">edit</v-icon> &nbsp;&nbsp; KÝ TOKEN
-                        </v-btn>
-                        <v-btn small color="red" class="white--text" @click="signSimCa(fileKySo, indexFileSelect)">
-                          <v-icon style="color: #fff !important">sim_card</v-icon> &nbsp;&nbsp; KÝ SIM CA
-                        </v-btn>
-                      </div>
+                      <!-- <div style="position: absolute; bottom: 10px; width: 100%;">
+                        <div>
+                          <v-btn small color="indigo" class="white--text" @click="getHashStringFile">
+                            <v-icon style="color: #fff !important">edit</v-icon> &nbsp;&nbsp; KÝ TOKEN
+                          </v-btn>
+                          <v-btn small color="red" class="white--text" @click="signSimCa(fileKySo, indexFileSelect)">
+                            <v-icon style="color: #fff !important">sim_card</v-icon> &nbsp;&nbsp; KÝ SIM CA
+                          </v-btn>
+                        </div>
+                        <div style="width: 100%;height: 65px;" class="text-xs-center">
+                          <div class="text-xs-center" style="width: 100px;cursor: pointer;background: #fff;border-radius: 10px;display: inline-block; border: 1px solid #dedede" 
+                            @click="mySignViettel(fileKySo, indexFileSelect)">
+                            <v-img contain style="width: 100px; height: 45px" src="/o/tinhdongthap-theme/images/mysignVT.png">
+                            </v-img>
+                            <div style="color: red;font-size: 14px">KÝ MY-SIGN</div>
+                          </div>
+                        </div>
+                      </div> -->
                     </div>
                   </v-expand-transition>
                 </div>
@@ -701,20 +714,20 @@
             <v-flex xs12 sm6 class="text-xs-center" style="cursor: pointer">
               <v-hover>
                 <div slot-scope="{ hover }" style="position: relative;height: 100%;">
-                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-kyso-bancoyeu.png" alt="trevor" style="background: #fff;"><br>
+                  <img class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-kyso-bancoyeu.png"  style="background: #fff;"><br>
                   <span class="text-bold" style="color: #0071bd;" v-if="!hover">KÝ SỐ BAN CƠ YẾU CHÍNH PHỦ</span>
                   <v-expand-transition>
                     <div
                       v-if="hover"
                       class="slide-x-transition blue darken-2 display-3 white--text"
-                      style="height: 115px;align-items: center;
-                      bottom: -10px;
+                      style="height: 155px;align-items: center;
+                      bottom: -40px;
                       background-color: #1976d22e !important;
                       justify-content: center;
                       position: absolute;
                       width: 100%;"
                     >
-                      <div class="d-flex" style="position: absolute; bottom: 0px; width: 100%;">
+                      <div class="d-flex" style="position: absolute; bottom: 10px; width: 100%;">
                         <v-btn small color="indigo" class="white--text" @click="vgcaSignAction (fileKySo, indexFileSelect, 'approved')">
                           <v-icon style="color: #fff !important">edit</v-icon> &nbsp;&nbsp; KÝ DUYỆT
                         </v-btn>
@@ -741,12 +754,13 @@
     <!-- ký số điện tử -->
     <v-dialog
       v-model="dialogInputMobile"
-      max-width="350"
+      max-width="550"
       persistent
     >
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title style="font-size: 14px">NHẬP SỐ SIM CA THỰC HIỆN KÝ SỐ</v-toolbar-title>
+          <v-toolbar-title style="font-size: 14px" v-if="useSimPKI">NHẬP SỐ SIM CA THỰC HIỆN KÝ SỐ</v-toolbar-title>
+          <v-toolbar-title style="font-size: 14px" v-if="!useSimPKI">THÔNG TIN TÀI KHOẢN CHỮ KÝ SỐ CÔNG CỘNG</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogInputMobile = false">
             <v-icon>close</v-icon>
@@ -754,16 +768,58 @@
         </v-toolbar>
         <v-card-text class="px-0 pb-0">
           <v-layout wrap>
-            <v-flex xs12 class="text-xs-center" style="cursor: pointer">
-              <v-text-field class="my-2 mb-0 mx-2" 
+            <v-flex xs12 class="text-xs-center" v-if="useSimPKI" style="cursor: pointer">
+              <v-text-field class="my-2 mb-0 mx-2"
                 v-model="mobileCA"
                 box
                 placeholder="0868919191, 0972919191, ..."
               ></v-text-field>
             </v-flex>
+            <v-flex xs12 class="px-3" v-if="!useSimPKI" style="cursor: pointer">
+              <div>Chọn nhà cung cấp : <span style="color: red"> (*)</span></div>
+              <!-- <v-radio-group class="mt-1" v-model="typeUserMySign" row>
+                <v-radio label="Doanh nghiệp" value="MST" ></v-radio>
+                <v-radio label="Cá nhân" value="CMT"></v-radio>
+              </v-radio-group> -->
+              <v-autocomplete
+                :items="dsCungCapCA"
+                hide-no-data
+                v-model="donViCapCA"
+                item-text="name"
+                item-value="value"
+                box
+                class="my-2"
+              ></v-autocomplete>
+              <div>Mã số thuế / Số CMND/CCCD, hộ chiếu<span style="color: red"> (*)</span>:</div>
+              <v-text-field class="mt-2"
+                v-model="userIdMySign"
+                box
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 class="text-xs-center mb-3" v-if="!useSimPKI">
+              <v-btn :loading="loadingAction" :disabled="loadingAction" class="mr-0" style="width: 100px" color="primary" @click="getCertMySign()" >
+                <v-icon>save</v-icon> &nbsp;
+                Xác nhận
+              </v-btn>
+            </v-flex>
+            <v-flex xs12 class="px-3 mb-4" v-if="!useSimPKI && listCertMySign.length">
+              <div style="display: flex;align-items: center;">
+                <v-icon size="20" color="#5a770d" class="mr-2">double_arrow</v-icon>
+                <span style="text-transform: uppercase; color: #5a770d;font-weight: 500; font-size: 14px;">Chọn chứng thư số:</span>
+              </div>
+              <v-flex class="py-2 mt-2" v-for="(item, index) in listCertMySign" :key="index" xs12 
+                style="border: 1px dotted #5a770d; background: #5a770d24;"
+                @click="submitMySign(item)"
+              >
+                <p style="cursor: pointer !important;text-decoration: underline;padding-left: 15px;margin-bottom: 0px;">
+                  <v-icon class="mr-2" size="18">edit</v-icon>
+                  <span style="font-size: 14px;">{{item.cert_id}}</span>
+                </p>
+              </v-flex>
+            </v-flex>
           </v-layout>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions v-if="useSimPKI">
           <v-spacer></v-spacer>
           <v-btn class="mr-0" style="width: 125px" color="primary" @click="submitSignSimCa()" :loading="loadingAction"
           :disabled="loadingAction">
@@ -952,7 +1008,7 @@
         <v-card-text class="px-0 pb-0">
           <v-layout wrap v-if="!detailUserSmartVnpt">
             <v-flex xs12 class="text-xs-center" style="">
-              <img style="width: 100px;" class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-vnpt-ca.svg" alt="trevor"><br>
+              <img style="width: 100px;" class="mb-2" src="/o/opencps-store/js/cli/dvc/app/image/logo-vnpt-ca.svg"><br>
             </v-flex>
             <v-flex xs12 class="mt-2" style="cursor: pointer">
               <p class="mx-3">Tên đăng nhập</p>
@@ -1007,7 +1063,7 @@
     </v-dialog>
     <!--  -->
     <v-dialog
-      v-model="dialogChoKyVnptSmartCa"
+      v-model="dialogChoKySoBatDongBo"
       max-width="550"
       persistent
     >
@@ -1015,33 +1071,43 @@
         <v-toolbar dark color="primary">
           <v-toolbar-title style="font-size: 14px"> CHỜ KÝ SỐ</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialogChoKyVnptSmartCa = false">
+          <v-btn icon dark @click.native="dialogChoKySoBatDongBo = false">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
         <v-card-text class="px-0 pb-0">
           <v-layout wrap>
-            <v-flex xs12 class="mt-2" style="font-size: 14px;">
+            <v-flex xs12 class="mt-2" style="font-size: 16px;">
+              <div class="mb-2 mx-3">
+                <v-progress-linear :indeterminate="true"></v-progress-linear>
+              </div>
               <p class="mx-3">
                 Yêu cầu ký số tài liệu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.
-              </p>
-              <p class="mx-3 mt-2">
-                Xác nhận 
-                <span class="text-bold"> "ĐÃ KÝ SỐ" </span>
-                sau khi thực hiện.
               </p>
             </v-flex>
           </v-layout>
         </v-card-text>
-        <v-card-actions class="">
-          <v-spacer></v-spacer>
-          <v-btn class="mr-2 white--text" style="width: 125px" color="#00204a" @click="getTransInfo()" :loading="loadingAction"
+        <v-card-actions class="py-3 px-3" style="justify-content: center;">
+          <v-btn v-if="useMySignVT" class="mr-2 white--text" style="width: 125px" color="primary" @click="dialogChoKySoBatDongBo = false">
+            <v-icon>clear</v-icon> &nbsp;
+            HỦY BỎ
+            <span slot="loader">Đang kiểm tra</span>
+          </v-btn>
+        </v-card-actions>
+        <!-- <v-card-actions class="py-3 px-3" style="justify-content: center;">
+          <v-btn class="mr-2 white--text" v-if="!useMySignVT" style="width: 125px" color="#00204a" @click="getTransInfo()" :loading="loadingAction"
           :disabled="loadingAction">
             <v-icon>done_all</v-icon> &nbsp;
             ĐÃ KÝ SỐ
             <span slot="loader">Đang kiểm tra</span>
           </v-btn>
-        </v-card-actions>
+          <v-btn v-if="useMySignVT" class="mr-2 white--text" style="width: 125px" color="primary" @click="getResultMySign()" :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>done_all</v-icon> &nbsp;
+            ĐÃ KÝ SỐ
+            <span slot="loader">Đang kiểm tra</span>
+          </v-btn>
+        </v-card-actions> -->
       </v-card>
     </v-dialog>
     <!--  -->
@@ -1141,6 +1207,10 @@
     <div style="display:none">
       <a id="downloadCaiDatSavis" :href="srcDownloadSavis" download></a>
     </div>
+    <!--  -->
+    <div style="display:none">
+      <a id="downloadFileKho" :href="srcDownload" download></a>
+    </div>
   </div>
 </template>
 
@@ -1149,9 +1219,11 @@ import $ from 'jquery'
 import axios from 'axios'
 import toastr from 'toastr'
 import KhoTaiLieu from '../TiepNhan/KhoTaiLieu'
+import KhoTaiLieuTapTrung from '../TiepNhan/KhoTaiLieuTapTrung'
 toastr.options = {
   'closeButton': true,
-  'timeOut': '5000'
+  'timeOut': '5000',
+  "positionClass": "toast-top-center"
 }
 export default {
   props: {
@@ -1186,6 +1258,7 @@ export default {
   },
   components: {
     'kho-tai-lieu': KhoTaiLieu,
+    'kho-tai-lieu-tap-trung': KhoTaiLieuTapTrung,
   },
   data: () => ({
     dialog_add_giayto: false,
@@ -1356,7 +1429,7 @@ export default {
     showKySoMotCua: false,
     dialogSignDigital: false,
     dialogXacThucVnptSmartCa: false,
-    dialogChoKyVnptSmartCa: false,
+    dialogChoKySoBatDongBo: false,
     fileKySo: '',
     indexFileSelect: '',
     fileEditor: '',
@@ -1369,12 +1442,34 @@ export default {
     loadingAction: false,
     kySoSavis: false,
     kySoVnptSmartCa: false,
-    oneApp: false
+    oneApp: false,
+    khoTaiLieuTapTrung: false,
+    srcDownload: '',
+    useSimPKI: '',
+    useMySignVT: false,
+    typeUserMySign: 'MST',
+    userIdMySign: '',
+    dsCungCapCA: [
+      {name: 'Viettel CA', value: 'Viettel-CA'},
+      {name: 'VNPT CA', value: 'VNPT-CA'},
+      {name: 'FPT CA', value: 'FPT-CA'},
+      {name: 'BKAV CA', value: 'BkavCA'},
+      {name: 'Nacencom', value: 'CA2'},
+      {name: 'MISA CA', value: 'MISA-CA'}
+    ],
+    donViCapCA: '',
+    listCertMySign: [],
+    transactionInfo: '',
+    certSelected: ''
   }),
   created () {
     let vm = this
     vm.receiveMessage = function (event) {
       vm.saveAlpacaFormCallBack(event)
+    }
+    try {
+      vm.khoTaiLieuTapTrung = khoTaiLieuTapTrung
+    } catch (error) {
     }
     try {
       vm.oneApp = oneApp
@@ -1398,6 +1493,10 @@ export default {
     }
     try {
       vm.showKySo = showKySoDvc
+    } catch (error) {
+    }
+    try {
+      vm.dsCungCapCA = dsCungCapCA
     } catch (error) {
     }
     try {
@@ -1519,6 +1618,21 @@ export default {
       console.log('dossierTemplateItemsFilter222', vm.dossierTemplateItemsFilter)
     },
     dialog_documentApplicant (val) {
+      setTimeout(function () {
+        if (val) {
+          let myElements = document.querySelectorAll(".v-menu__content");
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'fixed';
+          }
+        } else {
+          let myElements = document.querySelectorAll(".v-menu__content")
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'absolute';
+          }
+        }
+      }, 300)
+    },
+    dialogInputMobile (val) {
       setTimeout(function () {
         if (val) {
           let myElements = document.querySelectorAll(".v-menu__content");
@@ -2867,8 +2981,23 @@ export default {
     },
     downloadSingleFile (data) {
       let vm = this
-      let url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
-      window.location.assign(url)
+      let fileKhoSoHoa = data.hasOwnProperty('url') && data.url && data.url.indexOf('{urlKhoSoHoa}/') == 0
+      if (!fileKhoSoHoa) {
+        let url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+        window.location.assign(url)
+      } else {
+        let filter = {
+          id: data.url.split("/").pop()
+        }
+        vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
+          vm.srcDownload = result
+          setTimeout(function () {
+            document.getElementById('downloadFileKho').click()
+          }, 100)
+        }).catch(function () {
+          toastr.error('Tải xuống không thành công')
+        })
+      }
     },
     viewFile (data) {
       var vm = this
@@ -2940,35 +3069,61 @@ export default {
     },
     viewFile2 (data, index) {
       var vm = this
-      if (data.fileSize === 0) {
-        return
-      }
-      if (data['eForm']) {
-        vm.pdfEform = true
-      } else {
-        vm.pdfEform = false
-      }
-      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
-        var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
-        window.location.assign(url)
-      } else {
-        data['dossierId'] = vm.thongTinHoSo.dossierId
-        if (data.referenceUid) {
-          vm.dialogPDFLoading = true
-          vm.dialogPDF = true
-          if (vm.dossierFilesItems[index].hasOwnProperty('pdfSigned') && vm.dossierFilesItems[index]['pdfSigned']) {
-            vm.dialogPDFLoading = false
-            document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['pdfSigned']
-          } else {
-            vm.$store.dispatch('viewFile', data).then(result => {
-              vm.dialogPDFLoading = false
-              document.getElementById('dialogPDFPreview' + vm.id).src = result
-            })
-          }
-        } else {
-          toastr.clear()
-          toastr.error('File dữ liệu không tồn tại')
+      let fileKhoSoHoa = data.hasOwnProperty('url') && data.url && data.url.indexOf('{urlKhoSoHoa}/') == 0
+      if (!fileKhoSoHoa) {
+        if (data.fileSize === 0) {
+          return
         }
+        if (data['eForm']) {
+          vm.pdfEform = true
+        } else {
+          vm.pdfEform = false
+        }
+        if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
+          var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+          window.location.assign(url)
+        } else {
+          data['dossierId'] = vm.thongTinHoSo.dossierId
+          if (data.referenceUid) {
+            vm.dialogPDFLoading = true
+            vm.dialogPDF = true
+            if (vm.dossierFilesItems[index].hasOwnProperty('pdfSigned') && vm.dossierFilesItems[index]['pdfSigned']) {
+              vm.dialogPDFLoading = false
+              document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['pdfSigned']
+            } else {
+              vm.$store.dispatch('viewFile', data).then(result => {
+                vm.dialogPDFLoading = false
+                document.getElementById('dialogPDFPreview' + vm.id).src = result
+              })
+            }
+          } else {
+            toastr.clear()
+            toastr.error('File dữ liệu không tồn tại')
+          }
+        }
+      } else {
+        vm.dialogPDFLoading = true
+        let filter = {
+          id: data.url.split("/").pop()
+        }
+        vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
+          vm.dialogPDFLoading = false
+          vm.dialogPDF = true
+          let fileType = data.displayName.split(".")[1].toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            document.getElementById('dialogPDFPreview' + vm.id).src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFileKho').click()
+            }, 100)
+          }
+        }).catch(function () {
+          vm.dialogPDFLoading = false
+          toastr.error('Tải xuống không thành công')
+        })
       }
     },
     attachToDossier (file, index) {
@@ -3320,29 +3475,30 @@ export default {
       }
       if (applicantIdNo) {
         if (!vm.khoTaiLieuCongDan) {
-          vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
-            vm.dossierFilesApplicant = result
-          }).catch(reject => {
-            console.log('error')
-          })
+          // vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+          //   vm.dossierFilesApplicant = result
+          // }).catch(reject => {
+          //   console.log('error')
+          // })
         } else {
-          filter['templateNo'] = vm.thongTinHoSo.dossierTemplateNo
-          if (vm.oneApp || vm.originality == 3) {
-            vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
-              vm.dossierFilesApplicant = result
-              console.log('hasFile', vm.dossierFilesApplicant)
-            }).catch(reject => {
-              console.log('error')
-            })
-          } else {
-            vm.$store.dispatch('getDossierFilesApplicantsVer2Proxy', filter).then(result => {
-              vm.dossierFilesApplicant = result
-              console.log('hasFile', vm.dossierFilesApplicant)
-            }).catch(reject => {
-              console.log('error')
-            })
-          }
-          
+          if (!vm.khoTaiLieuTapTrung) {
+            filter['templateNo'] = vm.thongTinHoSo.dossierTemplateNo
+            if (vm.oneApp || vm.originality == 3) {
+              vm.$store.dispatch('getDossierFilesApplicantsVer2', filter).then(result => {
+                vm.dossierFilesApplicant = result
+                console.log('hasFile', vm.dossierFilesApplicant)
+              }).catch(reject => {
+                console.log('error')
+              })
+            } else {
+              vm.$store.dispatch('getDossierFilesApplicantsVer2Proxy', filter).then(result => {
+                vm.dossierFilesApplicant = result
+                console.log('hasFile', vm.dossierFilesApplicant)
+              }).catch(reject => {
+                console.log('error')
+              })
+            }
+          }          
         }
       }
     },
@@ -3480,8 +3636,48 @@ export default {
         })
       }
     },
-    getDocumentTypeIcon (type) {
+    attachFileFromStorageCentralized (data) {
       let vm = this
+      let tepDuLieu = []
+      if (data.hasOwnProperty('TepDuLieu') && data.TepDuLieu) {
+        tepDuLieu = data.TepDuLieu
+      }
+      if (tepDuLieu.length) {
+        console.log('dataTep', tepDuLieu, vm.dossierPartAttach)
+        let arrReq = []
+        tepDuLieu.forEach(element => {
+          let filter = {
+            dossierId: vm.thongTinHoSo.dossierId,
+            dossierTemplateNo: vm.thongTinHoSo.dossierTemplateNo,
+            partNo: vm.dossierPartAttach.partNo,
+            fileName: element.TenTep + '.' + element.Ext,
+            fileType: element.DinhDangTep,
+            fileSize: element.KichThuocTep,
+            fileTemplateNo: vm.dossierPartAttach.fileTemplateNo,
+            referenceUid: '{urlKhoSoHoa}/' + data.MaDinhDanh + '/' + element.MaDinhDanh
+          }
+          arrReq.push(vm.$store.dispatch('cloneFileFromStorageCentralized', filter))
+        });
+        Promise.all(arrReq).then(values => {
+          vm.dialog_documentApplicant = false
+          vm.dossierTemplateItemsFilter[vm.indexPart]['passRequired'] = true
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
+        }).catch(function () {
+          toastr.error('Đính kèm tài liệu thất bại')
+        })
+      } else {
+        toastr.error('Giấy tờ, tài liệu không có tệp')
+      }
+    },
+    getDocumentTypeIcon (file) {
+      let vm = this
+      let type = file.fileType
+      if (file.hasOwnProperty('url') && file.url && file.url.indexOf('{urlKhoSoHoa}/') == 0) {
+        type = file.displayName.split(".")[1].toLowerCase()
+      }
       let typeDoc = 'doc,docx'
       let typeExcel = 'xls,xlsx'
       let typeImage = 'png,jpg,jpeg'
@@ -3518,7 +3714,11 @@ export default {
           }
         }
       } else {
-        return ''
+        return {
+          icon: 'fas fa fa-paperclip',
+          color: '',
+          size: 14
+        }
       }
     },
     showDocumentApplicant (part, index) {
@@ -3530,8 +3730,25 @@ export default {
       vm.indexPart = index
       vm.dialog_documentApplicant = true
       setTimeout(function () {
-        vm.$refs.khotailieu.initData()
+        if (vm.$refs.khotailieu) {
+          vm.$refs.khotailieu.initData()
+        }
+        if (vm.$refs.khotailieutaptrung) {
+          vm.$refs.khotailieutaptrung.initData()
+        }
       }, 200)
+    },
+    cancelDialogKhoTaiLieu () {
+      let vm = this
+      if (vm.khoTaiLieuTapTrung) {
+        if (vm.$refs.khotailieutaptrung.showDetail) {
+          vm.$refs.khotailieutaptrung.showDetail = false
+        } else {
+          vm.dialog_documentApplicant = false
+        }
+      } else {
+        vm.dialog_documentApplicant = false
+      }
     },
     guiYeuCauSoHoa (part, index) {
       let vm = this
@@ -3642,10 +3859,20 @@ export default {
     },
     showSelectDigitalSign (file, index) {
       let vm = this
-      vm.dialogSignDigital = true
-      vm.fileKySo = file
-      vm.indexFileSelect = index
-      console.log('fileKySo', vm.fileKySo)
+      if (String(file.fileType).toLowerCase() === 'pdf') {
+        vm.dialogSignDigital = true
+        vm.fileKySo = file
+        vm.indexFileSelect = index
+        console.log('fileKySo', vm.fileKySo)
+        let applicantType = 'citizen'
+        try {
+          applicantType = JSON.parse(localStorage.getItem('userInfo'))['applicantType']
+        } catch (error) {
+        }
+        vm.typeUserMySign = applicantType === 'citizen' ? 'CMT' : 'MST'
+      } else {
+        toastr.error('Ký số chỉ áp dụng giấy tờ định dạng *.pdf')
+      }
     },
     loadFiles () {
       let vm = this
@@ -3739,8 +3966,149 @@ export default {
     },
     signSimCa (file, index) {
       let vm = this
+      vm.useSimPKI = true
+      vm.useMySignVT = false
       vm.dialogSignDigital = false
       vm.dialogInputMobile = true
+    },
+    mySignViettel (file, index) {
+      let vm = this
+      if (String(file.fileType).toLowerCase() === 'pdf') {
+        vm.fileKySo = file
+        vm.indexFileSelect = index
+        vm.useSimPKI = false
+        vm.useMySignVT = true
+        vm.dialogSignDigital = false
+        vm.dialogInputMobile = true
+      } else {
+        toastr.error('Ký số chỉ áp dụng giấy tờ định dạng *.pdf')
+      }
+    },
+    getCertMySign () {
+      let vm = this
+      if (vm.typeUserMySign && String(vm.userIdMySign).trim()) {
+        let user = {
+          user_id: String(vm.userIdMySign).trim(),
+          ca_name: vm.donViCapCA,
+          serial_number: ''
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('getCertMySign', user).then(res => {
+          vm.loadingAction = false
+          vm.listCertMySign = []
+          try {
+            vm.listCertMySign = res.data.user_certificates
+          } catch (error) {
+          }
+          if (!vm.listCertMySign.length) {
+            toastr.error('Không có thông tin chứng thư số')
+          }
+        }).catch(function () {
+          vm.loadingAction = false
+          toastr.error('Không có thông tin chứng thư số')
+        })
+      }  
+    },
+    submitMySign (item) {
+      let vm = this
+      vm.certSelected = item
+      if (vm.loadingAction) {
+        return;
+      }
+      let dataInsertSignature = {
+        "user_id": String(vm.userIdMySign).trim(),
+        "ca_name": vm.donViCapCA,
+        "serial_number": item.serial_number,
+        "dossierId": vm.fileKySo.dossierId,
+        "referenceUid": vm.fileKySo.referenceUid,
+        "cert_data": item.cert_data
+      }
+      vm.loadingAction = true
+      toastr.success('Yêu cầu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.')
+      vm.dialogChoKySoBatDongBo = true
+      vm.dialogInputMobile = false
+      vm.$store.dispatch('signatureMySign', dataInsertSignature).then(res => {
+        vm.loadingAction = false
+        let dataUpdateFile = {
+          fileEntryIdStr: res ? res['fileEntryIdStr'] : '',
+          dossierFileIdStr: vm.fileKySo.dossierFileId
+        }
+        vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
+          toastr.clear()
+          toastr.success('Thực hiện ký số thành công')
+          vm.dialogChoKySoBatDongBo = false
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+            vm.dossierFilesItems = resFiles
+          }).catch(reject => {
+          })
+        }).catch(function() {
+          toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
+          vm.dialogChoKySoBatDongBo = false
+        })
+      }).catch(function () {
+        vm.loadingAction = false
+        vm.dialogChoKySoBatDongBo = false
+        toastr.error('Gửi yêu cầu ký số thất bại')
+      })
+    },
+    getResultMySign () {
+      let vm = this
+      let dataInsertSignature = {
+        dossierId: vm.thongTinHoSo['dossierId'],
+        fileReferenceUid: vm.fileKySo.referenceUid,
+        credentialID: vm.certSelected.credentialId,
+        applicantIdNo: vm.typeUserMySign + '_' + String(vm.userIdMySign).trim(),
+        transactionId: vm.transactionInfo['transactionId']
+      }
+      vm.loadingAction = true
+      vm.$store.dispatch('getResultMySign', dataInsertSignature).then(res => {
+        vm.loadingAction = false
+        console.log('resMySign', res)
+        let status = true
+        let mss = ''
+        if (res.hasOwnProperty('status') && res.status == 4000) {
+          status = false
+          mss = 'Người dùng chưa thực hiện ký số trên thiết bị'        
+        }
+        if (res.hasOwnProperty('status') && res.status == 4001) {
+          status = false
+          mss = 'Yêu cầu ký số hết thời gian chờ'        
+        }
+        if (res.hasOwnProperty('status') && res.status == 4002) {
+          status = false
+          mss = 'Yêu cầu ký số đã bị từ chối'        
+        }
+        if (res.hasOwnProperty('status') && res.status == 4004) {
+          status = false
+          mss = 'Ký số thất bại. Có lỗi xảy ra'        
+        }
+        if (res.hasOwnProperty('status') && res.status == 50000) {
+          status = false
+          mss = 'Có lỗi xảy ra khi lấy thông tin'        
+        }
+        if (!status) {
+          toastr.clear()
+          toastr.error(mss)
+          return;
+        }
+        let dataUpdateFile = {
+          fileEntryIdStr: res ? res['fileEntryIdStr'] : '',
+          dossierFileIdStr: vm.fileKySo.dossierFileId
+        }
+        vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
+          toastr.clear()
+          toastr.success('Thực hiện ký số thành công')
+          vm.dialogChoKySoBatDongBo = false
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+            vm.dossierFilesItems = resFiles
+          }).catch(reject => {
+          })
+        }).catch(function() {
+          toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
+        })
+      }).catch(function () {
+        vm.loadingAction = false
+      })
     },
     submitSignSimCa () {
       let vm = this
@@ -3978,7 +4346,7 @@ export default {
         if (response.hasOwnProperty('data') && response.data) {
           vm.tranId_vnpt = response.data.tranId
           vm.dialogXacThucVnptSmartCa = false
-          vm.dialogChoKyVnptSmartCa = true
+          vm.dialogChoKySoBatDongBo = true
         }
       }).catch(function (xhr) {
         toastr.error('Quá trình ký số thất bại')
@@ -4003,7 +4371,7 @@ export default {
           let signFileNameStr = dataFile.signFileNameStr
           let dossierFileIdStr = dataFile.dossierFileIdStr
           vm.updateSignedVnptCa(signFileNameStr, dossierFileIdStr)
-          vm.dialogChoKyVnptSmartCa = false
+          vm.dialogChoKySoBatDongBo = false
         } else {
           toastr.error('Vui lòng thực hiện ký số trên thiết bị')
         }

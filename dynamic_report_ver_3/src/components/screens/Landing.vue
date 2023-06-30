@@ -1742,6 +1742,13 @@ export default {
               vm.dossierList = result
             }
           }
+          if (vm.itemsReports[vm.index]['reportCode'] === 'REPORT_TK_BGT') {
+            try {
+              dataReport = dataConfig
+              vm.dossierList = dataConfig
+            } catch (error) {
+            }
+          }
           vm.pagination.totalItems = vm.dossierList.length
           if (vm.dossierList && vm.dossierList.length === 0) {
             vm.isShowLoading = false

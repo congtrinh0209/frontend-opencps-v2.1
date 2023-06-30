@@ -459,7 +459,7 @@ export default {
         } else {
           vm.documentApplicantList = []
         }
-        vm.totalDocument = response['total']
+        vm.totalDocument = response['data']['total']
         vm.loadingTable = false
       }, error => {
         vm.loadingTable = false

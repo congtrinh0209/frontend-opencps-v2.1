@@ -1,4 +1,4 @@
-import 'idempotent-babel-polyfill'
+// import 'idempotent-babel-polyfill'
 import Vue from 'vue'
 import './plugins/vuetify'
 import App from './App_dvc.vue'
@@ -13,6 +13,9 @@ import VueCookies from 'vue-cookies'
 Vue.use(VueCookies)
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 Vue.use(VueContentPlaceholders)
+import VueObserveVisibility from "vue-observe-visibility"
+
+Vue.use(VueObserveVisibility)
 Vue.config.productionTip = false
 
 Vue.mixin({

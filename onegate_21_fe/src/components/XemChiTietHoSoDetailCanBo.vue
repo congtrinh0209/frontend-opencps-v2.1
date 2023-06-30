@@ -869,7 +869,7 @@
       </div>
     </div>
     <!-- plugin ký số -->
-    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
+    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0" alt="Ký số" aria-label="Ký số"></object>
     <!--  -->
     <div style="display: none">
       <input id="dossierId_hidden" type="text" :value="thongTinChiTietHoSo.dossierId">
@@ -928,7 +928,7 @@
           <div v-else-if="modelPlugin['plugin']">
             <div v-if="modelPlugin.pdf">
               <div class="flex xs12 sm12 text-center">
-                <object id="dossierPDFViewPlugin" data="" width="100%" height="100%" v-if="!modelPlugin.no_pdf">
+                <object id="dossierPDFViewPlugin" data="" width="100%" height="100%" v-if="!modelPlugin.no_pdf" aria-label="Xem pdf" alt="Xem pdf">
                   <iframe :src="modelPlugin.url" width="100%" style="min-height: 500px !important; padding-left: 0;"> </iframe>
                 </object>
                 <div id="dossierPDFViewNotFound" class="text-center">{{ modelPlugin.no_pdf }}</div>

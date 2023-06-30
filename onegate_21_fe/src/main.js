@@ -6,10 +6,12 @@ import router from './router/index'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'toastr/build/toastr.css'
-// import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
 import 'v-suggestions/dist/v-suggestions.css'
 import 'svg-pan-zoom/dist/svg-pan-zoom.min.js'
 import axios from 'axios'
+import VueObserveVisibility from "vue-observe-visibility"
+
+Vue.use(VueObserveVisibility)
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 Vue.use(VueContentPlaceholders)

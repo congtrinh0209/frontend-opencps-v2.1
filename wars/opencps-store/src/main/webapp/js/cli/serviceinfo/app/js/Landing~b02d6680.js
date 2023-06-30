@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["Landing~b02d6680"],{"306c":function(n,t,e){"use strict";e.r(t);var u=function(){var n=this,t=n.$createElement,e=n._self._c||t;return e("div",[n._v("\n bbbbbb\n")])},a=[],b={data:function(){return{}}},c=b,r=e("2877"),i=Object(r["a"])(c,u,a,!1,null,null,null);t["default"]=i.exports}}]);

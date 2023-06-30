@@ -35,7 +35,7 @@
                 {{item.counter}}
               </span>
               <span v-else class="status__counter_group status__counter">
-                <v-progress-circular :width="1" :size="16" indeterminate color="red"></v-progress-circular>
+                <v-progress-circular :width="1" :size="16" indeterminate color="red" aria-label="Đang tải"></v-progress-circular>
               </span>
             </v-list-tile-content>
           </v-list-tile>
@@ -138,7 +138,7 @@
         </v-card>
       </v-dialog>
     </v-content>
-    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
+    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0" aria-label="Ký số" alt="Ký số"></object>
   </v-app>
 </template>
 

@@ -47,8 +47,8 @@
                     text-align: right;
                   "
           >
-            <button type="button" class="btn-register" @click="goToDangKyPage">Đăng ký</button>
-            <button type="button" class="btn-login" @click="goToDangNhap">Đăng nhập</button>
+            <button type="button" class="btn-register" @click="goToDangKyPage" name="Đăng ký" aria-label="Đăng ký">Đăng ký</button>
+            <button type="button" class="btn-login" @click="goToDangNhap" name="Đăng nhập" aria-label="Đăng nhập">Đăng nhập</button>
           </div>
         </div>
       </div>
@@ -72,9 +72,10 @@
             type="button"
             class="mx-0 my-0 v-btn v-btn--icon theme--light"
             style="
-            position: absolute;
-            left: 0;
-        "
+              position: absolute;
+              left: 0;
+            "
+            name="Thông báo" aria-label="Thông báo"
           >
             <div class="v-btn__content">
               <i
@@ -104,7 +105,7 @@
             >{{notificationCount > 5 ? "5+" : notificationCount}}</span>
           </span>
         </span>
-        <v-btn v-else @click="showNoti" icon class="mx-0 my-0">
+        <v-btn v-else @click="showNoti" icon class="mx-0 my-0" name="Thông báo" aria-label="Thông báo">
           <v-icon
             size="20"
             color="blue darken-3"
@@ -115,7 +116,7 @@
         <v-menu offset-y :nudge-bottom="5">
           <v-chip slot="activator" @click="isShowUserMenu = !isShowUserMenu">
             <v-avatar v-if="avatarURL !== ''">
-              <img :src="avatarURL" style="width: 32px;height: 32px;margin: 0 !important;">
+              <img :src="avatarURL" style="width: 32px;height: 32px;margin: 0 !important;" alt="Ảnh đại diện">
             </v-avatar>
             <v-avatar v-else class="white--text" :style="{background: '#' + colorBG}">
               <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
@@ -180,6 +181,7 @@
                   border-top-left-radius: 8px;
                   border-bottom-left-radius: 8px;
                 "
+                name="Thông báo" aria-label="Thông báo"
               >Thông báo</v-btn>
             </v-flex>
             <v-flex xs6 class="text-center">
@@ -194,6 +196,7 @@
                     border-top-right-radius: 8px;
                     border-bottom-right-radius: 8px;
                 "
+                name="Đánh dấu" aria-label="Đánh dấu"
               >Đánh dấu đã đọc</v-btn>
             </v-flex>
           </v-layout>

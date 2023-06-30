@@ -282,7 +282,7 @@
             background: #efe5e5;
             border-radius: 5px;
           ">
-          <qrcode :value="JSON.stringify(dataVietelPay)" :options="{ width: 150 }"></qrcode><br>
+          <!-- <qrcode :value="JSON.stringify(dataVietelPay)" :options="{ width: 150 }"></qrcode><br> -->
           <v-chip class="my-0 ml-1" color="#24b2b4" text-color="white" style="width:135px;margin-top:-5px !important">
             <span style="font-size:13px !important">Quét để thanh toán</span>
           </v-chip>
@@ -299,8 +299,8 @@ import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
 import {VMoney} from 'v-money'
-import VueQrcode from '@chenfengyuan/vue-qrcode'
-Vue.component(VueQrcode.name, VueQrcode)
+// import VueQrcode from '@chenfengyuan/vue-qrcode'
+// Vue.component(VueQrcode.name, VueQrcode)
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'

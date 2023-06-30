@@ -1,17 +1,20 @@
-import 'idempotent-babel-polyfill'
+// import 'idempotent-babel-polyfill'
 import Vue from 'vue'
 import './plugins/vuetify'
 import App from './App_dvc.vue'
 import router from './router/index-dvc'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
-// import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
 import 'v-suggestions/dist/v-suggestions.css'
 import 'svg-pan-zoom/dist/svg-pan-zoom.min.js'
 import axios from 'axios'
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 Vue.use(VueContentPlaceholders)
+import VueObserveVisibility from "vue-observe-visibility"
+
+Vue.use(VueObserveVisibility)
+
 Vue.config.productionTip = false
 
 Vue.mixin({

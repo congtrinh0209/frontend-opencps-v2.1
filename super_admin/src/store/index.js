@@ -1326,6 +1326,14 @@ export const store = new Vuex.Store({
             }
           }
           var dataPostAction = new URLSearchParams()
+          let createDossierFilesText = data.createDossierFiles ? data.createDossierFiles.join() : ''
+          if (data.createDossierFilesText) {
+            createDossierFilesText = data.createDossierFilesText
+          }
+          let returnDossierFilesText = data.returnDossierFiles ? data.returnDossierFiles.join() : ''
+          if (data.returnDossierFilesText) {
+            returnDossierFilesText = data.returnDossierFilesText
+          }
           dataPostAction.append('actionCode', data.actionCode ? data.actionCode : '')
           dataPostAction.append('actionName', data.actionName ? data.actionName : '')
           dataPostAction.append('preStepCode', data.preStepCode ? data.preStepCode : '')
@@ -1338,8 +1346,8 @@ export const store = new Vuex.Store({
           dataPostAction.append('paymentFee', data.paymentFee ? data.paymentFee : '')
           dataPostAction.append('syncActionCode', data.syncActionCode ? data.syncActionCode : '')
           dataPostAction.append('rollbackable', data.rollbackable)
-          dataPostAction.append('createDossierFiles', data.createDossierFiles ? data.createDossierFiles.join() : '')
-          dataPostAction.append('returnDossierFiles', data.returnDossierFiles ? data.returnDossierFiles.join() : '')
+          dataPostAction.append('createDossierFiles', createDossierFilesText)
+          dataPostAction.append('returnDossierFiles', returnDossierFilesText)
           dataPostAction.append('createDossierNo', data.createDossierNo ? data.createDossierNo : '')
           dataPostAction.append('eSignature', data.eSignature)
           dataPostAction.append('signatureType', data.eSignature && data.signatureType ? data.signatureType : '')

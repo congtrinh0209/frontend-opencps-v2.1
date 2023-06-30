@@ -13,7 +13,7 @@
             ></canvas>
           </div>
           <div v-show="!isCameraSelect">
-            <ejs-uploader
+            <!-- <ejs-uploader
               id="imageSelfiePreview"
               name="UploadFiles"
               :allowedExtensions="extensions"
@@ -22,7 +22,7 @@
               :selected="onFrontFileSelect"
               :multiple="false"
             >
-            </ejs-uploader>
+            </ejs-uploader> -->
             <img id="upload-selfie-image" />
           </div>
         </div>
@@ -87,9 +87,9 @@ toastr.options = {
   closeButton: true,
   timeOut: "3000",
 };
-import { UploaderPlugin } from "@syncfusion/ej2-vue-inputs";
+// import { UploaderPlugin } from "@syncfusion/ej2-vue-inputs";
 
-Vue.use(UploaderPlugin);
+// Vue.use(UploaderPlugin);
 
 export default {
   props: ["userData"],

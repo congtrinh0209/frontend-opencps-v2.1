@@ -426,14 +426,14 @@
 <script>
   // import $ from 'jquery'
   // 
-  import docxtemplater from 'docxtemplater';
-  import PizZip from "pizzip";
-  import PizZipUtils from "pizzip/utils/index.js";
-  import angularParser from "docxtemplater/js/expressions";
-  import { saveAs } from "file-saver";
-  function loadFile(url, callback) {
-    PizZipUtils.getBinaryContent(url, callback);
-  }
+  // import docxtemplater from 'docxtemplater';
+  // import PizZip from "pizzip";
+  // import PizZipUtils from "pizzip/utils/index.js";
+  // import angularParser from "docxtemplater/js/expressions";
+  // import { saveAs } from "file-saver";
+  // function loadFile(url, callback) {
+  //   PizZipUtils.getBinaryContent(url, callback);
+  // }
   // 
   import toastr from 'toastr'
   import HoSoTrongNhom from '.././TiepNhan/HoSoTrongNhom'

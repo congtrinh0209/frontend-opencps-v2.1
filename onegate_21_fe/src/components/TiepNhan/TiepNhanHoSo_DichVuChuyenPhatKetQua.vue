@@ -226,6 +226,7 @@
 
 <script>
 import axios from 'axios'
+import support from '../../store/support.json'
 export default {
   props: ['detailDossier'],
   data: () => ({
@@ -235,10 +236,10 @@ export default {
     weight: '',
     feeVnPost: '',
     valid_dichvuchuyenphat: false,
-    citys: [],
+    citys: support.danhMucVNPOST,
     resultDistricts: [],
     resultWards: [],
-    vnPostItems: [],
+    vnPostItems: support.danhMucVNPOST,
     postalServiceItems: [
       // {
       //   itemName: 'VIETTEL POST',
@@ -282,9 +283,9 @@ export default {
       vm.showTinhPhi = showTinhPhi
     } catch (error) {
     }
-    vm.$store.dispatch('getVNPOSTcode').then(result => {
-      vm.vnPostItems = result
-    })
+    // vm.$store.dispatch('getVNPOSTcode').then(result => {
+    //   vm.vnPostItems = result
+    // })
     if (this.postalServiceItems.length > 0) {
       this.dichVuChuyenPhatKetQua.postalServiceCode = this.postalServiceItems[0].itemCode
     }
@@ -302,95 +303,30 @@ export default {
         }
       } catch (error) {
       }
-      // var filter = {
-      //   collectionCode: 'VNPOST_CITY_CODE',
-      //   level: 0,
-      //   parent: 0
-      // }
-      // if (val.cityCode) {
-      //   vm.onChangeResultCity(val.cityCode)
-      // }
-      // if (val.districtCode) {
-      //   vm.onChangeResultDistrict(val.districtCode)
-      // }
     }
   },
   mounted () {
     var vm = this
-    var filter = {
-      collectionCode: 'VNPOST_CITY_CODE',
-      level: 0,
-      parent: 0
-    }
-    var data = vm.dichVuChuyenPhatKetQua
-    vm.$store.getters.getDictItems(filter).then(function (result) {
-      vm.citys = result.data
-    })
-    if (data.postalCityCode) {
-      filter.parent = data.postalCityCode
-      filter.level = 1
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultDistricts = result.data
-      })
-    }
-    // if (data.postalDistrictCode) {
-    //   filter.parent = data.postalDistrictCode
+    // var filter = {
+    //   collectionCode: 'VNPOST_CITY_CODE',
+    //   level: 0,
+    //   parent: 0
+    // }
+    // var data = vm.dichVuChuyenPhatKetQua
+    // vm.$store.getters.getDictItems(filter).then(function (result) {
+    //   vm.citys = result.data
+    // })
+    // if (data.postalCityCode) {
+    //   filter.parent = data.postalCityCode
     //   filter.level = 1
     //   vm.$store.getters.getDictItems(filter).then(function (result) {
-    //     vm.resultWards = result.data
+    //     vm.resultDistricts = result.data
     //   })
     // }
   },
   methods: {
     initData (data) {
       var vm = this
-      // let dichVuChuyenPhatKetQuaTemp = {
-      //   viaPostal: data.viaPostal,
-      //   postalServiceCode: data.postalServiceCode,
-      //   postalServiceName: data.postalServiceName,
-      //   postalAddress: data.postalAddress,
-      //   postalCityCode: data.postalCityCode,
-      //   postalCityName: data.postalCityName,
-      //   postalDistrictCode: data.postalDistrictCode,
-      //   postalDistrictName: data.postalDistrictName,
-      //   postalWardCode: data.postalWardCode,
-      //   postalWardName: data.postalWardName,
-      //   postalTelNo: data.postalTelNo,
-      //   vnPostCode: data.vnPostCode
-      // }
-      // vm.dichVuChuyenPhatKetQua = dichVuChuyenPhatKetQuaTemp
-      vm.$nextTick(function () {
-        // var filter = {
-        //   collectionCode: 'VNPOST_CITY_CODE',
-        //   level: 0,
-        //   parent: 0
-        // }
-        // vm.$store.getters.getDictItems(filter).then(function (result) {
-        //   vm.citys = result.data
-        // })
-        // if (data.postalCityCode) {
-        //   filter.parent = data.postalCityCode
-        //   filter.level = 1
-        //   vm.$store.getters.getDictItems(filter).then(function (result) {
-        //     vm.resultDistricts = result.data
-        //   })
-        // }
-        // if (data.postalDistrictCode) {
-        //   filter.parent = data.postalDistrictCode
-        //   filter.level = 1
-        //   vm.$store.getters.getDictItems(filter).then(function (result) {
-        //     vm.resultWards = result.data
-        //   })
-        // }
-        // filter = {
-        //   collectionCode: 'VNPOST_CODE',
-        //   level: 0,
-        //   parent: 0
-        // }
-        // vm.$store.getters.getDictItems(filter).then(function (result) {
-        //   vm.vnPostItems = result.data
-        // })
-      })
     },
     onChangeResultCity (data) {
       var vm = this
@@ -400,24 +336,18 @@ export default {
         parent: data
       }
       console.log('onChangeResultCity', data)
-      vm.$store.getters.getDictItems(filter).then(function (result) {
-        vm.resultDistricts = result.data
-      })
+      if (data !== '' && data !== null && data !== undefined) {
+        vm.$store.getters.getDictItems(filter).then(function (result) {
+          vm.resultDistricts = result.data
+        })
+      }
+      
       if (vm.showTinhPhi) {
         vm.getFee()
       }
     },
     onChangeResultDistrict (data) {
       var vm = this
-      // let filter = {
-      //   collectionCode: 'VNPOST_CITY_CODE',
-      //   level: 2,
-      //   parent: data
-      // }
-      // console.log('onChangeResultDistrict', data)
-      // vm.$store.getters.getDictItems(filter).then(function (result) {
-      //   vm.resultWards = result.data
-      // })
       if (vm.showTinhPhi) {
         vm.getFee()
       }

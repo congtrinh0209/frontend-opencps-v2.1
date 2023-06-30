@@ -349,11 +349,11 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="submitSelectGov">
-              <v-icon size="20">save</v-icon>&nbsp; Đồng ý
-            </v-btn>
             <v-btn class="white--text" color="primary"  @click="dialog_selectAgency = false">
               <v-icon size="20">clear</v-icon>&nbsp; Thoát
+            </v-btn>
+            <v-btn color="primary" @click="submitSelectGov">
+              <v-icon size="20">save</v-icon>&nbsp; Đồng ý
             </v-btn>
           </v-card-actions>
         </v-card>

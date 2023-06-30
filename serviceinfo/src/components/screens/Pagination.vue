@@ -10,31 +10,37 @@
           item-value="value"
           autocomplete
           @input="goToPage"
+          aria-label="Chọn trang"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-haspopup="true"
+          aria-controls="suggestions-list"
+          aria-required="true"
         ></v-select>
       </div>
       <ul class="tiny-pagination" :class="customClass">
         <li class="page-item" :class="classFirstPage">
-          <button @click.prevent="lastPageLast" :class="classFirstPage" class="pagination__navigation">
+          <button aria-label="Chuyển trang" name="Chuyển trang" label="Chuyển trang" @click.prevent="lastPageLast" :class="classFirstPage" class="pagination__navigation">
             <i aria-hidden="true" class="material-icons icon">first_page</i>
           </button>
         </li>
         <li class="page-item" :class="classFirstPage">
-          <button @click.prevent="lastPage" :class="classFirstPage" class="pagination__navigation" style="border-left: 0;">
+          <button aria-label="Chuyển trang" name="Chuyển trang" label="Chuyển trang" @click.prevent="lastPage" :class="classFirstPage" class="pagination__navigation" style="border-left: 0;">
             <i aria-hidden="true" class="material-icons icon">chevron_left</i>
           </button>
         </li>
         <li class="page-item" style="margin-right: 0;">
-          <button class="pagination__navigation pagination__navigation--disabled text-bold primary--text" style="border-right: 0; border-left: 0;">
+          <button aria-label="Chuyển trang" name="Chuyển trang" label="Chuyển trang" class="pagination__navigation pagination__navigation--disabled text-bold primary--text" style="border-right: 0; border-left: 0;">
             {{titlePage}}
           </button>
         </li>
         <li class="page-item" :class="classLastPage" style="margin-right: 0;">
-          <button @click.prevent="nextPage" :class="classLastPage" class="pagination__navigation" style="border-left: 0;">
+          <button aria-label="Chuyển trang" name="Chuyển trang" label="Chuyển trang" @click.prevent="nextPage" :class="classLastPage" class="pagination__navigation" style="border-left: 0;">
             <i aria-hidden="true" class="material-icons icon">chevron_right</i>
           </button>
         </li>
         <li class="page-item" :class="classLastPage">
-          <button @click.prevent="nextPageLast" :class="classLastPage" class="pagination__navigation">
+          <button aria-label="Chuyển trang" name="Chuyển trang" label="Chuyển trang" @click.prevent="nextPageLast" :class="classLastPage" class="pagination__navigation">
             <i aria-hidden="true" class="material-icons icon">last_page</i>
           </button>
         </li>

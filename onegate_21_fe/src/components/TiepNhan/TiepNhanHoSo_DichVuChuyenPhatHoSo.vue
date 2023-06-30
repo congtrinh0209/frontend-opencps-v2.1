@@ -180,6 +180,7 @@
 
 <script>
 import axios from 'axios'
+import support from '../../store/support.json'
 export default {
   props: ['detailDossier'],
   data: () => ({
@@ -188,7 +189,7 @@ export default {
     weight: '',
     feeVnPost: '',
     valid_dichvuchuyenphat: false,
-    citys: [],
+    citys: support.danhMucVNPOST,
     resultDistricts: [],
     resultWards: [],
     vnPostItems: [],
@@ -242,55 +243,27 @@ export default {
   watch: {
     thongTinChuHoSoBindChuyenPhat (val) {
       var vm = this
-      // vm.dichVuChuyenPhatHoSo.postalCityCode = val.cityCode
-      // vm.dichVuChuyenPhatHoSo.postalDistrictCode = val.districtCode
-      // vm.dichVuChuyenPhatHoSo.postalWardCode = val.wardCode
-      /*
-      vm.dichVuChuyenPhatHoSo.postalAddress = val.address
-      vm.dichVuChuyenPhatHoSo.postalTelNo = val.contactTelNo
-      */
-      // var filter = {
-      //   collectionCode: 'VNPOST_CITY_CODE',
-      //   level: 0,
-      //   parent: 0
-      // }
-      // if (val.cityCode) {
-      //   vm.onChangeResultCity(val.cityCode)
-      // }
-      // if (val.districtCode) {
-      //   vm.onChangeResultDistrict(val.districtCode)
-      // }
     }
   },
   mounted () {
     let vm = this
-    let filter = {
-      collectionCode: 'VNPOST_CITY_CODE',
-      level: 0,
-      parent: 0
-    }
-    let data = vm.dichVuChuyenPhatHoSo
-    vm.$store.getters.getDictItems(filter).then(function (result) {
-      vm.citys = result.data
-    })
-    if (data.postalCityCode) {
-      let filter1 = {
-        collectionCode: 'VNPOST_CITY_CODE',
-        level: 1,
-        parent: data.postalCityCode
-      }
-      vm.$store.getters.getDictItems(filter1).then(function (result) {
-        vm.resultDistricts = result.data
-      })
-    }
-    // if (data.postalDistrictCode) {
-    //   let filter2 = {
+    // let filter = {
+    //   collectionCode: 'VNPOST_CITY_CODE',
+    //   level: 0,
+    //   parent: 0
+    // }
+    // let data = vm.dichVuChuyenPhatHoSo
+    // vm.$store.getters.getDictItems(filter).then(function (result) {
+    //   vm.citys = result.data
+    // })
+    // if (data.postalCityCode) {
+    //   let filter1 = {
     //     collectionCode: 'VNPOST_CITY_CODE',
     //     level: 1,
-    //     parent: data.postalDistrictCode
+    //     parent: data.postalCityCode
     //   }
-    //   vm.$store.getters.getDictItems(filter2).then(function (result) {
-    //     vm.resultWards = result.data
+    //   vm.$store.getters.getDictItems(filter1).then(function (result) {
+    //     vm.resultDistricts = result.data
     //   })
     // }
   },
@@ -323,15 +296,6 @@ export default {
     },
     onChangeResultDistrict (data) {
       let vm = this
-      // vm.resultWards = []
-      // let filter = {
-      //   collectionCode: 'VNPOST_CITY_CODE',
-      //   level: 2,
-      //   parent: data
-      // }
-      // vm.$store.getters.getDictItems(filter).then(function (result) {
-      //   vm.resultWards = result.data
-      // })
       vm.dichVuChuyenPhatHoSo.postalDistrictName = vm.resultDistricts.filter(function(item) {
         return item.itemCode === data
       })[0]['itemName']

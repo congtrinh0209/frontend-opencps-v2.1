@@ -38,7 +38,7 @@
     <v-layout v-show="aiSearching">
       <v-flex sm24 xs24>
         <v-card elevation="0" class="px-5 py-3">
-          <selfie-image-box ref="selfieImageBox" @filterByApplicantIdNo="filterByApplicantIdNo"></selfie-image-box>
+          <!-- <selfie-image-box ref="selfieImageBox" @filterByApplicantIdNo="filterByApplicantIdNo"></selfie-image-box> -->
         </v-card>
       </v-flex>
     </v-layout>
@@ -1015,7 +1015,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import AdvSearch from './TimKiemNangCao'
-import SelfieImageBox from './ext/SelfieImageBox.vue'
+// import SelfieImageBox from './ext/SelfieImageBox.vue'
 import axios from 'axios'
 
 export default {
@@ -1027,7 +1027,7 @@ export default {
     'template-rendering': TemplateRendering,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'tim-kiem-nang-cao': AdvSearch,
-    SelfieImageBox
+    // SelfieImageBox
   },
   data: () => ({
     showKySoDocument: false,
@@ -1460,7 +1460,7 @@ export default {
               vm.aiSearching = false
               vm.aiSearchComplete = false
               vm.applicantIdNo = ''
-              vm.$refs.selfieImageBox.deleteImage()
+              // vm.$refs.selfieImageBox.deleteImage()
             }
             // 
           }).catch(function (){})
@@ -1510,7 +1510,7 @@ export default {
         vm.aiSearching = false
         vm.aiSearchComplete = false
         vm.applicantIdNo = ''
-        vm.$refs.selfieImageBox.deleteImage()
+        // vm.$refs.selfieImageBox.deleteImage()
       }
       // 
       if (currentQuery.hasOwnProperty('q')) {

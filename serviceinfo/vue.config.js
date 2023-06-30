@@ -23,6 +23,12 @@ if (process.env.NODE_ENV === 'production') {
       output: {
         filename: '../../wars/opencps-store/src/main/webapp/js/cli/serviceinfo/app/js/[name].js',
         chunkFilename: '../../wars/opencps-store/src/main/webapp/js/cli/serviceinfo/app/js/[name].js'
+      },
+      optimization: {
+        splitChunks: {
+          minSize: 200000,
+          maxSize: 500000
+        }
       }
     }
   }

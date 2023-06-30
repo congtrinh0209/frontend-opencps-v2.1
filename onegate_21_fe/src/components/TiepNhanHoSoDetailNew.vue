@@ -3068,6 +3068,10 @@ export default {
     },
     goBack () {
       let vm = this
+      let location = window.location.href.indexOf('/NEW?')
+      if (location >= 0) {
+        window.location.href = window.location.pathname
+      }
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
       delete currentQuery['template_no']

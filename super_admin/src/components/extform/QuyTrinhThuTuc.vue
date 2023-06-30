@@ -931,6 +931,20 @@
                       </template>
                     </v-autocomplete>
                   </v-flex>
+                  <v-flex xs12 sm6 class="pr-2">
+                    <v-text-field
+                      label="Mã tài liệu tạo mới"
+                      v-model="createDossierFilesText"
+                      box
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 class="pr-2">
+                    <v-text-field
+                      label="Mã kết quả trả về"
+                      v-model="currentAction.returnDossierFilesText"
+                      box
+                    ></v-text-field>
+                  </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
                     <v-select
@@ -1416,6 +1430,8 @@
             }
           },
         },
+        createDossierFilesText: '',
+        returnDossierFilesText: ''
       }
     },
     created () {
@@ -1666,6 +1682,8 @@
           vm.currentAction['createDossier'] = result.createDossiers ? result.createDossiers : ''
           vm.currentAction['createDossierFiles'] = result.createDossierFiles ? result.createDossierFiles.split(',') : []
           vm.currentAction['returnDossierFiles'] = result.returnDossierFiles ? result.returnDossierFiles.split(',') : []
+          vm.createDossierFilesText = result.createDossierFiles
+          vm.returnDossierFilesText = result.returnDossierFiles
         }).catch(reject => {
           console.log(reject)
         })
@@ -2043,6 +2061,8 @@
         let currentPath = vm.$router.history.current.path
         if (vm.$refs.formAddAction.validate()) {
           vm.currentAction['type'] = type
+          vm.currentAction['createDossierFilesText'] = vm.createDossierFilesText
+          vm.currentAction['returnDossierFilesText'] = vm.returnDossierFilesText
           vm.currentAction['currentProcess'] = vm.id
           vm.$store.dispatch('postProcessAction', vm.currentAction).then(function (result) {
             let data = {

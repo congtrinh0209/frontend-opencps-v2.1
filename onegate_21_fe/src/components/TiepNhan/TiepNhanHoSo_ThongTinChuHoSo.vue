@@ -220,8 +220,8 @@
                             <v-layout row wrap class="mt-4">
                               <v-flex xs6 sm4>
                                 <v-card elevation="0">
-                                  <attached-back-image ref="attachedBackImage" :type="'image'" @loadBackData="loadBackData" @changeLoading="changeLoading" @clearBackData="clearBackData"
-                                  ></attached-back-image>
+                                  <!-- <attached-back-image ref="attachedBackImage" :type="'image'" @loadBackData="loadBackData" @changeLoading="changeLoading" @clearBackData="clearBackData"
+                                  ></attached-back-image> -->
                                 </v-card>
                               </v-flex>
                               <v-spacer></v-spacer>
@@ -453,6 +453,7 @@
                       </content-placeholders>
                       <v-textarea
                       v-else
+                      aria-label="Địa chỉ chi tiết"
                       v-model="thongTinChuHoSo.address"
                       rows="2"
                       @change="thongTinChuHoSo.address=String(thongTinChuHoSo.address).trim()"
@@ -472,6 +473,9 @@
                       </content-placeholders>
                       <v-autocomplete
                       v-else
+                      aria-label="Tỉnh, thành phố"
+                      aria-autocomplete="list"
+                      aria-required="true"
                       :items="citys"
                       item-text="itemName"
                       item-value="itemCode"
@@ -494,6 +498,9 @@
                       </content-placeholders>
                       <v-autocomplete
                       v-else
+                      aria-label="Quận, huyện"
+                      aria-autocomplete="list"
+                      aria-required="true"
                       :items="districts"
                       item-text="itemName"
                       item-value="itemCode"
@@ -516,6 +523,9 @@
                       </content-placeholders>
                       <v-autocomplete
                       v-else
+                      aria-label="Phường, xã"
+                      aria-autocomplete="list"
+                      aria-required="true"
                       :items="wards"
                       item-text="itemName"
                       item-value="itemCode"
@@ -538,6 +548,7 @@
                       </content-placeholders>
                       <v-text-field
                       v-else
+                      aria-label="Số điện thoại"
                       v-model="thongTinChuHoSo.contactTelNo"
                       @change="thongTinChuHoSo.contactTelNo=String(thongTinChuHoSo.contactTelNo).trim()"
                       append-icon="phone"
@@ -557,6 +568,7 @@
                       </content-placeholders>
                       <v-text-field
                       v-else
+                      aria-label="Địa chỉ email"
                       v-model="thongTinChuHoSo.contactEmail"
                        @change="thongTinChuHoSo.contactEmail=String(thongTinChuHoSo.contactEmail).trim()"
                       :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required, rules.varchar100] : (thongTinChuHoSo.contactEmail ? [rules.email, rules.varchar100] : '')"
@@ -670,6 +682,7 @@
                         </content-placeholders>
                         <v-textarea
                         v-else
+                        aria-label="Địa chỉ chi tiết"
                         v-model="thongTinNguoiNopHoSo.delegateAddress"
                         rows="2"
                         @change="thongTinNguoiNopHoSo.delegateAddress=String(thongTinNguoiNopHoSo.delegateAddress).trim()"
@@ -690,6 +703,9 @@
                         </content-placeholders>
                         <v-autocomplete
                         v-else
+                        aria-label="Tỉnh, thành phố"
+                        aria-autocomplete="list"
+                        aria-required="true"
                         :items="citys"
                         item-text="itemName"
                         item-value="itemCode"
@@ -713,6 +729,9 @@
                         </content-placeholders>
                         <v-autocomplete
                         v-else
+                        aria-label="Quận, huyện"
+                        aria-autocomplete="list"
+                        aria-required="true"
                         :items="delegateDistricts"
                         item-text="itemName"
                         item-value="itemCode"
@@ -736,6 +755,9 @@
                         </content-placeholders>
                         <v-autocomplete
                         v-else
+                        aria-label="Phường, xã"
+                        aria-autocomplete="list"
+                        aria-required="true"
                         :items="delegateWards"
                         item-text="itemName"
                         item-value="itemCode"
@@ -758,6 +780,7 @@
                         </content-placeholders>
                         <v-text-field
                         v-else
+                        aria-label="Số điện thoại"
                         v-model="thongTinNguoiNopHoSo.delegateTelNo"
                         append-icon="phone"
                         @change="thongTinNguoiNopHoSo.delegateName=String(thongTinNguoiNopHoSo.delegateName).trim()"
@@ -778,6 +801,7 @@
                         </content-placeholders>
                         <v-text-field
                         v-else
+                        aria-label="Địa chỉ email"
                         v-model="thongTinNguoiNopHoSo.delegateEmail"
                         @change="thongTinNguoiNopHoSo.delegateEmail=String(thongTinNguoiNopHoSo.delegateEmail).trim()"
                         :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : '')"
@@ -1463,9 +1487,9 @@ import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
 import TinyPagination from '../../components/pagging/opencps_pagination'
-import AttachedBackImage from "../ext/AttachedBackImage.vue"
-import AttachedFrontImage from "../ext/AttachedFrontImage.vue"
-import AttachedSelfieImage from "../ext/AttachedSelfieImage.vue"
+// import AttachedBackImage from "../ext/AttachedBackImage.vue"
+// import AttachedFrontImage from "../ext/AttachedFrontImage.vue"
+// import AttachedSelfieImage from "../ext/AttachedSelfieImage.vue"
 import support from '../../store/support.json'
 toastr.options = {
   'closeButton': true,
@@ -1476,9 +1500,9 @@ export default {
   components: {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination,
-    AttachedBackImage,
-    AttachedFrontImage,
-    AttachedSelfieImage,
+    // AttachedBackImage,
+    // AttachedFrontImage,
+    // AttachedSelfieImage,
   },
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode', 'applicantIdRequired', 'detailDossier'],
   data: () => ({
@@ -1511,7 +1535,7 @@ export default {
     },
     valid_thongtinchuhoso: false,
     loadingVerify: false,
-    citys: [],
+    citys: support.danhMucTinhThanh,
     delegateDistricts: [],
     districts: [],
     delegateWards: [],
@@ -2043,21 +2067,21 @@ export default {
       vm.thongTinChuHoSo = thongTinChuHoSoTemp
       vm.checkApplicantInfos()
       vm.$nextTick(function () {
-        var filter = {
-          collectionCode: 'ADMINISTRATIVE_REGION',
-          level: 0,
-          parent: 0
-        }
-        vm.$store.getters.getDictItems(filter).then(function (result) {
-          vm.citys = result.data
+        // var filter = {
+        //   collectionCode: 'ADMINISTRATIVE_REGION',
+        //   level: 0,
+        //   parent: 0
+        // }
+        // vm.$store.getters.getDictItems(filter).then(function (result) {
+          // vm.citys = result.data
           // set default cityCode
           if (vm.formCode === "NEW" && !thongTinChuHoSoTemp['cityCode'] && vm.defaultCityCode) {
             vm.thongTinChuHoSo['cityCode'] = vm.defaultCityCode ? vm.defaultCityCode : ''
             vm.thongTinChuHoSo['cityName'] = defaultCityName ? defaultCityName : ''
           }
           
-        })
-        setTimeout(function () {
+        // })
+        // setTimeout(function () {
           if (data.cityCode || vm.defaultCityCode) {
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
@@ -2094,7 +2118,7 @@ export default {
               vm.delegateWards = resultDeWards.data
             })
           }
-        }, 200)
+        // }, 200)
       })
       vm.$refs.formChuHoSo.resetValidation()
       // 
@@ -2284,7 +2308,7 @@ export default {
         vm.thongTinChuHoSo.applicantIdNo = ''
         return null
       }
-      let url = `/o/rest/v2/applicants?start=0&end=30&idNo=${query}`
+      let url = `/o/rest/v2/applicants?start=0&end=10&idNo=${query}`
 
       // if (vm.functionTimeOutApplicant) {
       //   clearTimeout(vm.functionTimeOutApplicant)
@@ -2315,7 +2339,7 @@ export default {
         vm.thongTinNguoiNopHoSo.delegateIdNo = ''
         return null
       }
-      let url = `/o/rest/v2/applicants?start=0&end=30&idNo=${query}`
+      let url = `/o/rest/v2/applicants?start=0&end=10&idNo=${query}`
 
       // if (vm.functionTimeOutApplicant) {
       //   clearTimeout(vm.functionTimeOutApplicant)
@@ -3698,7 +3722,8 @@ export default {
       if (!date) {
         return ''
       }
-      return date.slice(6,8) + '/' + date.slice(4,6) + '/' + date.slice(0,4)
+      let dateStr = String(date)
+      return dateStr.slice(6,8) + '/' + dateStr.slice(4,6) + '/' + dateStr.slice(0,4)
     }
   }
 }

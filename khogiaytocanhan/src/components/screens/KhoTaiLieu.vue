@@ -10,7 +10,7 @@
             style="height: auto; border-bottom: 1px solid #dedede;" 
           >
             <v-list-tile-avatar>
-              <v-icon :class="menuActive == 0 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">folder</v-icon>
+              <v-icon :class="menuActive == 0 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">folder_shared</v-icon>
             </v-list-tile-avatar>
 
             <v-list-tile-content>
@@ -27,7 +27,7 @@
             style="height: auto !important; border-bottom: 1px solid #dedede;" 
           >
             <v-list-tile-avatar>
-              <v-icon :class="menuActive == 1 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">folder</v-icon>
+              <v-icon :class="menuActive == 1 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">share</v-icon>
             </v-list-tile-avatar>
 
             <v-list-tile-content>
@@ -52,8 +52,8 @@
                 v-model="keywordSearch"
                 label="Nhập từ khóa tìm kiếm..."
                 append-icon="search"
-                @keyup.enter="searchGiayToSoHoa"
-                @click:append="searchGiayToSoHoa"
+                @keyup.enter="searchKeyword"
+                @click:append="searchKeyword"
               ></v-text-field>
             </v-flex>
             <v-flex style="max-width: 170px; text-align: right;padding-top: 2px;">
@@ -90,7 +90,7 @@
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{ documentPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
+                    <span>{{ (documentPage + 1) * numberPerPage - numberPerPage + props.index + 1 }}</span>
                   </div>
                 </td>
                 <td class="text-xs-left py-2" style="height:36px; min-width:250px">
@@ -98,61 +98,53 @@
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{props.item.hasOwnProperty('fileName') ? props.item.fileName : ''}}</span>
+                    <span>{{props.item.TenGiayTo }}</span>
                   </div>
                 </td>
-                <td class="text-xs-left py-2" style="height:36px">
+                <td class="text-xs-left py-2" style="height:36px;min-width: 120px">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{props.item.hasOwnProperty('fileNo') ? props.item.fileNo : ''}}</span>
+                    <span>{{props.item.SoHieuVanBan}}</span>
                   </div>
                 </td>
-                <td class="text-xs-left py-2" style="height:36px">
+                <td class="text-xs-left py-2" style="height:36px;min-width: 150px">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{props.item.hasOwnProperty('createDate') ? props.item.createDate : ''}}</span>
+                    <div class="mb-1">
+                      <b>{{props.item.ChuHoSo['TenGoi']}}</b>
+                    </div>
+                    <span>{{props.item.ChuHoSo['MaDinhDanh']}}</span>
                   </div>
                 </td>
-                <td class="text-xs-left py-2" style="height:36px">
+                <td class="text-xs-center py-2" style="height:36px;min-width: 120px">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{props.item.hasOwnProperty('dossierNo') ? props.item.dossierNo : ''}}</span>
+                    <span>{{ convertDate(props.item.NgayBanHanh) }}</span>
                   </div>
                 </td>
+                
                 <td class="text-xs-center py-2" style="height:36px;min-width:100px">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span :style="props.item.status === 1 ? 'color: green' : (props.item.status === 2 ? 'color: red' : 'color: orange')">
-                      {{props.item.hasOwnProperty('status') ? getStatus(props.item.status) : ''}}
+                    <span>
+                      {{props.item.HieuLucVanBan['TenMuc']}}
                     </span>
                   </div>
                 </td>
-                <td class="text-center py-2" :style="menuActive == 0 ? 'height:36px;min-width:200px': 'height:36px;min-width:150px'">
+                <td class="text-center py-2" style="height:36px;min-width:150px">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
-                  <v-tooltip top v-if="!loadingTable && props.item.fileEntryId" class="mr-2">
-                    <v-btn @click.stop="viewDocument(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
-                      <v-icon size="22">visibility</v-icon>
-                    </v-btn>
-                    <span>Xem giấy tờ</span>
-                  </v-tooltip>
-                  <v-tooltip top v-if="!loadingTable && props.item.fileEntryId" class="mr-2">
-                    <v-btn @click.stop="downloadDocument(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
-                      <v-icon size="22">fas fa fa-download</v-icon>
-                    </v-btn>
-                    <span>Tải xuống</span>
-                  </v-tooltip>
                   <v-tooltip top v-if="!loadingTable && menuActive == 1" class="mr-2">
-                    <v-btn @click.stop="cloneMyStorage(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
+                    <v-btn :disabled="loadingAction" @click.stop="cloneMyStorage(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon size="22">sync_alt</v-icon>
                     </v-btn>
                     <span>Lấy sang kho của tôi</span>
@@ -164,7 +156,7 @@
                     <span>Cập nhật giấy tờ</span>
                   </v-tooltip>
                   <v-tooltip top v-if="!loadingTable && menuActive == 0" class="">
-                    <v-btn @click="deleteDocument(props.item)" color="red" slot="activator" flat icon class="mx-0 my-0">
+                    <v-btn @click.stop="deleteDocument(props.item)" color="red" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon size="22">delete</v-icon>
                     </v-btn>
                     <span>Xóa</span>
@@ -182,7 +174,7 @@
           <div class="my-2" v-if="totalDocument > numberPerPage">
             <div class="text-xs-right layout wrap" style="position: relative;">
               <div class="flex pagging-table"> 
-                <pagination :total="totalDocument" :page="documentPage" :numberPerPage="numberPerPage" nameRecord="giấy tờ" custom-class="custom-tiny-class" 
+                <pagination :total="totalDocument" :page="documentPage + 1" :numberPerPage="numberPerPage" nameRecord="giấy tờ" custom-class="custom-tiny-class" 
                   @tiny:change-page="changePage" ></pagination> 
               </div>
             </div>
@@ -198,73 +190,98 @@
               <v-icon size="28" color="#0072bc">reply</v-icon>
             </v-btn>
           </div>
-          <v-card-text v-if="typeCreate == 'view'" class="py-2 px-0">
-            <div class="xs12 sm12 pb-2">
-              <span class="pr-2 text-bold">Tên giấy tờ: </span>
-              <span class="pl-0"> {{documentSelect.fileName}}</span>
+          <v-card-text v-if="typeCreate == 'view'" style="font-size: 14px;" class="py-2 px-0">
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Tên giấy tờ: </v-flex>
+              <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.TenGiayTo}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Số hiệu giấy tờ: </v-flex>
+              <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.SoHieuVanBan}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Cơ quan ban hành: </v-flex>
+              <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.CoQuanBanHanh['TenGoi']}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Ngày ban hành: </v-flex>
+              <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{convertDate(documentSelect.NgayBanHanh)}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Mẫu giấy tờ: </v-flex>
+              <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.MaMauGiayTo['MaMuc']}} - {{documentSelect.MaMauGiayTo['TenMuc']}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Mã hồ sơ: </v-flex>
+              <v-flex class="pl-0 " style="width: calc(100% - 160px);"> {{documentSelect.HoSoDichVuCong['MaDinhDanh']}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Người thụ hưởng: </v-flex>
+              <v-flex class="pl-0 mr-2" style="width: calc(100% - 160px);"> {{documentSelect.ChuHoSo['TenGoi']}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold" style="width: 150px;">Số CCCD/CMND, MST: </v-flex>
+              <v-flex class="pl-0 " style="width: calc(100% - 160px);">{{documentSelect.ChuHoSo['MaDinhDanh']}}</v-flex>
+            </v-flex>
+            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+              <v-flex class="pr-2 text-bold " style="width: 150px;">Hiệu lực giấy tờ: </v-flex>
+              <v-flex class="pl-0 "  style="width: calc(100% - 160px);"> {{documentSelect.HieuLucVanBan['TenMuc']}}</v-flex>
+            </v-flex>
+            <div class="xs12 sm12 py-2" v-if="documentSelect &&documentSelect.TepDuLieu && documentSelect.TepDuLieu.length">
+              <span class="pr-2 text-bold ">Tệp giấy tờ: </span>
+              <div v-for="(itemFileView, indexFile) in documentSelect.TepDuLieu" :key="indexFile" class="my-2">
+                <span v-on:click.stop="viewDocument(itemFileView)" class="ml-1" style="cursor: pointer;text-decoration: underline;">
+                  <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.Ext)['color']"
+                    :size="getDocumentTypeIcon(itemFileView.Ext)['size']">
+                    {{getDocumentTypeIcon(itemFileView.Ext)['icon']}}
+                  </v-icon>
+                  {{itemFileView.TenTep}}.{{itemFileView.Ext}}
+                </span>
+                <v-btn class="my-0" title="Xem tệp" flat icon color="indigo" :loading="loadingPdf" :disabled="loadingPdf"
+                  @click.stop="viewDocument(itemFileView, index)"
+                >
+                  <v-icon size="22">visibility</v-icon>
+                </v-btn>
+                <v-btn title="Tải xuống" color="indigo" flat icon v-on:click.stop="downloadDocument(itemFileView)"  :loading="loadingPdf" :disabled="loadingPdf" class="mx-0 my-0">
+                  <v-icon size="14" color="primary">fas fa fa-download</v-icon>
+                </v-btn>
+              </div>
             </div>
             <div class="xs12 sm12 pb-2">
-              <span class="pr-2 text-bold">Số hiệu giấy tờ: </span>
-              <span class="pl-0"> {{documentSelect.fileNo}}</span>
-            </div>
-            <div class="xs12 sm12 pb-2">
-              <span class="pr-2 text-bold">Cơ quan ban hành: </span>
-              <span class="pl-0 mr-3"> {{documentSelect.govAgencyName}}</span>
-              <span class="pr-2 text-bold">Ngày ban hành: </span>
-              <span class="pl-0"> {{documentSelect.issueDate}}</span>
-            </div>
-            <div class="xs12 sm12 pb-2">
-              <span class="pr-2 text-bold">Mẫu giấy tờ: </span>
-              <span class="pl-0"> {{documentSelect.fileTemplateNo}}</span>
-            </div>
-            <div class="xs12 sm12 pb-2">
-              <span class="pr-2 text-bold">Mã hồ sơ: </span>
-              <span class="pl-0 "> {{documentSelect.fileTemplateNo}}</span>
-            </div>
-            <div class="xs12 sm12 pb-2">
-              <span class="pr-2 text-bold">Người thụ hưởng: </span>
-              <span class="pl-0 mr-2"> {{documentSelect.applicantName}}</span>
-              <span class="pr-2 text-bold">Số CCCD/CMND: </span>
-              <span class="pl-0 "> {{documentSelect.applicantIdNo}}</span>
-            </div>
-            <div class="xs12 sm12 pb-2">
-              <span class="pr-2 text-bold ">Hiệu lực giấy tờ: </span>
-              <span class="pl-0 "> {{documentSelect.status}}</span>
-            </div>
-            <div class="xs12 sm12 pb-2">
-              <v-btn color="#0072bc" small class="mx-0 white--text mr-3" @click.stop="viewDocument(documentSelect)">
-                <v-icon size="20">visibility</v-icon> &nbsp;Xem file
-              </v-btn>
-              <v-btn color="#0072bc" small class="mx-0 white--text mr-3" @click.stop="downloadDocument(documentSelect)">
-                <v-icon size="18">fas fa fa-download</v-icon> &nbsp;Tải xuống
-              </v-btn>
-              <v-btn v-if="menuActive == 0" color="#0072bc" small class="mx-0 white--text mr-3" @click.stop="showEditDocument(documentSelect)">
-                <v-icon size="20">edit</v-icon> &nbsp;Cập nhật
-              </v-btn>
-              <v-btn v-if="menuActive == 1" color="#0072bc" small class="mx-0 white--text mr-3" @click.stop="cloneMyStorage(documentSelect)">
-                <v-icon size="20">sync_alt</v-icon> &nbsp;Lấy về kho của tôi
+              <v-btn class="mx-0" color="red" dark @click.native="showDetail = false">
+                <v-icon>reply</v-icon>&nbsp;
+                Quay lại
               </v-btn>
             </div>
           </v-card-text>
           <v-card-text v-else class="py-1 px-0">
             <v-form id="form-crud" ref="form" v-model="valid" lazy-validation class="px-0 grid-list">
-              <v-layout row wrap class="px-0 py-3">
-                <v-flex xs12 class="pr-0 pl-0 py-0 mb-3">
-                  <div class="mb-1">Test component <span style="color: red">(*)</span></div>
+              <v-layout row wrap class="px-0 py-3">                
+                <v-flex xs12 class="pr-0 pl-0 py-0">
+                  <div class="mb-1 text-bold">Mẫu giấy tờ <span style="color: red">(*)</span></div>
                   <v-autocomplete
+                    :items="fileTemplateList"
+                    v-model="fileTemplateNoCreate"
                     ref="autocomplete"
-                    v-model="selected"
                     :loading="loading"
-                    :items="itemsSelectBox"
                     :search-input.sync="keywordSearchSelect"
+                    item-text="TenMuc"
+                    item-value="MaMuc"
+                    return-object
+                    clearable
                     solo
                     flat
-                    item-text="fileName"
-                    item-value="applicantDataId"
-                    return-object
+                    :rules="[v => !!v || 'Mẫu giấy tờ là bắt buộc']"
+                    required
                   >
+                    <template slot="selection" slot-scope="{ item }">
+                      <b class="labelCodeItemSelect">{{item.MaMuc}}</b>&nbsp;-&nbsp;{{item.TenMuc}}
+                    </template>
+                    <template slot="item" slot-scope="{ item }">
+                      <b>{{item.MaMuc}}</b>&nbsp;-&nbsp;{{item.TenMuc}}
+                    </template>
                     <template v-slot:append-item>
-                      <div class="py-2"
+                      <div class="py-2" v-if="isShow"
                         v-observe-visibility="{
                           callback: visibilityChanged
                         }"
@@ -273,24 +290,8 @@
                     </template>
                   </v-autocomplete>
                 </v-flex>
-                
-                <v-flex xs12 class="pr-0 pl-0 py-0">
-                  <div class="mb-1">Mẫu giấy tờ <span style="color: red">(*)</span></div>
-                  <v-autocomplete
-                    :items="fileTemplateList"
-                    v-model="fileTemplateNoCreate"
-                    label=""
-                    item-text="name"
-                    item-value="fileTemplateNo"
-                    return-object
-                    solo
-                    flat
-                    :rules="[v => !!v || 'Mẫu giấy tờ là bắt buộc']"
-                    required
-                  ></v-autocomplete>
-                </v-flex>
                 <v-flex xs12 class="px-0 py-0">
-                  <div class="mb-1">Tên giấy tờ <span style="color: red">(*)</span></div>
+                  <div class="mb-1 text-bold">Tên giấy tờ <span style="color: red">(*)</span></div>
                   <v-text-field
                     label=""
                     v-model="fileName"
@@ -302,7 +303,7 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm3 class="px-0 pr-3 py-0">
-                  <div class="mb-1">Số hiệu giấy tờ <span style="color: red">(*)</span></div>
+                  <div class="mb-1 text-bold">Số hiệu giấy tờ <span style="color: red">(*)</span></div>
                   <v-text-field
                     label=""
                     v-model="fileNo"
@@ -316,7 +317,7 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm3 class="px-0 pr-3 py-0">
-                  <div class="mb-1">Ngày ban hành</div>
+                  <div class="mb-1 text-bold">Ngày ban hành</div>
                   <v-text-field
                     label=""
                     v-model="createDate"
@@ -330,7 +331,7 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm3 class="px-0 pr-3 py-0">
-                  <div class="mb-1">Ngày hết hạn</div>
+                  <div class="mb-1 text-bold">Thời hạn hiệu lực</div>
                   <v-text-field
                     label=""
                     v-model="expireDate"
@@ -342,53 +343,50 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm3 class="px-0 py-0">
-                  <div class="mb-1">Hiệu lực <span style="color: red">(*)</span></div>
+                  <div class="mb-1 text-bold">Hiệu lực <span style="color: red">(*)</span></div>
                   <v-autocomplete
                     :items="statusList"
                     v-model="statusCreate"
                     label=""
-                    item-text="tenMuc"
-                    item-value="maMuc"
+                    item-text="TenMuc"
+                    item-value="MaMuc"
                     solo
                     flat
                     :rules="[v => !!v || 'Hiệu lực giấy tờ là bắt buộc']"
                     required
+                    return-object
                   ></v-autocomplete>
                 </v-flex>
                 
                 <v-flex xs12 class="px-0 py-0">
-                  <div class="mb-1">Cơ quan ban hành <span style="color: red">(*)</span></div>
+                  <div class="mb-1 text-bold">Cơ quan ban hành <span style="color: red">(*)</span></div>
                   <v-autocomplete
                     :items="donViList"
-                    item-text="name"
-                    item-value="value"
-                    label=""
                     v-model="govAgencyCreate"
-                    solo
-                    flat
-                    height="32"
-                    min-height="32"
+                    ref="autocomplete1"
+                    :loading="loadingDonVi"
+                    :search-input.sync="keywordSearchDonVi"
+                    item-text="TenGoi"
+                    item-value="MaDinhDanh"
+                    return-object
                     :rules="[v => !!v || 'Cơ quan ban hành là bắt buộc']"
                     required
                     clearable
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs12 sm3 class="px-0 py-0 pr-3">
-                  <div class="mb-1">Loại văn bản điện tử  <span style="color: red">(*)</span></div>
-                  <v-autocomplete
-                    :items="loaiVanBanList"
-                    v-model="loaiVanBanCreate"
-                    label=""
-                    item-text="tenMuc"
-                    item-value="maMuc"
                     solo
                     flat
-                    :rules="[v => !!v || 'Loại văn bản là bắt buộc']"
-                    required
-                  ></v-autocomplete>
+                  >
+                    <template v-slot:append-item>
+                      <div class="py-2" v-if="isShowDonVi"
+                        v-observe-visibility="{
+                          callback: visibilityChangedDonVi
+                        }"
+                      >
+                      </div>
+                    </template>
+                  </v-autocomplete>
                 </v-flex>
-                <v-flex xs12 sm3 class="px-0 py-0 pr-3">
-                  <div class="mb-1">Số CMND/CCCD người thụ hưởng <span style="color: red">(*)</span></div>
+                <v-flex xs12 sm4 class="px-0 py-0 pr-3">
+                  <div class="mb-1 text-bold">Mã định danh người thụ hưởng <span style="color: red">(*)</span></div>
                   <v-text-field
                     label=""
                     v-model="cmndNguoiThuHuong"
@@ -397,12 +395,12 @@
                     height="32"
                     min-height="32"
                     clearable
-                    :rules="[v => !!v || 'Số CMND/CCCD người thụ hưởng là bắt buộc']"
+                    :rules="[v => !!v || 'Số CMND/CCCD, mã số thuế đối tượng thụ hưởng là bắt buộc']"
                     required
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm3 class="px-0 py-0 pr-3">
-                  <div class="mb-1">Tên người thụ hưởng <span style="color: red">(*)</span></div>
+                <v-flex xs12 sm4 class="px-0 py-0 pr-3">
+                  <div class="mb-1 text-bold">Tên đối tượng thụ hưởng <span style="color: red">(*)</span></div>
                   <v-text-field
                     label=""
                     v-model="tenNguoiThuHuong"
@@ -411,11 +409,42 @@
                     height="32"
                     min-height="32"
                     clearable
-                    :rules="[v => !!v || 'Tên người thụ hưởng là bắt buộc']"
+                    :rules="[v => !!v || 'Tên đối tượng thụ hưởng là bắt buộc']"
                     required
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm3 class="px-0 py-0">
+                <!-- <v-flex xs12 sm4 class="px-0 py-0">
+                  <div class="mb-1 text-bold">Loại đối tượng thụ hưởng  <span style="color: red">(*)</span></div>
+                  <v-autocomplete
+                    :items="[
+                      {name: 'Cá nhân', value: 'CANHAN'},
+                      {name: 'Tổ chức, doanh nghiệp', value: 'DONVIKINHDOANH'}
+                    ]"
+                    v-model="loaiDoiTuongThuHuong"
+                    label=""
+                    item-text="name"
+                    item-value="value"
+                    solo
+                    flat
+                    return-object
+                  ></v-autocomplete>
+                </v-flex> -->
+                <v-flex xs12 sm4 class="px-0 py-0">
+                  <div class="mb-1 text-bold">Loại văn bản điện tử  <span style="color: red">(*)</span></div>
+                  <v-autocomplete
+                    :items="loaiVanBanList"
+                    v-model="loaiVanBanCreate"
+                    label=""
+                    item-text="TenMuc"
+                    item-value="MaMuc"
+                    solo
+                    flat
+                    :rules="[v => !!v || 'Loại văn bản là bắt buộc']"
+                    required
+                    return-object
+                  ></v-autocomplete>
+                </v-flex>
+                <!-- <v-flex xs12 sm3 class="px-0 py-0">
                   <div class="mb-1">Mã hồ sơ dịch vụ công</div>
                   <v-text-field
                     label=""
@@ -426,27 +455,51 @@
                     min-height="32"
                     clearable
                   ></v-text-field>
-                </v-flex>
+                </v-flex> -->
                 
                 <v-flex xs12 class="mt-2">
-                  <div class="mb-2">File giấy tờ:</div>
-                  <div v-if="fileNameView" class="pb-3" @click="viewDocument(documentSelect)">
-                    <v-icon size="18" color="red">fa fa-file-pdf-o</v-icon>
-                    <a class="ml-2" style="font-style: italic;font-size: 14px;text-decoration: underline;">{{fileNameView}}</a>
+                  <div class="mb-2 text-bold">Tệp giấy tờ <span style="color: red">(*)</span></div>
+                  <div v-for="(itemFileView, indexFile) in tepDinhKem" :key="indexFile" class="my-2">
+                    <span v-on:click.stop="viewDocument(itemFileView)" class="ml-1" style="cursor: pointer;text-decoration: underline;">
+                      <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.Ext)['color']"
+                        :size="getDocumentTypeIcon(itemFileView.Ext)['size']">
+                        {{getDocumentTypeIcon(itemFileView.Ext)['icon']}}
+                      </v-icon>
+                      {{itemFileView.TenTep}}.{{itemFileView.Ext}}
+                    </span>
+                    <v-btn class="my-0" title="Xem tệp" flat icon color="indigo" :loading="loadingPdf" :disabled="loadingPdf"
+                      @click.stop="viewDocument(itemFileView, index)"
+                    >
+                      <v-icon size="22">visibility</v-icon>
+                    </v-btn>
+                    <v-btn title="Tải xuống" color="indigo" flat icon v-on:click.stop="downloadDocument(itemFileView)" :loading="loadingPdf" :disabled="loadingPdf" class="mx-0 my-0">
+                      <v-icon size="16" color="primary">fas fa fa-download</v-icon>
+                    </v-btn>
+                    <v-btn title="Xóa" color="red" flat icon v-on:click.stop="deleteTepDinhKem(itemFileView, indexFile)" class="mx-0 my-0">
+                      <v-icon size="20" color="red">delete</v-icon>
+                    </v-btn>
                   </div>
-                  <input type="file" id="documentFile" @input="uploadDocumentFile($event)" style="display:none">
+                  <div v-for="(itemFileView, indexFile) in tepUpload" :key="indexFile" class="my-2">
+                    <span class="ml-1" style="cursor: pointer;text-decoration: underline;">
+                      <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.Ext)['color']"
+                        :size="getDocumentTypeIcon(itemFileView.Ext)['size']">
+                        {{getDocumentTypeIcon(itemFileView.Ext)['icon']}}
+                      </v-icon>
+                      {{itemFileView.TenTep}}
+                    </span>
+                    <v-btn title="Xóa" color="red" flat icon v-on:click.stop="deleteTepUpload(itemFileView, indexFile)" class="mx-0 my-0">
+                      <v-icon size="20" color="red">delete</v-icon>
+                    </v-btn>
+                  </div>
+                  <input type="file" id="documentFile" multiple @input="uploadDocumentFile($event)" style="display:none">
                   <v-btn block color="primary" class="mx-0 px-0 mr-4 d-inline-block" dark @click.native="uploadFile()" style="width: 175px">
                     <v-icon size="16">fas fa fa-upload</v-icon> &nbsp; &nbsp;
-                    Tải lên giấy tờ
+                    Tải lên tệp giấy tờ
                   </v-btn>
-                  <!-- <v-btn block color="primary" class="mx-0 px-0 d-inline-block" dark @click.native="vgca_sign_approved('https://kiemthu-mt-gov-vn-9001.fds.vn')" style="width: 230px">
-                    <v-icon size="16">border_color</v-icon> &nbsp; &nbsp;
-                    Tải lên và ký duyệt giấy tờ
-                  </v-btn> -->
-                  <div v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">
+                  <!-- <div v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">
                     <span style="color:red">(*) </span>
                     <span>File tải lên chấp nhận các định dạng: {{fileTemplateNoCreate.fileType}} .</span>
-                  </div>
+                  </div> -->
                 </v-flex>
               </v-layout>
             </v-form>
@@ -466,10 +519,10 @@
             </v-flex>
           </v-card-text>
         </v-card>
-        <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition">
+        <v-dialog v-model="dialogPDF" fullscreen transition="fade-transition">
           <v-card>
             <v-toolbar flat dark color="primary">
-              <v-toolbar-title>Giấy tờ tài liệu</v-toolbar-title>
+              <v-toolbar-title>Tệp dữ liệu</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon dark @click.native="dialogPDF = false">
                 <v-icon>close</v-icon>
@@ -526,6 +579,7 @@
       cmndNguoiThuHuong: '',
       tenNguoiThuHuong: '',
       maHoSoDvc: '',
+      loaiDoiTuongThuHuong: '',
       keywordSearch: '',
       applicantNameCreate: '',
       applicantIdNoCreate: '',
@@ -534,7 +588,7 @@
       expireDate: '',
       showDetail: false,
       fileTemplateList: [],
-      statusCreate: 1,
+      statusCreate: '',
       fileTemplateNoCreate: '',
       fileName: '',
       fileNo: '',
@@ -557,7 +611,7 @@
       loadingTable: false,
       documentApplicantList: [],
       totalDocument: 0,
-      documentPage: 1,
+      documentPage: 0,
       numberPerPage: 15,
       dialogViewFileSign: false,
       pathNameFileESign: '',
@@ -568,7 +622,6 @@
       fileNameView: '',
       srcDownload: '',
       fileEntryESign: '',
-      hasEsign: false,
       statusList: [],
       applicantInfos: '',
       documentListHeader: [
@@ -588,17 +641,17 @@
           sortable: false
         },
         {
-          text: 'Ngày tạo',
+          text: 'Người thụ hưởng',
           align: 'center',
           sortable: false
         },
         {
-          text: 'Mã hồ sơ',
+          text: 'Ngày ban hành',
           align: 'center',
           sortable: false
         },
         {
-          text: 'Tình trạng',
+          text: 'Hiệu lực giấy tờ',
           align: 'center',
           sortable: false
         },
@@ -608,6 +661,12 @@
           sortable: false
         }
       ],
+      applicantName: '',
+      applicantIdNo: '',
+      applicantType: '',
+      loadingPdf: false,
+      tepDinhKem: [],
+      tepUpload: [],
 
 
       loading: false,
@@ -616,7 +675,15 @@
       keywordSearchSelect: "",
       pageSelectBox: 0,
       totalItemsSelectBox: 0,
-      timeOutSearch: ""
+      timeOutSearch: "",
+      isShow: true,
+
+      loadingDonVi: false,
+      keywordSearchDonVi: "",
+      timeOutSearch1: "",
+      isShowDonVi: false,
+      pageSelectDonVi: 0,
+      totalItemsSelectDonVi: 0
     }),
     computed: {
     },
@@ -629,10 +696,23 @@
     },
     created () {
       let vm = this
-      let currentQuery = vm.$router.history.current.query
-      vm.getDanhSachGiayToSoHoa()
-      vm.getDanhMuc()
-      vm.searchItems()
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        }
+      }
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId(), param).then(function(response) {
+        try {
+          vm.applicantName = response.data['applicantName']
+          vm.applicantIdNo = response.data['applicantIdNo']
+          vm.applicantType = response.data['applicantType']
+        } catch (error) {
+        }
+        vm.getDanhSachGiayToSoHoa()
+        vm.getDanhMuc()
+      })
+      .catch(function(error) {
+      })
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -644,20 +724,20 @@
       fileTemplateNoCreate (val) {
         let vm = this
         if (val && vm.typeCreate === 'create') {
-          vm.fileName = val.name
+          vm.fileName = val.TenMuc
         }
       },
       // ----
       keywordSearchSelect(val) {
         let vm = this
-        if (vm.itemsSelectBox.length) {
-          if (val && val !== vm.selected) {
+        if (vm.fileTemplateList.length) {
+          if (val && val !== vm.fileTemplateNoCreate['TenMuc']) {
             if (vm.timeOutSearch) {
               clearTimeout(vm.timeOutSearch);
             }
             vm.timeOutSearch = setTimeout(function () {
-              let exits = vm.itemsSelectBox.find(function (item) {
-                return String(item.fileName).toLowerCase().includes(String(val).toLowerCase())
+              let exits = vm.fileTemplateList.find(function (item) {
+                return String(item.TenMuc).toLowerCase().includes(String(val).toLowerCase())
               })
               if (!exits) {
                 vm.searchItems()
@@ -670,6 +750,31 @@
           }
           vm.timeOutSearch = setTimeout(function () {
             vm.searchItems()
+          }, 1000)
+        }     
+      },
+      keywordSearchDonVi(val) {
+        let vm = this
+        if (vm.donViList.length) {
+          if (val && val !== vm.govAgencyCreate['TenGoi']) {
+            if (vm.timeOutSearch1) {
+              clearTimeout(vm.timeOutSearch1);
+            }
+            vm.timeOutSearch1 = setTimeout(function () {
+              let exits = vm.donViList.find(function (item) {
+                return String(item.TenGoi).toLowerCase().includes(String(val).toLowerCase())
+              })
+              if (!exits) {
+                vm.searchItemsDonVi()
+              }
+            }, 1000)
+          }
+        } else {
+          if (vm.timeOutSearch1) {
+            clearTimeout(vm.timeOutSearch1);
+          }
+          vm.timeOutSearch1 = setTimeout(function () {
+            vm.searchItemsDonVi()
           }, 1000)
         }     
       }
@@ -692,11 +797,12 @@
       getDanhSachDonVi () {
         let vm = this
         let filter = {
-          status: 1
+          page: 0,
+          size: 100
         }
-        vm.$store.dispatch('getFileItems', filter).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.donViList = result.data
+        vm.$store.dispatch('getDonVi', filter).then(function (result) {
+          if (result.hasOwnProperty('content')) {
+            vm.donViList = result.content
           } else {
             vm.donViList = []
           }
@@ -705,28 +811,36 @@
       },
       getMauGiayTo () {
         let vm = this
-        let filter = {
-          status: 1,
-          tenDanhMuc: 'maugiayto'
+        let filter1 = {
+          page: 0,
+          size: 20,
+          tenDanhMuc: 'mathanhphanhoso'
         }
-        vm.$store.dispatch('getDanhMuc', filter).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.fileTemplateList = result.data
-          } else {
-            vm.fileTemplateList = []
-          }
-        }).catch(function () {
+        let filter2 = {
+          page: 0,
+          size: 20,
+          tenDanhMuc: 'magiaytoketqua'
+        }
+        let req1 = vm.$store.dispatch('getDanhMuc', filter1)
+        let req2 = vm.$store.dispatch('getDanhMuc', filter2)
+        let arrAction = [req1, req2]
+        Promise.all(arrAction).then(results => {
+          let res = results[0]['content'].concat(results[1]['content'])
+          vm.fileTemplateList = res
+        }).catch(xhr => {
+          vm.fileTemplateList = []
         })
       },
       getHieuLuc () {
         let vm = this
         let filter = {
-          status: 1,
+          page: 0,
+          size: 100,
           tenDanhMuc: 'hieulucvanban'
         }
         vm.$store.dispatch('getDanhMuc', filter).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.statusList = result.data
+          if (result.hasOwnProperty('content')) {
+            vm.statusList = result.content
           } else {
             vm.statusList = []
           }
@@ -736,12 +850,13 @@
       getLoaiGiayTo () {
         let vm = this
         let filter = {
-          status: 1,
+          page: 0,
+          size: 100,
           tenDanhMuc: 'loaivanbandientu'
         }
         vm.$store.dispatch('getDanhMuc', filter).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.loaiVanBanList = result.data
+          if (result.hasOwnProperty('content')) {
+            vm.loaiVanBanList = result.content
           } else {
             vm.loaiVanBanList = []
           }
@@ -755,48 +870,43 @@
         let vm = this
         vm.menuActive = index
         vm.showDetail = false
+        vm.resetTimKiem()
+        vm.searchGiayToSoHoa()
       },
       uploadFile () {
         let vm = this
-        vm.hasEsign = false
         document.getElementById('documentFile').value = ''
         document.getElementById('documentFile').click()
       },
-      getDanhMucGiayTo () {
-        let vm = this
-        let filter = {
-          status: 1
-        }
-
-        vm.$store.dispatch('getFileItems', filter).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.fileTemplateList = result.data
-          } else {
-            vm.fileTemplateList = []
-          }
-        }).catch(function () {
-        })
-      },
       searchGiayToSoHoa (data) {
         let vm = this
-        console.log('dataInputSearch', data)
-        vm.dataInputSearch = data
-        vm.documentPage = 1
+        let dataSearch = Object.assign(data ? data : {}, {keyword: vm.keywordSearch })
+        console.log('dataInputSearch', dataSearch)
+        vm.dataInputSearch = dataSearch
+        vm.documentPage = 0
         vm.totalDocument = 0
-        vm.getDanhSachGiayToSoHoa(data)
+        vm.getDanhSachGiayToSoHoa(dataSearch)
       },
-      cancelSearchGiayToSoHoa (data) {
+      searchKeyword () {
         let vm = this
-        console.log('dataInputSearch2', data)
-        vm.showAdvanceSearch = false
-        vm.dataInputSearch = data
-        vm.documentPage = 1
+        let dataFormSearch = {}
+        if (vm.$refs.timkiem) {
+          dataFormSearch = vm.$refs.timkiem.getDataOutPut()
+        }
+        let dataSearch = Object.assign(dataFormSearch, {keyword: vm.keywordSearch})
+        console.log('dataInputSearch', dataSearch)
+        vm.dataInputSearch = dataSearch
+        vm.documentPage = 0
         vm.totalDocument = 0
-        vm.getDanhSachGiayToSoHoa(data)
+        vm.getDanhSachGiayToSoHoa(dataSearch)
+      },
+      cancelSearchGiayToSoHoa () {
+        let vm = this
+        vm.showAdvanceSearch = false
       },
       changePage (config) {
         let vm = this
-        vm.documentPage = config.page
+        vm.documentPage = config.page -1
         vm.getDanhSachGiayToSoHoa(vm.dataInputSearch)
       },
       getDanhSachGiayToSoHoa (dataSearch) {
@@ -804,39 +914,35 @@
         let filter = {
           page: vm.documentPage,
           size: vm.numberPerPage,
-          giayToToiSoHoa: '',
-          keyword: dataSearch ? dataSearch.dossierNo : '',
+          keyword: dataSearch ? dataSearch.keyword : '',
           coQuanBanHanh_MaDinhDanh: dataSearch ? dataSearch.govAgencyCode : '',
           mauGiayTo_MaMuc: dataSearch ? dataSearch.fileTemplateNo : '',
           ngayBanHanh_TuNgay: dataSearch ? dataSearch.fromReceiveDateFormatted : '',
           ngayBanHanh_DenNgay: dataSearch ? dataSearch.toReceiveDateFormatted : '',
           hieuLucGiayTo_MaMuc: dataSearch ? dataSearch.status : '',
-          trangThaiDuLieu_MaMuc: '',
-          orderFields: 'NgayBanHanh',
-          orderType: 'asc',
-
-          applicantIdNo: dataSearch ? dataSearch.applicantIdNo : '',
-          fileTemplateNo: dataSearch ? dataSearch.fileTemplateNo : '',
-          status: dataSearch ? dataSearch.status : '',
-          fileNoSearch: dataSearch ? dataSearch.fileNoSearch : '',
-          applicantName: dataSearch ? dataSearch.applicantName : '',
-          applicantDataType: '',
+          orderFields: 'ThoiGianTao',
+          orderType: 'desc',
+          cccd: vm.applicantIdNo,
+          duocChiaSe: vm.menuActive == 0 ? false : true
         }
 
         vm.loadingTable = true
-        vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.documentApplicantList = result.data
-          } else {
-            vm.documentApplicantList = []
-          }
-          vm.totalDocument = result['total']
+        vm.$store.dispatch('getGiayToKhoCaNhan', filter).then(function (result) {
+          vm.documentApplicantList = result.content
+          vm.totalDocument = result['totalElements']
           vm.loadingTable = false
         }).catch(function () {
           vm.loadingTable = false
           vm.documentApplicantList = []
           vm.totalDocument = 0
         })
+      },
+      resetTimKiem () {
+        let vm = this
+        vm.keywordSearch = ''
+        if (vm.$refs.timkiem) {
+          vm.$refs.timkiem.resetForm()
+        }
       },
       validFileUpload (file) {
         let vm = this
@@ -865,111 +971,120 @@
       },
       downloadDocument (item) {
         let vm = this
+        if (vm.loadingPdf) {
+          return
+        }
         vm.srcDownload = ''
-        let url = item.filePath
         let filter = {
-          applicantDataId: item.applicantDataId
+          id: item.MaDinhDanh
         }
-        if (vm.isDvc) {
-          vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
-            vm.srcDownload = result
-            setTimeout(function () {
-              document.getElementById('downloadFile').click()
-            }, 100)
-          }).catch(function () {
-          })
-        } else {
-          vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-            vm.srcDownload = result
-            setTimeout(function () {
-              document.getElementById('downloadFile').click()
-            }, 100)
-          }).catch(function () {
-          })
-        }
+        vm.loadingPdf = true
+        vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
+          vm.loadingPdf = false
+          vm.srcDownload = result
+          setTimeout(function () {
+            document.getElementById('downloadFile').click()
+          }, 100)
+        }).catch(function () {
+          vm.loadingPdf = false
+        })
       },
       viewDocument (item) {
         let vm = this
-        if (vm.pathNameFileESign) {
-          vm.dialogViewFileSign = true
-        } else {
-          vm.srcDownload = ''
-          let filter = {
-            applicantDataId: item.applicantDataId
-          }
-          if (vm.isDvc) {
-            vm.$store.dispatch('getFileAttachProxy', filter).then(function (result) {
-              let fileType = item.fileExtension.toLowerCase()
-              if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-                fileType === 'tif' || fileType === 'tiff'
-              ) {
-                vm.dialogPDF = true
-                document.getElementById('dialogPDFPreview').src = result
-              } else {
-                vm.srcDownload = result
-                setTimeout(function () {
-                  document.getElementById('downloadFile').click()
-                }, 100)
-              }
-            }).catch(function () {
-            })
-          } else {
-            vm.$store.dispatch('getFileAttach', filter).then(function (result) {
-              let fileType = item.fileExtension.toLowerCase()
-              if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
-                fileType === 'tif' || fileType === 'tiff'
-              ) {
-                vm.dialogPDF = true
-                document.getElementById('dialogPDFPreview').src = result
-              } else {
-                vm.srcDownload = result
-                setTimeout(function () {
-                  document.getElementById('downloadFile').click()
-                }, 100)
-              }
-            }).catch(function () {
-            })
-          }
+        if (vm.loadingPdf) {
+          return
         }
+        vm.srcDownload = ''
+        let filter = {
+          id: item.MaDinhDanh
+        }
+        vm.loadingPdf = true
+        vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
+          vm.loadingPdf = false
+          let fileType = item.Ext.toLowerCase()
+          if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+            fileType === 'tif' || fileType === 'tiff'
+          ) {
+            vm.dialogPDF = true
+            document.getElementById('dialogPDFPreview').src = result
+          } else {
+            vm.srcDownload = result
+            setTimeout(function () {
+              document.getElementById('downloadFile').click()
+            }, 100)
+          }
+        }).catch(function () {
+          vm.loadingPdf = false
+        })
+      },
+      deleteTepDinhKem (tep, index) {
+        let vm = this
+        vm.tepDinhKem.splice(index, 1)
+      },
+      deleteTepUpload (tep, index) {
+        let vm = this
+        vm.tepUpload.splice(index, 1)
       },
       showEditDocument (item) {
         let vm = this
-        vm.updateFile = false
-        $('html, body').animate({
-            scrollTop: $('#top-header').offset().top,
-          },
-          100,
-          'linear'
-        )
         vm.documentSelect = item
         vm.typeCreate = 'update'
-        vm.fileNameView = item.fileName
-        try {
-          vm.fileTemplateNoCreate = vm.fileTemplateList.filter(function (items) {
-            return items.fileTemplateNo === item.fileTemplateNo
-          })[0]
-        } catch (error) {
+        vm.fileTemplateNoCreate = item.MaMauGiayTo
+        vm.statusCreate = item.HieuLucVanBan
+        vm.fileName = item.TenGiayTo
+        vm.fileNo = item.SoHieuVanBan
+        vm.govAgencyCreate = item.CoQuanBanHanh
+        vm.loaiVanBanCreate = item.LoaiVanBanDienTu
+        vm.cmndNguoiThuHuong = item.ChuHoSo['MaDinhDanh'] && item.ChuHoSo['MaDinhDanh'].split(':')[1] ? item.ChuHoSo['MaDinhDanh'].split(':')[1] : item.ChuHoSo['MaDinhDanh']
+        vm.tenNguoiThuHuong = item.ChuHoSo['TenGoi']
+        vm.tepDinhKem = item.TepDuLieu
+        vm.createDate = vm.convertDate(item.NgayBanHanh)
+        vm.expireDate = vm.convertDate(item.ThoiHanHieuLuc)
+        vm.tepUpload = []
+        // if (item.ChuHoSo['MaDinhDanh'] && item.ChuHoSo['MaDinhDanh'].split(':')[0] === 'DONVIKINHDOANH') {
+        //   vm.loaiDoiTuongThuHuong = 'DONVIKINHDOANH'
+        // } else {
+        //   vm.loaiDoiTuongThuHuong = 'CANHAN'
+        // }
+        let exitsTemplate = vm.fileTemplateList.find(function (val) {
+          return val.MaMuc === item.MaMauGiayTo['MaMuc']
+        })
+        if (!exitsTemplate) {
+          vm.fileTemplateList.unshift(item.MaMauGiayTo)
         }
-        vm.statusCreate = item.status
-        vm.fileName = item.fileName
-        vm.fileNo = item.fileNo
-        vm.govAgencyCreate = item.govAgencyName ? item.govAgencyName : ''
-        vm.applicantNameCreate = item.applicantName ? item.applicantName : ''
-        vm.applicantIdNoCreate = item.applicantIdNo ? item.applicantIdNo : ''
-        vm.createDate = item.issueDate ? String(item.issueDate).split(" ")[0] : ''
-        vm.expireDate = item.expireDate ? String(item.expireDate).split(" ")[0] : ''
+        let exitsCoQuan = vm.donViList.find(function (val) {
+          return val.MaDinhDanh === item.CoQuanBanHanh['MaDinhDanh']
+        })
+        if (!exitsCoQuan) {
+          vm.donViList.unshift(item.CoQuanBanHanh)
+        }
+        
         vm.showDetail = true
       },
       cloneMyStorage (item) {
         let vm = this
+        let filter = {
+          "MaDinhDanh": item.MaDinhDanh,
+          // "CCCDMST": vm.applicantType === 'citizen' ? 'CaNhan:'+vm.applicantIdNo : 'DonViKinhDoanh:'+vm.applicantIdNo
+          "CCCDMST": vm.applicantIdNo
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('cloneMyStorage', filter).then(function (result) {
+          vm.loadingAction = false
+          toastr.success('Yêu cầu thực hiện thành công')
+        }).catch(function () {
+          vm.loadingAction = false
+          toastr.error('Yêu cầu thực hiện thất bại. Vui lòng thử lại.')
+        })
       },
       deleteDocument (item) {
         let vm = this
         let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
         if (x) {
-          vm.$store.dispatch('deleteDocument', item).then(function () {
+          vm.$store.dispatch('deleteGiayToLuTru', item).then(function () {
             toastr.clear()
             toastr.success('Yêu cầu thực hiện thành công')
+            vm.getDanhSachGiayToSoHoa(vm.dataInputSearch)
           }).catch(function () {
             toastr.clear()
             toastr.error('Yêu cầu thực hiện thất bại')
@@ -979,210 +1094,134 @@
       uploadDocumentFile (e) {
         let vm = this
         let files = $('#documentFile')[0].files
-        let file = files[0]
-        let fileName = ''
-        let valid = vm.validFileUpload(file)
-        if (valid) {
-          vm.updateFile = true
-          if (file['name']) {
-            fileName = file['name'].replace(/\%/g, '')
-            fileName = fileName.replace(/\//g, '')
-            fileName = fileName.replace(/\\/g, '')
-            fileName = fileName.replace(/\s/g, '')
-          }
-          vm.fileUpdate = file
-          vm.fileNameUpdate = fileName
-          vm.fileNameView = fileName
+        let arrTep = []
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          let ext = file['name'].split(".")
+          arrTep.push(
+            {
+              File: file,
+              Ext: ext[ext.length - 1],
+              KichThuocTep: file['size'],
+              TenTep: file['name'],
+              FileInput: true
+            }
+          )
         }
-
+        vm.tepUpload = arrTep
       },
       showCreatedocument () {
         let vm = this
+        vm.tenNguoiThuHuong = vm.applicantName
+        vm.cmndNguoiThuHuong = vm.applicantIdNo
+        vm.fileTemplateNoCreate = ''
+        vm.createDate = ''
+        vm.expireDate = ''
+        vm.statusCreate = ''
+        vm.govAgencyCreate = ''
+        vm.loaiVanBanCreate = ''
+        vm.tepDinhKem = []
+        vm.tepUpload = []
         vm.showDetail = true
         vm.typeCreate = 'create'
         vm.pathNameFileESign = ''
         vm.fileNameView = ''
         vm.fileName = ''
         vm.fileNo = ''
-        vm.updateFile = false
-        setTimeout(function () {
-          // vm.$refs.form.reset()
-          vm.$refs.form.resetValidation()
-          if (vm.showApplicantInfo) {
-            vm.applicantIdNoCreate = vm.applicantInfos.applicantIdNo
-            vm.applicantNameCreate = vm.applicantInfos.applicantName
-          }
-          vm.statusCreate = 1
-        }, 200)
+        // vm.loaiDoiTuongThuHuong = vm.applicantType === 'citizen' ? 'CANHAN' : 'DONVIKINHDOANH'
       },
       createDocument () {
         let vm = this
-        if (!vm.hasEsign) {
-          let validFileUpload = true
-          if (vm.updateFile) {
-            let files = $('#documentFile')[0].files
-            let file = files[0]
-            validFileUpload = vm.validFileUpload(file)
-          }
-          if (!validFileUpload) {
-            return
-          }
-          if (vm.$refs.form.validate()) {
-            if (vm.fileNameView) {
-              vm.loadingAction = true
-              let param = {
-                headers: {
-                  groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/x-www-form-urlencoded'
+        if (vm.$refs.form.validate()) {
+          if (vm.tepUpload.length) {
+            vm.loadingAction = true
+            
+            let arrReq = []
+            vm.tepUpload.forEach(element => {
+              let filter = {
+                file: element['File']
+              }
+              arrReq.push(vm.$store.dispatch('uploadTep', filter))
+            });
+            Promise.all(arrReq).then(values => {
+              let tepMapping = values
+              console.log('tepMapping', tepMapping)
+              let dataCreate = {
+                "TenGiayTo": vm.fileName,
+                "SoHieuVanBan": vm.fileNo,
+                "NgayBanHanh": vm.convertDateIso(vm.createDate),
+                "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDate),
+                "CoQuanBanHanh": {
+                  "MaDinhDanh": vm.govAgencyCreate['MaDinhDanh'],
+                  "TenGoi": vm.govAgencyCreate['TenGoi']
+                },
+                "HieuLucVanBan": {
+                  "MaMuc": vm.statusCreate['MaMuc'],
+                  "TenMuc": vm.statusCreate['TenMuc']
+                },
+                "MaMauGiayTo": {
+                  "MaMuc": vm.fileTemplateNoCreate['MaMuc'],
+                  "TenMuc": vm.fileTemplateNoCreate['TenMuc']
+                },
+                "ChuHoSo": {
+                  // "MaDinhDanh": vm.loaiDoiTuongThuHuong + ':' + vm.cmndNguoiThuHuong,
+                  "MaDinhDanh": vm.cmndNguoiThuHuong,
+                  "TenGoi": vm.tenNguoiThuHuong
+                },
+                "LoaiVanBanDienTu": {
+                  "MaMuc": vm.loaiVanBanCreate['MaMuc'],
+                  "TenMuc": vm.loaiVanBanCreate['TenMuc']
+                },
+                "ChuKhoLuuTru": {
+                  // "MaDinhDanh": vm.applicantType === 'citizen' ?  'CaNhan:'+vm.applicantIdNo : 'DonViKinhDoanh:'+vm.applicantIdNo,
+                  "MaDinhDanh": vm.applicantIdNo,
+                  "TenGoi": vm.applicantName
+                },
+                "TepDuLieu": tepMapping,
+                "MaDinhDanh": "",
+                "HoSoDichVuCong": {
+                  "MaDinhDanh": ""
+                },
+                "SoLanTaiSuDung": 0,
+                "TenLoaiVanBan": {
+                  "MaMuc": "",
+                  "TenMuc": ""
+                },
+                "TrichYeuVanBan": "",
+                "HoSoLuuTruSo": {
+                  "MaDinhDanh": ""
+                },
+                "SoThuTu": 0,
+                "ThuMucLuuTru": {
+                  "MaDinhDanh": "",
+                  "TenThuMuc": ""
+                },
+                "TrangThaiDuLieu": {
+                  "MaMuc": "",
+                  "TenMuc": ""
+                },
+                "PhanVungDuLieu": {
+                  "MaMuc": "",
+                  "TenMuc": ""
                 }
               }
-            
-              let dataCreateFile = new FormData()
-              let url = '/o/rest/v2/applicantdatas'
-              dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-              dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
-              dataCreateFile.append('fileNo', vm.fileNo)
-              dataCreateFile.append('fileName', vm.fileName)
-              dataCreateFile.append('applicantIdNo', vm.applicantIdNoCreate)
-              dataCreateFile.append('applicantName', vm.applicantNameCreate)
-              dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
-              dataCreateFile.append('file', vm.fileUpdate)
-              dataCreateFile.append('issueDate', vm.createDate)
-              dataCreateFile.append('expireDate', vm.expireDate)
-              dataCreateFile.append('serviceCode', '')
-              dataCreateFile.append('templateNo', '')
-              dataCreateFile.append('desciption', '')
-              dataCreateFile.append('dossierNo', '')
-
-              // {
-              //   "TenGiayTo": "string",
-              //   "TenLoaiVanBan": {
-              //     "MaMuc": "string",
-              //     "TenMuc": "string"
-              //   },
-              //   "SoHieuVanBan": "string",
-              //   "NgayBanHanh": "2023-05-11T04:31:59.606Z",
-              //   "ThoiHanHieuLuc": "2023-05-11T04:31:59.606Z",
-              //   "CoQuanBanHanh": {
-              //     "MaDinhDanh": "string",
-              //     "TenGoi": "string"
-              //   },
-              //   "HieuLucVanBan": {
-              //     "MaMuc": "string",
-              //     "TenMuc": "string"
-              //   },
-              //   "MaMauGiayTo": {
-              //     "MaMuc": "string",
-              //     "TenMuc": "string"
-              //   },
-              //   "HoSoDichVuCong": "string",
-              //   "ChuHoSo": {
-              //     "MaDinhDanh": "string",
-              //     "TenGoi": "string"
-              //   },
-              //   "LoaiVanBanDienTu": {
-              //     "MaMuc": "string",
-              //     "TenMuc": "string"
-              //   },
-              //   "TepDuLieu": [
-              //     {
-              //       "MaDinhDanh": "string",
-              //       "TenTep": "string",
-              //       "DinhDangTep": "string",
-              //       "KichThuocTep": 0,
-              //       "LoaiNguonDuLieu": {
-              //         "@type": "string",
-              //         "MaMuc": "string",
-              //         "TenMuc": "string"
-              //       },
-              //       "MaHoaDuLieu": "string",
-              //       "Ext": "string"
-              //     }
-              //   ]
-              // }
-
-              // let dataPost = JSON.stringify(filter.data)
-              // let config = {
-              //   method: 'post',
-              //   url: '/v1/datasharing/idp/account/' + filter.data.type,
-              //   headers: {
-              //     'Accept': 'application/json',
-              //     'Content-Type': 'application/json'
-              //   },
-              //   data: dataPost
-              // }
-              // axios(config).then(function (response) {
-              //   let serializable = response.data
-              // }).catch(function (error) {
-              // })
-
-
-              
-              axios.post(url, dataCreateFile, param).then(result1 => {
+              let filter = {
+                data: dataCreate
+              }
+              vm.$store.dispatch('addGiayToLuTru', filter).then(function (result) {
                 vm.loadingAction = false
                 toastr.success('Thêm mới giấy tờ thành công')
                 vm.showDetail = false
                 setTimeout(function () {
                   vm.getDanhSachGiayToSoHoa()
                 }, 200)
-              }).catch(xhr => {
+              }).catch(function () {
                 vm.loadingAction = false
                 toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
               })
-              
-            } else {
-              toastr.clear()
-              toastr.error('Vui lòng đính kèm tài liệu')
-            }
-          }
-        } else {
-          vm.createDocumentKySo()
-        }
-      },
-      createDocumentKySo () {
-        let vm = this
-        if (vm.$refs.form.validate()) {
-          if (vm.fileNameView) {
-            vm.loadingAction = true
-            let param = {
-              headers: {
-                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-                'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'
-              }
-            }
-
-            let dataCreateFile = new FormData()
-            let url = '/o/rest/v2/applicantdatas'
-            dataCreateFile.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-            dataCreateFile.append('status', vm.statusCreate ? vm.statusCreate : 0)
-            dataCreateFile.append('fileNo', vm.fileNo)
-            dataCreateFile.append('fileName', vm.fileName)
-            dataCreateFile.append('applicantIdNo', vm.applicantIdNoCreate)
-            dataCreateFile.append('applicantName', vm.applicantNameCreate)
-            dataCreateFile.append('govAgencyName', vm.govAgencyCreate)
-            dataCreateFile.append('fileEntryId', vm.fileEntryESign)
-            dataCreateFile.append('issueDate', vm.createDate)
-            dataCreateFile.append('expireDate', vm.expireDate)
-            dataCreateFile.append('serviceCode', '')
-            dataCreateFile.append('templateNo', '')
-            dataCreateFile.append('desciption', '')
-            dataCreateFile.append('file', '')
-            dataCreateFile.append('dossierNo', '')
-                
-            axios.post(url, dataCreateFile, param).then(result1 => {
+            }).catch(function () {
               vm.loadingAction = false
-              toastr.success('Thêm mới tài liệu thành công')
-              vm.showDetail = false
-              setTimeout(function () {
-                vm.getDanhSachGiayToSoHoa()
-              }, 200)
-            }).catch(xhr => {
-              vm.loadingAction = false
-              toastr.error('Thêm mới thất bại. Vui lòng thử lại.')
             })
-            
           } else {
             toastr.clear()
             toastr.error('Vui lòng đính kèm tài liệu')
@@ -1191,107 +1230,80 @@
       },
       updateDocument () {
         let vm = this
-        if (!vm.hasEsign) {
-          let validFileUpload = true
-          if (vm.updateFile) {
-            let files = $('#documentFile')[0].files
-            let file = files[0]
-            validFileUpload = vm.validFileUpload(file)
-          }
-          if (!validFileUpload) {
-            return
-          }
-          if (vm.$refs.form.validate()) {
-            vm.loadingAction = true
-            let param = {
-              headers: {
-                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-                'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'
-              }
-            }
-
-            let dataPost = new FormData()
-            let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
-            dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-            dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
-            dataPost.append('fileNo', vm.fileNo)
-            dataPost.append('fileName', vm.fileName)
-            dataPost.append('applicantIdNo', vm.applicantIdNoCreate)
-            dataPost.append('applicantName', vm.applicantNameCreate)
-            dataPost.append('govAgencyName', vm.govAgencyCreate)
-            dataPost.append('issueDate', vm.createDate)
-            dataPost.append('expireDate', vm.expireDate)
-            dataPost.append('serviceCode', '')
-            dataPost.append('templateNo', '')
-            dataPost.append('desciption', '')
-            
-            if (vm.updateFile) {
-              dataPost.append('file', vm.fileUpdate)
-            } else {
-              dataPost.append('file', '')
-            } 
-            axios.put(url, dataPost, param).then(result1 => {
-              vm.loadingAction = false
-              toastr.success('Cập nhật tài liệu thành công')
-              vm.showDetail = false
-              setTimeout(function () {
-                vm.getDanhSachGiayToSoHoa()
-              }, 200)
-            }).catch(xhr => {
-              vm.loadingAction = false
-              toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-            })
-            
-          }
-        } else {
-          vm.updateDocumentKySo()
-        }
-      },
-      updateDocumentKySo () {
-        let vm = this
         if (vm.$refs.form.validate()) {
-          vm.loadingAction = true
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              'Accept': 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
+          if (vm.tepDinhKem.length || vm.tepUpload.length) {
+            vm.loadingAction = true
+            let arrReq = []
+            vm.tepUpload.forEach(element => {
+              let filter = {
+                file: element['File'],
+                tepdulieu: {
+                  "TenTep": element['TenTep'],
+                  "LoaiNguonDuLieu":{"MaMuc":"","TenMuc":""}
+                }
+              }
+              arrReq.push(vm.$store.dispatch('uploadTep', filter))
+            });
+            Promise.all(arrReq).then(values => {
+              let tepMapping = vm.tepDinhKem.concat(values)
+              let dataCreate = {
+                "TenGiayTo": vm.fileName,
+                "SoHieuVanBan": vm.fileNo,
+                "NgayBanHanh": vm.convertDateIso(vm.createDate),
+                "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDate),
+                "CoQuanBanHanh": {
+                  "MaDinhDanh": vm.govAgencyCreate['MaDinhDanh'],
+                  "TenGoi": vm.govAgencyCreate['TenGoi']
+                },
+                "HieuLucVanBan": {
+                  "MaMuc": vm.statusCreate['MaMuc'],
+                  "TenMuc": vm.statusCreate['TenMuc']
+                },
+                "MaMauGiayTo": {
+                  "MaMuc": vm.fileTemplateNoCreate['MaMuc'],
+                  "TenMuc": vm.fileTemplateNoCreate['TenMuc']
+                },
+                "ChuHoSo": {
+                  // "MaDinhDanh": vm.loaiDoiTuongThuHuong + ':' + vm.cmndNguoiThuHuong,
+                  "MaDinhDanh": vm.cmndNguoiThuHuong,
+                  "TenGoi": vm.tenNguoiThuHuong
+                },
+                "LoaiVanBanDienTu": {
+                  "MaMuc": vm.loaiVanBanCreate['MaMuc'],
+                  "TenMuc": vm.loaiVanBanCreate['TenMuc']
+                },
+                "ChuKhoLuuTru": {
+                  // "MaDinhDanh": vm.applicantType === 'citizen' ?  'CaNhan:'+vm.applicantIdNo : 'DonViKinhDoanh:'+vm.applicantIdNo,
+                  "MaDinhDanh": vm.applicantIdNo,
+                  "TenGoi": vm.applicantName
+                },
+                "TepDuLieu": tepMapping
+              }
+              let filter = {
+                primKey: vm.documentSelect.primKey,
+                data: Object.assign(vm.documentSelect, dataCreate)
+              }
+              vm.$store.dispatch('updateGiayToLuTru', filter).then(function (result) {
+                vm.loadingAction = false
+                toastr.success('Cập nhật giấy tờ thành công')
+                vm.showDetail = false
+                setTimeout(function () {
+                  vm.getDanhSachGiayToSoHoa()
+                }, 200)
+              }).catch(function () {
+                vm.loadingAction = false
+                toastr.error('Cập nhật giấy tờ thất bại. Vui lòng thử lại.')
+              })
+            }).catch(function () {
+            })
+          } else {
+            toastr.clear()
+            toastr.error('Vui lòng đính kèm tệp')
           }
-
-          let dataPost = new FormData()
-          let url = '/o/rest/v2/applicantdatas/' + vm.documentSelect.applicantDataId
-          dataPost.append('fileTemplateNo', vm.fileTemplateNoCreate.fileTemplateNo)
-          dataPost.append('status', vm.statusCreate ? vm.statusCreate : 0)
-          dataPost.append('fileNo', vm.fileNo)
-          dataPost.append('fileName', vm.fileName)
-          dataPost.append('applicantIdNo', vm.documentSelect.applicantIdNo)
-          dataPost.append('fileEntryId', vm.fileEntryESign)
-          dataPost.append('govAgencyName', vm.govAgencyCreate)
-          dataPost.append('issueDate', vm.createDate)
-          dataPost.append('expireDate', vm.expireDate)
-          dataPost.append('serviceCode', '')
-          dataPost.append('templateNo', '')
-          dataPost.append('desciption', '')
-          dataPost.append('file', '')
-          axios.put(url, dataPost, param).then(result1 => {
-            vm.loadingAction = false
-            toastr.success('Cập nhật tài liệu thành công')
-            vm.showDetail = false
-            setTimeout(function () {
-              vm.getDanhSachGiayToSoHoa()
-            }, 200)
-          }).catch(xhr => {
-            vm.loadingAction = false
-            toastr.error('Cập nhật thất bại. Vui lòng thử lại.')
-          })
-          
         }
       },
       vgca_sign_approved() {
         let vm = this
-        vm.hasEsign = true
         let prms = {}
         prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload'
         prms['SessionId'] = ''
@@ -1367,39 +1379,141 @@
           return 'Hủy'
         }
       },
+      convertDate (date) {
+        let date1 = new Date(date)
+        return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
+      },
+      convertDateIso (dateString) {
+        let parts = dateString.split('/')
+        let day = parts[0]
+        let month = parts[1]
+        let year = parts[2]
+        let date = new Date(`${year}-${month}-${day}`)
+        let isoDate = date.toISOString()
+        return isoDate
+      },
+      convertMaDinhDanh (mdd) {
+        if (!mdd) {
+          return ""
+        }
+        let cccd = mdd.split(":")[1]
+        return cccd
+      },
+      getDocumentTypeIcon (type) {
+        let typeDoc = 'doc,docx'
+        let typeExcel = 'xls,xlsx'
+        let typeImage = 'png,jpg,jpeg'
+        if (type) {
+          if (typeDoc.indexOf(String(type).toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-word-o',
+              color: 'blue',
+              size: 14
+            }
+          } else if (typeExcel.indexOf(String(type).toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-excel-o',
+              color: 'green',
+              size: 14
+            }
+          } else if (String(type).toLowerCase() === 'pdf') {
+            return {
+              icon: 'fa fa-file-pdf-o',
+              color: 'red',
+              size: 14
+            }
+          } else if (typeImage.indexOf(String(type).toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-image-o',
+              color: 'primary',
+              size: 14
+            }
+          } else {
+            return {
+              icon: 'fas fa fa-paperclip',
+              color: '',
+              size: 14
+            }
+          }
+        } else {
+          return ''
+        }
+      },
 
       // -----
       visibilityChanged(e) {
         e && this.loadMoreItems();
       },
+      visibilityChangedDonVi (e) {
+        e && this.loadMoreItemsDonVi();
+      },
       searchItems() {
-        // Reset lại danh sách khi tìm kiếm mới
-        this.itemsSelectBox = [];
-        this.pageSelectBox = 1;
+        this.fileTemplateList = [];
+        this.pageSelectBox = 0;
         this.loadMoreItems();
-        console.log('run searchItem')
+      },
+      searchItemsDonVi() {
+        this.donViList = [];
+        this.pageSelectDonVi = 0;
+        this.loadMoreItemsDonVi();
       },
       loadMoreItems() {
         let vm = this
-        if (vm.itemsSelectBox.length < vm.totalItemsSelectBox || vm.pageSelectBox == 1) {
-          vm.loading = true;
-          let filter = {
-            applicantIdNo: "125211381",
-            start: vm.pageSelectBox * 10 - 10,
-            end: vm.pageSelectBox * 10,
-            keyword: vm.keywordSearchSelect
+        if (vm.fileTemplateList.length < vm.totalItemsSelectBox || vm.pageSelectBox == 0) {
+          // vm.loading = true;
+          vm.isShow = false
+          let filter1 = {
+            page: vm.pageSelectBox,
+            size: 10,
+            tenDanhMuc: 'mathanhphanhoso',
+            keyword: vm.keywordSearchSelect ? vm.keywordSearchSelect : ''
           }
-          console.log('paramsSearch', filter)
-          vm.$store.dispatch('getApplicantDocumentFromDvc', filter).then(function (result) {
-            vm.itemsSelectBox = [
-              ...vm.itemsSelectBox,
-              ...result.data
-            ];
+          let filter2 = {
+            page: vm.pageSelectBox,
+            size: 10,
+            tenDanhMuc: 'magiaytoketqua',
+            keyword: vm.keywordSearchSelect ? vm.keywordSearchSelect : ''
+          }
+          let req1 = vm.$store.dispatch('getDanhMuc', filter1)
+          let req2 = vm.$store.dispatch('getDanhMuc', filter2)
+          let arrAction = [req1, req2]
+          Promise.all(arrAction).then(results => {
+            let res = results[0]['content'].concat(results[1]['content'])
+            vm.fileTemplateList = vm.fileTemplateList.concat(res);
+            vm.isShow = true
             vm.pageSelectBox++;
-            vm.totalItemsSelectBox = result['total']
+            vm.totalItemsSelectBox = results[0]['totalElements'] + results[1]['totalElements']
             vm.loading = false
-          }).catch(function () {
+            if (vm.$refs.autocomplete) {
+              vm.$refs.autocomplete.onScroll()
+            }
+          }).catch(xhr => {
             vm.loading = false
+          })
+        }
+      },
+      loadMoreItemsDonVi() {
+        let vm = this
+        if (vm.donViList.length < vm.totalItemsSelectDonVi || vm.pageSelectDonVi == 0) {
+          // vm.loadingDonVi = true;
+          vm.isShowDonVi = false
+          let filter = {
+            page: vm.pageSelectDonVi,
+            size: 20,
+            keyword: vm.keywordSearchDonVi ? vm.keywordSearchDonVi : ''
+          }
+          vm.$store.dispatch('getDonVi', filter).then(results => {
+            let res = results['content']
+            vm.donViList = vm.donViList.concat(res);
+            vm.isShowDonVi = true
+            vm.pageSelectDonVi++
+            vm.totalItemsSelectDonVi = results['totalElements']
+            vm.loadingDonVi = false
+            if (vm.$refs.autocomplete1) {
+              vm.$refs.autocomplete1.onScroll()
+            }
+          }).catch(xhr => {
+            vm.loadingDonVi = false
           })
         }
       }

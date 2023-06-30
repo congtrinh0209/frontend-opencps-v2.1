@@ -109,20 +109,22 @@
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
             </v-btn>
-            <v-btn v-if="conectDvcqg && !mapping" class="px-2 my-0" color="#913938"
+            <v-btn v-if="conectDvcqg && !mapping" class="btn-dvcqg px-2 my-0" color="#913938"
               :loading="loading"
               :disabled="loading"
               @click="loginDVCQG"
+              style="width: 300px !important; margin-top: 10px !important;"
             >
               Đăng nhập qua Cổng DVC Quốc gia
             </v-btn>
-            <v-btn v-if="hasSSO" class="px-2 my-0" color="#913938"
+            <v-btn v-if="hasSSO" class="btn-sso px-2 my-0" color="#913938"
               :loading="loading"
               :disabled="loading"
               @click="loginSso"
+              style="width: 300px !important; margin-top: 10px !important;"
             >
               <v-icon>admin_panel_settings</v-icon>&nbsp;
-              Đăng nhập SSO
+              Đăng nhập Hệ thống xác thực tập trung
             </v-btn>
           </v-flex>
         </v-form>

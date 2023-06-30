@@ -13,7 +13,7 @@
             ></canvas>
           </div>
           <div v-show="showPreviewImage">
-            <ejs-uploader
+            <!-- <ejs-uploader
               id="imageBackPreview"
               name="UploadFiles"
               :allowedExtensions="extensions"
@@ -22,7 +22,7 @@
               :selected="onBackFileSelect"
               :multiple="false"
             >
-            </ejs-uploader>
+            </ejs-uploader> -->
             <img id="upload-back-image" />
           </div>
         </div>
@@ -92,9 +92,9 @@ toastr.options = {
   closeButton: true,
   timeOut: "3000",
 };
-import { UploaderPlugin } from "@syncfusion/ej2-vue-inputs";
+// import { UploaderPlugin } from "@syncfusion/ej2-vue-inputs";
 
-Vue.use(UploaderPlugin);
+// Vue.use(UploaderPlugin);
 
 export default {
   data() {

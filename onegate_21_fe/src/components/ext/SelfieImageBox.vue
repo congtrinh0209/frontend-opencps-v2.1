@@ -68,9 +68,9 @@ toastr.options = {
   closeButton: true,
   timeOut: "3000",
 };
-import { UploaderPlugin } from "@syncfusion/ej2-vue-inputs";
+// import { UploaderPlugin } from "@syncfusion/ej2-vue-inputs";
 
-Vue.use(UploaderPlugin);
+// Vue.use(UploaderPlugin);
 
 export default {
   props: ["userData"],

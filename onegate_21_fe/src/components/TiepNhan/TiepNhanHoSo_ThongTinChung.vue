@@ -69,7 +69,7 @@
               </span>
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
-              <vue-ctk-date-time-picker 
+              <!-- <vue-ctk-date-time-picker 
                 ref="datepicker" 
                 v-model="dueDateInput" 
                 format="YYYY-MM-DDTHH:mm"
@@ -80,7 +80,7 @@
                 :min-date="minDate"
                 :max-date="maxDate"
                 locale="vi"
-              ></vue-ctk-date-time-picker>
+              ></vue-ctk-date-time-picker> -->
               <v-icon class="hover-pointer" @click="showDatePicker">event</v-icon>
             </v-subheader>
           </v-flex>
@@ -92,10 +92,10 @@
 
 <script>
 
-  let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
+  // let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
   export default {
     components: {
-      'vue-ctk-date-time-picker': datePicker
+      // 'vue-ctk-date-time-picker': datePicker
     },
     data: () => ({
       minDate: null,

@@ -1,33 +1,61 @@
 <template>
   <div id="form-search">
-    <v-card-text class="px-0 pt-0">
-        <v-row v-if="form !== 'danhmuc'">
+    <v-card-text class="px-0 pt-0 pb-0">
+        <v-row>
           <v-layout wrap class="mt-0">
-            <v-flex xs12 sm6 class="px-0 pr-3">
+            <v-flex class="px-0 pr-3 xs12 sm6">
               <div class="mb-1">Cơ quan ban hành</div>
               <v-autocomplete
                 :items="donViList"
                 v-model="dataSearch['govAgencyCode']"
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
+                ref="autocomplete1"
+                :loading="loadingDonVi"
+                :search-input.sync="keywordSearchDonVi"
+                item-text="TenGoi"
+                item-value="MaDinhDanh"
                 clearable
                 solo
                 flat
-              ></v-autocomplete>
+              >
+                <template v-slot:append-item>
+                  <div class="py-2" v-if="isShowDonVi"
+                    v-observe-visibility="{
+                      callback: visibilityChangedDonVi
+                    }"
+                  >
+                  </div>
+                </template>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs12 sm6 class="px-0">
               <div class="mb-1">Mẫu giấy tờ</div>
               <v-autocomplete
                 :items="fileTemplateList"
                 v-model="dataSearch['fileTemplateNo']"
-                item-text="name"
-                item-value="fileTemplateNo"
-                :hide-selected="true"
+                ref="autocomplete"
+                :loading="loading"
+                :search-input.sync="keywordSearchSelect"
+                item-text="TenMuc"
+                item-value="MaMuc"
                 clearable
                 solo
                 flat
-              ></v-autocomplete>
+              >
+                <template slot="selection" slot-scope="{ item }">
+                  <b class="labelCodeItemSelect">{{item.MaMuc}}</b>&nbsp;-&nbsp;{{item.TenMuc}}
+                </template>
+                <template slot="item" slot-scope="{ item }">
+                  <b>{{item.MaMuc}}</b>&nbsp;-&nbsp;{{item.TenMuc}}
+                </template>
+                <template v-slot:append-item>
+                  <div class="py-2" v-if="isShow"
+                    v-observe-visibility="{
+                      callback: visibilityChanged
+                    }"
+                  >
+                  </div>
+                </template>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs12 sm3 class="">
               <div class="mb-1">Ngày ban hành</div>
@@ -94,9 +122,8 @@
               <v-autocomplete
                 :items="statusList"
                 v-model="dataSearch['status']"
-                item-text="text"
-                item-value="value"
-                :hide-selected="true"
+                item-text="TenMuc"
+                item-value="MaMuc"
                 clearable
                 solo
                 flat
@@ -105,12 +132,12 @@
           </v-layout>
         </v-row>
         <v-flex class="text-right">
-          <v-btn color="red" small class="mr-3 ml-0 white--text" @click="cancelSearch">
+          <!-- <v-btn color="red" small class="mr-3 ml-0 white--text" @click="cancelSearch">
               <v-icon size="20">
               clear
               </v-icon> &nbsp;
               Thoát
-          </v-btn>
+          </v-btn> -->
           <v-btn color="#0072bc" small class="mx-0 white--text" @click="changeFilterSearch">
               <v-icon size="20">
               search
@@ -132,12 +159,7 @@
       return {
         donViList: [],
         fileTemplateList: [],
-        statusList: [
-          {text: 'Yêu cầu số hóa', value: 0},
-          {text: 'Có hiệu lực', value: 1},
-          {text: 'Hết hiệu lực', value: 2},
-          {text: 'Hủy', value: 3}
-        ],
+        statusList: [],
         dataSearch: {
           applicantName: '',
           applicantIdNo: '',
@@ -159,6 +181,21 @@
         fromReceiveDateFormatted: '',
         toReceiveDate: '',
         toReceiveDateFormatted: '',
+
+        loading: false,
+        keywordSearchSelect: "",
+        pageSelectBox: 0,
+        totalItemsSelectBox: 0,
+        timeOutSearch: "",
+        isShow: true,
+
+        loadingDonVi: false,
+        keywordSearchDonVi: "",
+        timeOutSearch1: "",
+        isShowDonVi: false,
+        pageSelectDonVi: 0,
+        totalItemsSelectDonVi: 0
+
       }
     },
     created () {
@@ -167,10 +204,7 @@
         vm.dataSearch = Object.assign(vm.dataSearch, vm.inputSearch)
       }
       vm.getDanhMucGiayTo()
-      let currentQuery = vm.$router.history.current.query
-      if (currentQuery.hasOwnProperty('applicantIdNo') && currentQuery.applicantIdNo) {
-        vm.disableInput = true
-      }
+      vm.getDanhMucHieuLuc()
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -195,6 +229,56 @@
           vm.dataSearch['toReceiveDateFormatted'] = vm.toReceiveDateFormatted
         } catch (error) {
         }
+      },
+      keywordSearchSelect(val) {
+        let vm = this
+        if (vm.fileTemplateList.length) {
+          if (val && val !== vm.dataSearch['fileTemplateNo']) {
+            if (vm.timeOutSearch) {
+              clearTimeout(vm.timeOutSearch);
+            }
+            vm.timeOutSearch = setTimeout(function () {
+              let exits = vm.fileTemplateList.find(function (item) {
+                return String(item.TenMuc).toLowerCase().includes(String(val).toLowerCase())
+              })
+              if (!exits) {
+                vm.searchItems()
+              }
+            }, 1000)
+          }
+        } else {
+          if (vm.timeOutSearch) {
+            clearTimeout(vm.timeOutSearch);
+          }
+          vm.timeOutSearch = setTimeout(function () {
+            vm.searchItems()
+          }, 1000)
+        }     
+      },
+      keywordSearchDonVi(val) {
+        let vm = this
+        if (vm.donViList.length) {
+          if (val && val !== vm.dataSearch['govAgencyCode']) {
+            if (vm.timeOutSearch1) {
+              clearTimeout(vm.timeOutSearch1);
+            }
+            vm.timeOutSearch1 = setTimeout(function () {
+              let exits = vm.donViList.find(function (item) {
+                return String(item.TenGoi).toLowerCase().includes(String(val).toLowerCase())
+              })
+              if (!exits) {
+                vm.searchItemsDonVi()
+              }
+            }, 1000)
+          }
+        } else {
+          if (vm.timeOutSearch1) {
+            clearTimeout(vm.timeOutSearch1);
+          }
+          vm.timeOutSearch1 = setTimeout(function () {
+            vm.searchItemsDonVi()
+          }, 1000)
+        }     
       }
     },
     computed: {
@@ -203,6 +287,17 @@
       getDataOutPut () {
         let vm = this
         return vm.dataSearch
+      },
+      resetForm () {
+        let vm = this
+        vm.dataSearch = {
+          govAgencyCode: '',
+          fileTemplateNo: '',
+          status: '',
+          fileNoSearch: '',
+          fromReceiveDateFormatted: '',
+          toReceiveDateFormatted: ''
+        }
       },
       cancelSearch () {
         let vm = this
@@ -228,28 +323,41 @@
       },
       getDanhMucGiayTo () {
         let vm = this
+        let filter1 = {
+          page: 0,
+          size: 20,
+          tenDanhMuc: 'mathanhphanhoso'
+        }
+        let filter2 = {
+          page: 0,
+          size: 20,
+          tenDanhMuc: 'magiaytoketqua'
+        }
+        let req1 = vm.$store.dispatch('getDanhMuc', filter1)
+        let req2 = vm.$store.dispatch('getDanhMuc', filter2)
+        let arrAction = [req1, req2]
+        Promise.all(arrAction).then(results => {
+          let res = results[0]['content'].concat(results[1]['content'])
+          vm.fileTemplateList = res
+        }).catch(xhr => {
+          vm.fileTemplateList = []
+        })
+      },
+      getDanhMucHieuLuc () {
+        let vm = this
         let filter = {
-          status: 1
+          page: 0,
+          size: 100,
+          tenDanhMuc: 'hieulucvanban'
         }
-        if (vm.isDvc) {
-          vm.$store.dispatch('getFileItemsFromDvc', filter).then(function (result) {
-            if (result.hasOwnProperty('data')) {
-              vm.fileTemplateList = result.data
-            } else {
-              vm.fileTemplateList = []
-            }
-          }).catch(function () {
-          })
-        } else {
-          vm.$store.dispatch('getFileItems', filter).then(function (result) {
-            if (result.hasOwnProperty('data')) {
-              vm.fileTemplateList = result.data
-            } else {
-              vm.fileTemplateList = []
-            }
-          }).catch(function () {
-          })
-        }
+        vm.$store.dispatch('getDanhMuc', filter).then(function (result) {
+          if (result.hasOwnProperty('content')) {
+            vm.statusList = result.content
+          } else {
+            vm.statusList = []
+          }
+        }).catch(function () {
+        })
       },
       parseDate(date) {
         if (!date) return ''
@@ -291,21 +399,84 @@
         const [day, month, year] = date.split('/')
         return `${year}-${month}-${day}`
       },
-      getMinFromDate30 (date) {
-        let vm = this
-        let toDate = (new Date(vm.parseDate(date))).getTime() - 30*86400000
-        return vm.parseDate(toDate)
+      // -----
+      visibilityChanged(e) {
+        e && this.loadMoreItems();
       },
-      getMaxToDate30 (date) {
+      visibilityChangedDonVi (e) {
+        e && this.loadMoreItemsDonVi();
+      },
+      searchItems() {
+        this.fileTemplateList = [];
+        this.pageSelectBox = 0;
+        this.loadMoreItems();
+      },
+      searchItemsDonVi() {
+        this.donViList = [];
+        this.pageSelectDonVi = 0;
+        this.loadMoreItemsDonVi();
+      },
+      loadMoreItems() {
         let vm = this
-        let toDate = (new Date(vm.parseDate(date))).getTime() + 30*86400000
-        if (toDate > (new Date()).getTime()) {
-          return vm.parseDate((new Date()).getTime())
-        } else {
-          return vm.parseDate(toDate)
+        if (vm.fileTemplateList.length < vm.totalItemsSelectBox || vm.pageSelectBox == 0) {
+          // vm.loading = true;
+          vm.isShow = false
+          let filter1 = {
+            page: vm.pageSelectBox,
+            size: 10,
+            tenDanhMuc: 'mathanhphanhoso',
+            keyword: vm.keywordSearchSelect ? vm.keywordSearchSelect : ''
+          }
+          let filter2 = {
+            page: vm.pageSelectBox,
+            size: 10,
+            tenDanhMuc: 'magiaytoketqua',
+            keyword: vm.keywordSearchSelect ? vm.keywordSearchSelect : ''
+          }
+          let req1 = vm.$store.dispatch('getDanhMuc', filter1)
+          let req2 = vm.$store.dispatch('getDanhMuc', filter2)
+          let arrAction = [req1, req2]
+          Promise.all(arrAction).then(results => {
+            let res = results[0]['content'].concat(results[1]['content'])
+            vm.fileTemplateList = vm.fileTemplateList.concat(res);
+            vm.isShow = true
+            vm.pageSelectBox++;
+            vm.totalItemsSelectBox = results[0]['totalElements'] + results[1]['totalElements']
+            vm.loading = false
+            if (vm.$refs.autocomplete) {
+              vm.$refs.autocomplete.onScroll()
+            }
+          }).catch(xhr => {
+            vm.loading = false
+          })
         }
-        
       },
+      loadMoreItemsDonVi() {
+        let vm = this
+        if (vm.donViList.length < vm.totalItemsSelectDonVi || vm.pageSelectDonVi == 0) {
+          // vm.loadingDonVi = true;
+          vm.isShowDonVi = false
+          let filter = {
+            page: vm.pageSelectDonVi,
+            size: 20,
+            keyword: vm.keywordSearchDonVi ? vm.keywordSearchDonVi : ''
+          }
+          vm.$store.dispatch('getDonVi', filter).then(results => {
+            let res = results['content']
+            vm.donViList = vm.donViList.concat(res);
+            vm.isShowDonVi = true
+            vm.pageSelectDonVi++
+            vm.totalItemsSelectDonVi = results['totalElements']
+            vm.loadingDonVi = false
+            if (vm.$refs.autocomplete1) {
+              vm.$refs.autocomplete1.onScroll()
+            }
+          }).catch(xhr => {
+            vm.loadingDonVi = false
+          })
+        }
+      }
+      // ------
     },
   }
 </script>

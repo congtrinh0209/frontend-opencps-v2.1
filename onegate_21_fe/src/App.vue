@@ -128,7 +128,7 @@
         </v-flex>
       </v-layout>
     </v-content>
-    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
+    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0" aria-label="Ký số" alt="Ký số"></object>
   </v-app>
 </template>
 

@@ -395,6 +395,252 @@ export const store = new Vuex.Store({
         })
       })
     },
+    // 
+    addGiayToLuTru ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter.data)
+        let config = {
+          method: 'post',
+          url: '/o/systemintegration/giaytoluutruso',
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'Token': Liferay.authToken
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+    },
+    updateGiayToLuTru ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter.data)
+        let config = {
+          method: 'put',
+          url: '/o/systemintegration/giaytoluutruso/' + filter.primKey,
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'Token': Liferay.authToken
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+    },
+    deleteGiayToLuTru ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          method: 'delete',
+          url: '/o/systemintegration/giaytoluutruso/' + filter.primKey,
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'Token': Liferay.authToken
+          }
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+    },
+    cloneMyStorage ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter)
+        let config = {
+          method: 'put',
+          url: '/o/systemintegration/giaytoluutruso/clone',
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'Token': Liferay.authToken
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+    },
+    getDanhMuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          params: {
+            page: filter.hasOwnProperty('page') ? filter.page : 0,
+            size: filter.hasOwnProperty('size') ? filter.size : 20,
+            orderFields: 'maMuc',
+            orderTypes: 'asc',
+            keyword: filter.hasOwnProperty('keyword') ? filter.keyword : ''
+          },
+          data: {}
+        }
+        axios.get('/o/systemintegration/danhmuc/' + filter.tenDanhMuc, param).then(function (response) {
+          resolve(response.data)
+        }, error => {
+          reject({
+            totalElements: 0,
+            content: []
+          })
+        })
+      })
+    },
+    getDonVi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          params: {
+            page: filter.hasOwnProperty('page') ? filter.page : 0,
+            size: filter.hasOwnProperty('size') ? filter.size : 20,
+            keyword: filter.hasOwnProperty('keyword') ? filter.keyword : ''
+          },
+          data: {}
+        }
+        axios.get('/o/systemintegration/danhmuc/coquandonvi', param).then(function (response) {
+          resolve(response.data)
+        }, error => {
+          reject({
+            totalElements: 0,
+            content: []
+          })
+        })
+      })
+    },
+    getGiayToKhoCaNhan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              'Accept': 'application/json', 
+              'Content-Type': 'application/json'
+            },
+            params: {
+              page: filter.page ? filter.page : 0,
+              size: filter.size ? filter.size : 20,
+              coQuanBanHanhMaDinhDanh: filter.coQuanBanHanh_MaDinhDanh ? filter.coQuanBanHanh_MaDinhDanh : '',
+              mauGiayToMaMuc: filter.mauGiayTo_MaMuc ? filter.mauGiayTo_MaMuc : '',
+              hieuLucGiayToMaMuc: filter.hieuLucGiayTo_MaMuc,
+              keyword: filter.keyword ? filter.keyword : '',
+              ngayBanHanhTuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
+              ngayBanHanhDenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
+              orderFields: 'ThoiGianTao',
+              orderType: 'desc',
+              cccd: filter.cccd ? filter.cccd : '',
+              duocChiaSe: filter.duocChiaSe
+            },
+            data: {}
+          }
+
+          axios.get('/o/systemintegration/giaytoluutruso', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getChiTietGiayToCaNhan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              'Accept': 'application/json', 
+              'Content-Type': 'application/json'
+            },
+            params: {},
+            data: {}
+          }
+
+          axios.get('/o/systemintegration/giaytoluutruso/' + filter.primKey, param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    uploadTep ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+        
+          let dataCreateFile = new FormData()
+          let url = '/o/systemintegration/giaytoluutruso/upload/file'
+          dataCreateFile.append('file', filter.file)
+          
+          axios.post(url, dataCreateFile, param).then(result => {
+            resolve(result.data.resp)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
+    getTepDuLieu ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            responseType: 'blob',
+            params: {},
+            data: {}
+          }
+
+          axios.get('/o/systemintegration/giaytoluutruso/download/' + filter.id, param).then(function (response) {
+            let url = window.URL.createObjectURL(response.data)
+            resolve(url)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

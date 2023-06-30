@@ -297,10 +297,10 @@
 </template>
 
 <script>
-  mermaid.initialize({
-    theme: 'forest',
-    startOnLoad: false
-  })
+  // mermaid.initialize({
+  //   theme: 'forest',
+  //   startOnLoad: false
+  // })
   export default {
     props: {
       detailDossier: {

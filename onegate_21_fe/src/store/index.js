@@ -1018,75 +1018,30 @@ export const store = new Vuex.Store({
         })
       })
     },
-    uploadSingleFileGroupCongVan ({ commit, state }, data) {
+    cloneFileFromStorageCentralized ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let dataOutPut = []
-        let files = $('input[id="documentFile"]')[0].files
-        let countFiles = files.length
-        let count = 0
-        if (files) {
-          for (let index = 0; index < countFiles; index++) {
-            let file = files[index]
-            let fileName = file['name']
-            if (file['name']) {
-              fileName = file['name'].replace(/\%/g, '')
-              fileName = fileName.replace(/\//g, '')
-              fileName = fileName.replace(/\\/g, '')
-            }
-            let formData = new FormData()
-            if (data.partType === 3) {
-              if (data['displayName']) {
-                fileName = data['displayName'].replace(/\%/g, '')
-                fileName = fileName.replace(/\//g, '')
-                fileName = fileName.replace(/\\/g, '')
-              }
-              formData.append('displayName', fileName)
-            } else {
-              formData.append('displayName', fileName)
-            }
-            formData.append('fileType', file.type)
-            formData.append('fileSize', file.size)
-            formData.append('isSync', 'false')
-            formData.append('file', file, fileName)
-            formData.append('dossierPartNo', data.partNo)
-            formData.append('dossierTemplateNo', data.dossierTemplateNo)
-            formData.append('fileTemplateNo', data.fileTemplateNo)
-            formData.append('formData', '')
-            formData.append('referenceUid', '')
-            let fileUpload = {
-              partTip: data.partTip,
-              file: file
-            }
-            console.log('dataFILEELLELE', data, data.partTip)
-            store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
-            if (file && state.validFileUpload) {
-              axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
-                headers: {
-                  'groupId': state.initData.groupId,
-                  'Content-Type': 'multipart/form-data'
-                }
-              }).then(function (response) {
-                count += 1
-                dataOutPut.push(response.data)
-                if (count === countFiles) {
-                  resolve(dataOutPut)
-                }
-              }).catch(function (xhr) {
-                toastr.clear()
-                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-                count += 1
-                if (count === countFiles) {
-                  reject(dataOutPut)
-                }
-              })
-            } else {
-              count += 1
-              if (count === countFiles) {
-                reject(dataOutPut)
-              }
-            }
+        let formData = new FormData()
+        formData.append('displayName', data.fileName)
+        formData.append('fileType', data.fileType)
+        formData.append('fileSize', data.fileSize)
+        formData.append('isSync', 'false')
+        formData.append('file', '')
+        formData.append('dossierPartNo', data.partNo)
+        formData.append('dossierTemplateNo', data.dossierTemplateNo)
+        formData.append('fileTemplateNo', data.fileTemplateNo)
+        formData.append('formData', '')
+        formData.append('referenceUid', data.referenceUid)
+
+        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
           }
-        }
+        }).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
       })
     },
     uploadSingleOtherFile ({ commit, state }, data) {
@@ -5562,6 +5517,84 @@ export const store = new Vuex.Store({
       } catch (error) { 
       }
     },
+    signatureMySign ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter);
+        
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/signature/NEAC/sign',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          let serializable = response.data
+          resolve(serializable)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+      })
+    },
+    getResultMySign ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify({
+          "credentialID": filter.credentialID,
+          "applicantIdNo": filter.applicantIdNo,
+          "type":"status",
+          "transactionId": filter.transactionId
+        });
+        
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/signature/' + filter.dossierId + '/signMySignCA/' + filter.fileReferenceUid,
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          let serializable = response.data
+          resolve(serializable)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+      })
+    },
+    getCertMySign ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/signature/NEAC/get_certificate',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+          },
+          data : JSON.stringify(filter)
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          let serializable = response.data
+          resolve(serializable)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+      })
+    },
     phiChuyenPhat ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         let options = {
@@ -6211,7 +6244,135 @@ export const store = new Vuex.Store({
           })
         }).catch(function (){})
       })
-    }
+    },
+    getDanhMuc ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          params: {
+            page: filter.hasOwnProperty('page') ? filter.page : 0,
+            size: filter.hasOwnProperty('size') ? filter.size : 20,
+            orderFields: 'maMuc',
+            orderTypes: 'asc',
+            keyword: filter.hasOwnProperty('keyword') ? filter.keyword : ''
+          },
+          data: {}
+        }
+        axios.get('/o/systemintegration/danhmuc/' + filter.tenDanhMuc, param).then(function (response) {
+          resolve(response.data)
+        }, error => {
+          reject({
+            totalElements: 0,
+            content: []
+          })
+        })
+      })
+    },
+    getDonVi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          params: {
+            page: filter.hasOwnProperty('page') ? filter.page : 0,
+            size: filter.hasOwnProperty('size') ? filter.size : 20,
+            keyword: filter.hasOwnProperty('keyword') ? filter.keyword : ''
+          },
+          data: {}
+        }
+        axios.get('/o/systemintegration/danhmuc/coquandonvi', param).then(function (response) {
+          resolve(response.data)
+        }, error => {
+          reject({
+            totalElements: 0,
+            content: []
+          })
+        })
+      })
+    },
+    getGiayToKhoCaNhan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              'Accept': 'application/json', 
+              'Content-Type': 'application/json'
+            },
+            params: {
+              page: filter.page ? filter.page : 0,
+              size: filter.size ? filter.size : 20,
+              coQuanBanHanhMaDinhDanh: filter.coQuanBanHanh_MaDinhDanh ? filter.coQuanBanHanh_MaDinhDanh : '',
+              mauGiayToMaMuc: filter.mauGiayTo_MaMuc ? filter.mauGiayTo_MaMuc : '',
+              hieuLucGiayToMaMuc: filter.hieuLucGiayTo_MaMuc,
+              keyword: filter.keyword ? filter.keyword : '',
+              ngayBanHanhTuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
+              ngayBanHanhDenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
+              orderFields: 'ThoiGianTao',
+              orderType: 'desc',
+              cccd: filter.cccd ? filter.cccd : ''
+            },
+            data: {}
+          }
+
+          axios.get('/o/systemintegration/giaytoluutruso', param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getChiTietGiayToCaNhan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              'Accept': 'application/json', 
+              'Content-Type': 'application/json'
+            },
+            params: {},
+            data: {}
+          }
+
+          axios.get('/o/systemintegration/giaytoluutruso/' + filter.primKey, param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getTepDuLieu ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            responseType: 'blob',
+            params: {},
+            data: {}
+          }
+
+          axios.get('/o/systemintegration/giaytoluutruso/download/' + filter.id, param).then(function (response) {
+            let url = window.URL.createObjectURL(response.data)
+            console.log('blob', url)
+            resolve(url)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     // ----End---------
   },
   mutations: {

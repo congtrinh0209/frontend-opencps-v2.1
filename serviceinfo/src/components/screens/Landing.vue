@@ -26,7 +26,7 @@
             ></v-text-field>
           </div>
           <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-            <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName">
+            <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName" aria-label="Tìm kiếm" name="Tìm kiếm">
               <v-icon size="16">search</v-icon>
             </v-btn>
           </div>
@@ -45,6 +45,12 @@
             clearable
             @change="changeAdministration"
             box
+            aria-label="Chọn cơ quan quản lý"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="suggestions-list"
+            aria-required="true"
           ></v-autocomplete>
         </v-flex>
         <v-flex v-if="hasCoQuanThucHien && !setAgency" :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
@@ -59,6 +65,12 @@
             clearable
             @change="changeGovAgencyThucHien"
             box
+            aria-label="Chọn cơ quan thực hiện"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="suggestions-list"
+            aria-required="true"
           ></v-autocomplete>
         </v-flex>
         <v-flex :class="setAgency ? 'xs12 sm6' : (hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4')" class="px-2">
@@ -73,6 +85,12 @@
             clearable
             @change="changeDomain"
             box
+            aria-label="Chọn lĩnh vực"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="suggestions-list"
+            aria-required="true"
           ></v-autocomplete>
         </v-flex>
         <v-flex :class="setAgency ? 'xs12 sm6' : (hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4')" class="px-2">
@@ -87,6 +105,12 @@
             @change="changeLevel"
             clearable
             box
+            aria-label="Chọn mức độ"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="suggestions-list"
+            aria-required="true"
           >
           </v-autocomplete>
         </v-flex>
@@ -105,6 +129,12 @@
             clearable
             @change="changeDomain"
             box
+            aria-label="Chọn lĩnh vực"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="suggestions-list"
+            aria-required="true"
           ></v-autocomplete>
         </v-flex>
         <v-flex class="xs12 sm6 px-2">
@@ -119,6 +149,12 @@
             @change="changeLevel"
             clearable
             box
+            aria-label="Chọn mức độ"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="suggestions-list"
+            aria-required="true"
           >
           </v-autocomplete>
         </v-flex>
@@ -129,6 +165,7 @@
       </content-placeholders>
       <div v-else class="service__info__table">
         <v-data-table
+          v-if="serviceInfoList && serviceInfoList.length > 0"
           :headers="headers"
           :items="serviceInfoList"
           hide-actions

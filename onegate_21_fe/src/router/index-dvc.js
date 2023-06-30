@@ -1,8 +1,18 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+// const Landing = () => import('@/components/Landing');
+// const XemChiTietHoSoDetailCanBo = () => import('@/components/XemChiTietHoSoDetailCanBo');
+// const XuLyHoSo = () => import('@/components/XuLyHoSo');
+// const HoanThienBoSungHoSoDetail = () => import('@/components/HoanThienBoSungHoSoDetail');
+// const DetailForward = () => import('@/components/DetailForward');
+// const DanhSachThuTuc = () => import('@/components/DanhSachThuTucNew');
+// const LinhVucThuTuc = () => import('@/components/LinhVucThuTuc');
+// const NopThanhCong = () => import('@/components/NopThanhCong');
+// const ThanhToanThanhCong = () => import('@/components/ThanhToanThanhCong');
+// const NotFound = () => import('@/components/NotFound');
+// const ImportHoSo = () => import('@/components/ImportHoSo');
+
 import Landing from '@/components/Landing'
-// import TiepNhanHoSoDetail from '@/components/TiepNhanHoSoDetail'
-// import TiepNhanNhomHoSo from '@/components/TiepNhanHoSoTheoNhom'
 import XemChiTietHoSoDetailCanBo from '@/components/XemChiTietHoSoDetailCanBo'
 import XuLyHoSo from '@/components/XuLyHoSo'
 import HoanThienBoSungHoSoDetail from '@/components/HoanThienBoSungHoSoDetail'

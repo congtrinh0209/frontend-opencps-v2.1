@@ -75,7 +75,7 @@
                   ></v-autocomplete>
                   <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
                     <v-icon color="blue" class="">event</v-icon>
-                    <vue-ctk-date-time-picker 
+                    <!-- <vue-ctk-date-time-picker 
                       ref="datepicker"
                       :label="item.value ? '' : 'Chọn ngày'"
                       style="width:auto!important"
@@ -88,7 +88,7 @@
                       :min-date="getCurentDateTime()"
                       :without-header="true"
                       locale="vi"
-                    />
+                    /> -->
                   </v-layout>
                   <v-layout wrap v-if="item.fieldType.indexOf('options_group') >= 0" class="mt-2">
                     <v-flex xs4 v-for="(item1, index1) in optionsGroup" v-bind:key="index1" class="pr-3">
@@ -189,7 +189,7 @@
             <v-flex xs12 class="px-3">
               <v-layout wrap class="mt-2" v-if="item.fieldType === 'date'">
                 <v-icon color="blue" class="">event</v-icon>
-                <vue-ctk-date-time-picker 
+                <!-- <vue-ctk-date-time-picker 
                   ref="datepicker"
                   :label="item.value ? '' : 'Chọn ngày'"
                   style="width:auto!important"
@@ -201,7 +201,7 @@
                   time-format="HH:mm"
                   :without-header="true"
                   locale="vi"
-                />
+                /> -->
               </v-layout>
             </v-flex>
             <v-flex xs12 class="px-3">
@@ -223,13 +223,6 @@
             full-width
             landscape
           ></v-date-picker>
-          <!-- <vue-ctk-date-time-picker
-            v-model="date"
-            formatted="DD/MM/YYYY HH:mm"
-            format="YYYY-MM-DDTHH:mm"
-            time-format="HH:mm"
-            without-input
-          /> -->
           <v-card-actions style="background: #fff">
             <v-spacer></v-spacer>
             <v-btn color="primary" flat @click="pickDateCustom">
@@ -247,13 +240,13 @@
   </div>
 </template>
 <script>
-  let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
+  // let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
   import $ from 'jquery'
   import axios from 'axios'
   export default {
-    components: {
-      'vue-ctk-date-time-picker': datePicker
-    },
+    // components: {
+    //   'vue-ctk-date-time-picker': datePicker
+    // },
     props: {
       dossier_id: {
         type: Number

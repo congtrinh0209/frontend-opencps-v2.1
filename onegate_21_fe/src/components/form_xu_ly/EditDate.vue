@@ -11,7 +11,7 @@
           <v-card-text>
             <v-layout wrap class="pl-2">
               <v-icon color="primary" class="hover-pointer" @click="showDatePicker">event</v-icon>
-              <vue-ctk-date-time-picker
+              <!-- <vue-ctk-date-time-picker
                 ref="datepicker" 
                 style="width:auto!important"
                 class="ml-2"
@@ -23,7 +23,7 @@
                 :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
                 locale="vi"
-              ></vue-ctk-date-time-picker>
+              ></vue-ctk-date-time-picker> -->
             </v-layout>
           </v-card-text>
         </v-card>
@@ -32,11 +32,11 @@
   </div>
 </template>
 <script>
-let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
+// let datePicker = window.VueCtkDateTimePicker ? window.VueCtkDateTimePicker.default : window['vue-ctk-date-time-picker']
 export default {
-  components: {
-    'vue-ctk-date-time-picker': datePicker
-  },
+  // components: {
+  //   'vue-ctk-date-time-picker': datePicker
+  // },
   props: ['dueDateEdit'],
   data: () => ({
     dueDateInput: '',
