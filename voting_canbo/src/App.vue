@@ -49,16 +49,24 @@
               </div>
             </div>
             <div class="flex col-right sm6 md7 lg7">
-              <div class="title-voting">
-                <span>Xin vui lòng đánh giá chất lượng dịch vụ</span> <br>
-                <span v-if="dossierNoVoting">Hồ sơ: {{dossierNoVoting}}</span>
+              <div class="title-voting" v-if="!dossierNoVoting && active">
+                <div class="mb-2">Không có hồ sơ</div>
+                <div>Đánh giá chất lượng dịch vụ</div>
               </div>
-              <div>
+              <div class="title-voting" v-if="!dossierNoVoting && !active">
+                <div class="mb-2">Xin vui lòng lấy mã hồ sơ</div>
+                <div>Đánh giá chất lượng dịch vụ</div>
+              </div>
+              <div class="title-voting" v-if="dossierNoVoting && active">
+                <span>Xin vui lòng đánh giá chất lượng dịch vụ</span> <br>
+                <span>Hồ sơ: {{dossierNoVoting}}</span>
+              </div>
+              <div v-if="dossierNoVoting">
                 <div>
                   <v-btn class="my-0 white--text btn-vote" color="#8bc34a"
                     :loading="loading"
                     :disabled="loading"
-                    @click.stop="submitVoting({name: 'Rất hài lòng', value: 3})"
+                    @click.stop="showVoting({name: 'Rất hài lòng', value: 3})"
                   >
                     <span>RẤT HÀI LÒNG</span>
                   </v-btn>
@@ -67,7 +75,7 @@
                   <v-btn class="my-0 white--text btn-vote" color="#2196f3"
                     :loading="loading"
                     :disabled="loading"
-                    @click.stop="submitVoting({name: 'Hài lòng', value: 2})"
+                    @click.stop="showVoting({name: 'Hài lòng', value: 2})"
                   >
                     <span>HÀI LÒNG</span>
                   </v-btn>
@@ -76,16 +84,40 @@
                   <v-btn class="my-0 white--text btn-vote" color="#CE7A58"
                     :loading="loading"
                     :disabled="loading"
-                    @click.stop="submitVoting({name: 'Không hài lòng', value: 1})"
+                    @click.stop="showVoting({name: 'Không hài lòng', value: 1})"
                   >
                     <span>KHÔNG HÀI LÒNG</span>
                   </v-btn>
                 </div>
               </div>
+              <div v-else>
+                <v-btn class="my-0 white--text btn-vote" color="#8bc34a"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click.stop="getEmpData()"
+                >
+                  <span>LẤY MÃ HỒ SƠ</span>
+                </v-btn>
+              </div>
             </div>
           </div> 
           
         </v-container>
+        <v-dialog v-model="dialogSubmitVoting" persistent max-width="500">
+          <v-card style="min-height: 150px">
+            <div style="justify-content: center;height: 72px;font-size: 24px;display: flex;color: rgb(148, 4, 4);justify-content: center;align-items: center;">
+              Ông/ bà đồng ý đánh giá: <span style="font-weight: 600; color: color: rgb(148, 4, 4);"> {{ votingChoice ? votingChoice['name'] : '' }}</span>?
+            </div>
+            <v-card-actions class="mx-0 px-3 pb-3" style="justify-content: center">
+              <v-btn class="white--text mr-2" color="red" style="color: #fff !important;height: 36px;border-radius: 7px;"  @click="dialogSubmitVoting = false" :loading="loading" :disabled="loading">
+                <v-icon class="white--text" size="22"  style="color: #fff !important">clear</v-icon>&nbsp; TỪ CHỐI
+              </v-btn>
+              <v-btn style="color: #fff !important;width: 150px;height: 36px;border-radius: 7px;" color="#5d9b14" @click.stop="submitVoting" :loading="loading" :disabled="loading">
+                <v-icon size="22" style="color: #fff !important">save</v-icon>&nbsp; ĐỒNG Ý
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
         <v-dialog v-model="dialogSuccess" persistent max-width="700px">
           <v-card>
             <v-toolbar height="48" flat dark color="#940404">
@@ -142,6 +174,8 @@
   export default {
     data: () => ({
       dossierNoVoting: '',
+      active: false,
+      votingChoice: '',
       gateName: '',
       gateNameEdit: '',
       dialogSuccess: false,
@@ -152,6 +186,7 @@
       employeeAvatar: '/o/hau-giang-theme/images/avatar-default.png',
       countDown: 0,
       dialogUpdate: false,
+      dialogSubmitVoting: false,
       govAgency: ''
     }),
     beforeDestroy () {
@@ -208,9 +243,9 @@
             }).catch(function (xhr) {
             })
             vm.getEmpProfile(vm.employeeInfo.employeeEmail)
-            setInterval(function () {
-              vm.getEmpData(vm.employeeInfo.employeeEmail)
-            }, 5000)
+            // setInterval(function () {
+            //   vm.getEmpData(vm.employeeInfo.employeeEmail)
+            // }, 5000)
           }).catch(function () {
             window.location.href = "/c/portal/logout"
           })
@@ -257,14 +292,20 @@
         }).catch(function (xhr) {
         })
       },
-      getEmpData (email) {
+      getEmpData () {
         let vm = this
+        let email = vm.employeeInfo && vm.employeeInfo.employeeEmail ? vm.employeeInfo.employeeEmail : ''
+        if (!email) {
+          toastr.error('Chưa có thông tin cán bộ được đánh giá')
+          return
+        }
         let param = {
           headers: {
             groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           }
         }
         axios.get('/o/rest/v2/employees/' + email + '/profile', param).then(function (response) {
+          vm.active = true
           try {
             let data = response.data
             let empData = data.employeeData ? JSON.parse(data.employeeData) : ''
@@ -272,16 +313,36 @@
               vm.dossierNoVoting = empData.dossier_vote
             } else {
               vm.dossierNoVoting = ''
+              setTimeout(function(){
+                vm.active = false
+              }, 5000)
             }
+            setTimeout(function () {
+              vm.dossierNoVoting = ''
+              vm.active = false
+            }, 120000)
           } catch (error) {
             vm.dossierNoVoting = ''
+            setTimeout(function(){
+              vm.active = false
+            }, 5000)
           }
         }).catch(function (xhr) {
+          vm.active = true
           vm.dossierNoVoting = ''
+          setTimeout(function(){
+            vm.active = false
+          }, 5000)
         })
       },
-      submitVoting (vote) {
+      showVoting (vote) {
         let vm = this
+        vm.votingChoice = vote
+        vm.dialogSubmitVoting = true
+      },
+      submitVoting () {
+        let vm = this
+        let vote = vm.votingChoice
         if (!vm.dossierNoVoting) {
           toastr.error('Chưa có hồ sơ thực hiện đánh giá')
           return;
@@ -304,17 +365,10 @@
             "groupId": window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           }
         }
-
+        vm.dialogSubmitVoting = false
         $.ajax(settings).done(function (response) {
           vm.loading = false
           vm.dialogSuccess = true
-          // vm.countDown = 60
-          // var downloadTimer = setInterval(function(){
-          //   if(vm.countDown <= 0){
-          //     clearInterval(downloadTimer)
-          //   }
-          //   vm.countDown -= 1
-          // }, 1000)
           let config = {
             headers: {
               'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -325,12 +379,13 @@
           let dataPost = new URLSearchParams()
           dataPost.append('employeeData', JSON.stringify(
             {
-              "title_vote": vm.gateNameEdit,
+              "title_vote": vm.gateName ? vm.gateNameEdit : '',
               "dossier_vote": ''
             }
           ))
           axios.put('/o/rest/v2/employees/' + vm.employeeInfo['classPK'] + '/employeeData', dataPost, config).then(function (result) {})
           vm.dossierNoVoting = ''
+          vm.active = false
           setTimeout (function () {
             vm.dialogSuccess = false
           }, 10000)

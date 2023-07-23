@@ -46,42 +46,42 @@ export const store = new Vuex.Store({
             code: 'opencps_dossiertemplate',
             text: 'Mẫu hồ sơ'
           },
-          {
-            icon: 'filter_3',
-            link: '/table/opencps_serviceprocess',
-            code: 'opencps_serviceprocess',
-            text: 'Quy trình thủ tục'
-          },
-          {
-            icon: 'filter_4',
-            link: '/table/opencps_serviceconfig',
-            code: 'opencps_serviceconfig',
-            text: 'Dịch vụ công một cửa'
-          },
-          {
-            icon: 'filter_5',
-            link: '/table/opencps_serviceconfig_dvc',
-            code: 'opencps_serviceconfig_dvc',
-            text: 'Dịch vụ công cổng DVC'
-          },
-          {
-            icon: 'filter_6',
-            link: '/table/opencps_stepconfig',
-            code: 'opencps_stepconfig',
-            text: 'Bước xử lý'
-          },
-          {
-            icon: 'filter_7',
-            link: '/table/opencps_actionconfig',
-            code: 'opencps_actionconfig',
-            text: 'Thao tác xử lý'
-          },
-          {
-            icon: 'filter_8',
-            link: '/table/opencps_employee',
-            code: 'opencps_employee',
-            text: 'Quản lý nhân sự'
-          },
+          // {
+          //   icon: 'filter_3',
+          //   link: '/table/opencps_serviceprocess',
+          //   code: 'opencps_serviceprocess',
+          //   text: 'Quy trình thủ tục'
+          // },
+          // {
+          //   icon: 'filter_4',
+          //   link: '/table/opencps_serviceconfig',
+          //   code: 'opencps_serviceconfig',
+          //   text: 'Dịch vụ công một cửa'
+          // },
+          // {
+          //   icon: 'filter_5',
+          //   link: '/table/opencps_serviceconfig_dvc',
+          //   code: 'opencps_serviceconfig_dvc',
+          //   text: 'Dịch vụ công cổng DVC'
+          // },
+          // {
+          //   icon: 'filter_6',
+          //   link: '/table/opencps_stepconfig',
+          //   code: 'opencps_stepconfig',
+          //   text: 'Bước xử lý'
+          // },
+          // {
+          //   icon: 'filter_7',
+          //   link: '/table/opencps_actionconfig',
+          //   code: 'opencps_actionconfig',
+          //   text: 'Thao tác xử lý'
+          // },
+          // {
+          //   icon: 'filter_8',
+          //   link: '/table/opencps_employee',
+          //   code: 'opencps_employee',
+          //   text: 'Quản lý nhân sự'
+          // },
         ]
       },
     ],

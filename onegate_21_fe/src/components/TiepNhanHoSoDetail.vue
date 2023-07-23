@@ -105,7 +105,10 @@
                   <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
                   <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
                 </div>
-                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
+                <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" 
+                  :partTypes="formCode === 'NEW_GROUP' || formCode === 'NEW_GROUP_CV' || formCode === 'NEW_GROUP_CV_DI' ? inputTypesGroup : inputTypes"
+                  :serviceCodeDvcqg="serviceCodeDvcqg"
+                ></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -691,6 +694,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    serviceCodeDvcqg: '',
     splitBienLai: false,
     fixDescriptionDt: false,
     valid_tenHoSo: false,
@@ -1318,6 +1322,7 @@ export default {
             vm.$store.dispatch('getServiceInfo', {
               serviceInfoId: result.serviceCode
             }).then(function (res) {
+              vm.serviceCodeDvcqg = res.hasOwnProperty('serviceCodeDVCQG') && res.serviceCodeDVCQG ? res.serviceCodeDVCQG : res.serviceCode
               if (res.hasOwnProperty('isNotarization') && String(res.isNotarization) === 'true') { 
                 vm.isNotarization = true
 

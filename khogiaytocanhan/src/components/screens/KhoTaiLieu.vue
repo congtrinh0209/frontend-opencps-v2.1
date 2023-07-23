@@ -3,6 +3,14 @@
     <v-layout wrap>
       <v-flex class="pl-2" style="width: 300px">
         <v-list>
+          <v-btn color="#0072bc" small class="mx-0 my-0 white--text" @click.stop="showCreatedocument"
+            style="height: 36px;width: 100%"
+          >
+            <v-icon size="24">
+              post_add
+            </v-icon> &nbsp;
+            <span style="line-height: 36px;font-size: 14px;">THÊM MỚI GIẤY TỜ</span>
+          </v-btn>
           <v-list-tile
             avatar
             @click="changeMenu(0)"
@@ -19,7 +27,6 @@
               </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-
           <v-list-tile
             avatar
             @click="changeMenu(1)"
@@ -27,11 +34,29 @@
             style="height: auto !important; border-bottom: 1px solid #dedede;" 
           >
             <v-list-tile-avatar>
-              <v-icon :class="menuActive == 1 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">share</v-icon>
+              <v-icon :class="menuActive == 1 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">
+                fas fa fa-share-square-o
+              </v-icon>
             </v-list-tile-avatar>
 
             <v-list-tile-content>
               <v-list-tile-title :style="menuActive == 1 ? 'text-transform: uppercase; font-size: 14px;padding-left: 15px;color: #0072bc;font-weight: 500;' : 'text-transform: uppercase; font-size: 14px;padding-left: 15px;'">
+                Giấy tờ chia sẻ
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile
+            avatar
+            @click="changeMenu(2)"
+            class="px-2 py-2"
+            style="height: auto !important; border-bottom: 1px solid #dedede;" 
+          >
+            <v-list-tile-avatar>
+              <v-icon :class="menuActive == 2 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">share</v-icon>
+            </v-list-tile-avatar>
+
+            <v-list-tile-content>
+              <v-list-tile-title :style="menuActive == 2 ? 'text-transform: uppercase; font-size: 14px;padding-left: 15px;color: #0072bc;font-weight: 500;' : 'text-transform: uppercase; font-size: 14px;padding-left: 15px;'">
                 Giấy tờ được chia sẻ
               </v-list-tile-title>
             </v-list-tile-content>
@@ -43,7 +68,9 @@
           <v-layout wrap>
             <v-flex>
               <div class="headline mb-3" style="font-size: 20px!important; text-transform: uppercase;color: #0072bc;">
-                {{ menuActive == 0 ? 'Giấy tờ của tôi' : 'Giấy tờ được chia sẻ' }}
+                <span v-if="menuActive == 0">Giấy tờ của tôi</span>
+                <span v-else-if="menuActive == 1">Giấy tờ chia sẻ</span>
+                <span v-else>Giấy tờ được chia sẻ</span>
               </div>
             </v-flex>
             <v-flex style="width: 500px">
@@ -59,7 +86,7 @@
             <v-flex style="max-width: 170px; text-align: right;padding-top: 2px;">
               <v-btn color="#0072bc" small class="mx-0 white--text my-0" @click.stop="showTimKiem" style="">
                 <v-icon size="20">
-                  filter_alt
+                  filter_list
                 </v-icon> &nbsp;
                 Tìm kiếm nâng cao
               </v-btn>
@@ -68,13 +95,6 @@
           <v-card-text class="px-0 pb-0" v-if="showAdvanceSearch">
             <tim-kiem ref="timkiem" :inputSearch="inputSearch" v-on:trigger-search="searchGiayToSoHoa" v-on:trigger-cancel="cancelSearchGiayToSoHoa"></tim-kiem>
           </v-card-text>
-
-          <v-btn v-if="menuActive == 0" color="#0072bc" small class="mx-0 white--text" @click.stop="showCreatedocument">
-            <v-icon size="20">
-              post_add
-            </v-icon> &nbsp;
-            Thêm mới giấy tờ
-          </v-btn>
           <v-data-table
             :headers="documentListHeader"
             :items="documentApplicantList"
@@ -147,7 +167,7 @@
                     <v-btn :disabled="loadingAction" @click.stop="cloneMyStorage(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon size="22">sync_alt</v-icon>
                     </v-btn>
-                    <span>Lấy sang kho của tôi</span>
+                    <span>Lấy về kho của tôi</span>
                   </v-tooltip>
                   <v-tooltip top v-if="!loadingTable && menuActive == 0" class="mr-2">
                     <v-btn @click.stop="showEditDocument(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
@@ -191,43 +211,43 @@
             </v-btn>
           </div>
           <v-card-text v-if="typeCreate == 'view'" style="font-size: 14px;" class="py-2 px-0">
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Tên giấy tờ: </v-flex>
               <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.TenGiayTo}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Số hiệu giấy tờ: </v-flex>
               <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.SoHieuVanBan}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Cơ quan ban hành: </v-flex>
               <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.CoQuanBanHanh['TenGoi']}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Ngày ban hành: </v-flex>
               <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{convertDate(documentSelect.NgayBanHanh)}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Mẫu giấy tờ: </v-flex>
               <v-flex class="pl-0" style="width: calc(100% - 160px);"> {{documentSelect.MaMauGiayTo['MaMuc']}} - {{documentSelect.MaMauGiayTo['TenMuc']}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Mã hồ sơ: </v-flex>
               <v-flex class="pl-0 " style="width: calc(100% - 160px);"> {{documentSelect.HoSoDichVuCong['MaDinhDanh']}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Người thụ hưởng: </v-flex>
               <v-flex class="pl-0 mr-2" style="width: calc(100% - 160px);"> {{documentSelect.ChuHoSo['TenGoi']}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold" style="width: 150px;">Số CCCD/CMND, MST: </v-flex>
               <v-flex class="pl-0 " style="width: calc(100% - 160px);">{{documentSelect.ChuHoSo['MaDinhDanh']}}</v-flex>
             </v-flex>
-            <v-flex class="xs12 sm12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
+            <v-flex class="xs12 md12 pb-2 layout wrap" style="padding: 10px 0; border-bottom: 1px dashed #dadada;align-items: center;">
               <v-flex class="pr-2 text-bold " style="width: 150px;">Hiệu lực giấy tờ: </v-flex>
               <v-flex class="pl-0 "  style="width: calc(100% - 160px);"> {{documentSelect.HieuLucVanBan['TenMuc']}}</v-flex>
             </v-flex>
-            <div class="xs12 sm12 py-2" v-if="documentSelect &&documentSelect.TepDuLieu && documentSelect.TepDuLieu.length">
+            <div class="xs12 md12 py-2" v-if="documentSelect &&documentSelect.TepDuLieu && documentSelect.TepDuLieu.length">
               <span class="pr-2 text-bold ">Tệp giấy tờ: </span>
               <div v-for="(itemFileView, indexFile) in documentSelect.TepDuLieu" :key="indexFile" class="my-2">
                 <span v-on:click.stop="viewDocument(itemFileView)" class="ml-1" style="cursor: pointer;text-decoration: underline;">
@@ -235,7 +255,7 @@
                     :size="getDocumentTypeIcon(itemFileView.Ext)['size']">
                     {{getDocumentTypeIcon(itemFileView.Ext)['icon']}}
                   </v-icon>
-                  {{itemFileView.TenTep}}.{{itemFileView.Ext}}
+                  <span>{{itemFileView.TenTep}}.{{itemFileView.Ext}}</span>
                 </span>
                 <v-btn class="my-0" title="Xem tệp" flat icon color="indigo" :loading="loadingPdf" :disabled="loadingPdf"
                   @click.stop="viewDocument(itemFileView, index)"
@@ -247,7 +267,7 @@
                 </v-btn>
               </div>
             </div>
-            <div class="xs12 sm12 pb-2">
+            <div class="xs12 md12 pb-2">
               <v-btn class="mx-0" color="red" dark @click.native="showDetail = false">
                 <v-icon>reply</v-icon>&nbsp;
                 Quay lại
@@ -302,7 +322,7 @@
                     required
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm3 class="px-0 pr-3 py-0">
+                <v-flex xs12 md3 class="px-0 pr-3 py-0">
                   <div class="mb-1 text-bold">Số hiệu giấy tờ <span style="color: red">(*)</span></div>
                   <v-text-field
                     label=""
@@ -316,7 +336,7 @@
                     required
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm3 class="px-0 pr-3 py-0">
+                <v-flex xs12 md3 class="px-0 pr-3 py-0">
                   <div class="mb-1 text-bold">Ngày ban hành</div>
                   <v-text-field
                     label=""
@@ -330,7 +350,7 @@
                     clearable
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm3 class="px-0 pr-3 py-0">
+                <v-flex xs12 md3 class="px-0 pr-3 py-0">
                   <div class="mb-1 text-bold">Thời hạn hiệu lực</div>
                   <v-text-field
                     label=""
@@ -342,7 +362,7 @@
                     clearable
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm3 class="px-0 py-0">
+                <v-flex xs12 md3 class="px-0 py-0">
                   <div class="mb-1 text-bold">Hiệu lực <span style="color: red">(*)</span></div>
                   <v-autocomplete
                     :items="statusList"
@@ -385,8 +405,8 @@
                     </template>
                   </v-autocomplete>
                 </v-flex>
-                <v-flex xs12 sm4 class="px-0 py-0 pr-3">
-                  <div class="mb-1 text-bold">Mã định danh người thụ hưởng <span style="color: red">(*)</span></div>
+                <v-flex xs12 md6 class="px-0 py-0 pr-3">
+                  <div class="mb-1 text-bold">Mã đối tượng thụ hưởng <span style="color: red">(*)</span></div>
                   <v-text-field
                     label=""
                     v-model="cmndNguoiThuHuong"
@@ -399,7 +419,7 @@
                     required
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm4 class="px-0 py-0 pr-3">
+                <v-flex xs12 md6 class="px-0 py-0">
                   <div class="mb-1 text-bold">Tên đối tượng thụ hưởng <span style="color: red">(*)</span></div>
                   <v-text-field
                     label=""
@@ -413,7 +433,7 @@
                     required
                   ></v-text-field>
                 </v-flex>
-                <!-- <v-flex xs12 sm4 class="px-0 py-0">
+                <!-- <v-flex xs12 md4 class="px-0 py-0">
                   <div class="mb-1 text-bold">Loại đối tượng thụ hưởng  <span style="color: red">(*)</span></div>
                   <v-autocomplete
                     :items="[
@@ -429,8 +449,8 @@
                     return-object
                   ></v-autocomplete>
                 </v-flex> -->
-                <v-flex xs12 sm4 class="px-0 py-0">
-                  <div class="mb-1 text-bold">Loại văn bản điện tử  <span style="color: red">(*)</span></div>
+                <v-flex xs12 md6 class="px-0 py-0 pr-3">
+                  <div class="mb-1 text-bold">Loại giấy tờ <span style="color: red">(*)</span></div>
                   <v-autocomplete
                     :items="loaiVanBanList"
                     v-model="loaiVanBanCreate"
@@ -439,12 +459,31 @@
                     item-value="MaMuc"
                     solo
                     flat
-                    :rules="[v => !!v || 'Loại văn bản là bắt buộc']"
+                    :rules="[v => !!v || 'Loại giấy tờ là bắt buộc']"
                     required
                     return-object
                   ></v-autocomplete>
                 </v-flex>
-                <!-- <v-flex xs12 sm3 class="px-0 py-0">
+                <v-flex xs12 md6 class="px-0 py-0">
+                  <div class="mb-1 text-bold">Chia sẻ giấy tờ <span style="color: red">(*)</span></div>
+                  <!-- <v-autocomplete
+                    :items="trangThaiChiaSeList"
+                    v-model="trangThaiChiaSeCreate"
+                    label=""
+                    item-text="TenMuc"
+                    item-value="MaMuc"
+                    solo
+                    flat
+                    :rules="[v => !!v || 'Trạng thái chia sẻ là bắt buộc']"
+                    required
+                    return-object
+                  ></v-autocomplete> -->
+                  <v-radio-group class="my-0" v-model="trangThaiChiaSeCreate" row>
+                    <v-radio label="Có" :value="1"></v-radio>
+                    <v-radio label="Không" :value="0"></v-radio>
+                  </v-radio-group>
+                </v-flex>
+                <!-- <v-flex xs12 md3 class="px-0 py-0">
                   <div class="mb-1">Mã hồ sơ dịch vụ công</div>
                   <v-text-field
                     label=""
@@ -479,23 +518,69 @@
                       <v-icon size="20" color="red">delete</v-icon>
                     </v-btn>
                   </div>
-                  <div v-for="(itemFileView, indexFile) in tepUpload" :key="indexFile" class="my-2">
-                    <span class="ml-1" style="cursor: pointer;text-decoration: underline;">
-                      <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.Ext)['color']"
-                        :size="getDocumentTypeIcon(itemFileView.Ext)['size']">
-                        {{getDocumentTypeIcon(itemFileView.Ext)['icon']}}
-                      </v-icon>
-                      {{itemFileView.TenTep}}
-                    </span>
-                    <v-btn title="Xóa" color="red" flat icon v-on:click.stop="deleteTepUpload(itemFileView, indexFile)" class="mx-0 my-0">
-                      <v-icon size="20" color="red">delete</v-icon>
-                    </v-btn>
-                  </div>
-                  <input type="file" id="documentFile" multiple @input="uploadDocumentFile($event)" style="display:none">
+                  <!-- <input type="file" id="documentFile" multiple @input="uploadDocumentFile($event)" style="display:none">
                   <v-btn block color="primary" class="mx-0 px-0 mr-4 d-inline-block" dark @click.native="uploadFile()" style="width: 175px">
                     <v-icon size="16">fas fa fa-upload</v-icon> &nbsp; &nbsp;
                     Tải lên tệp giấy tờ
-                  </v-btn>
+                  </v-btn> -->
+                  <div class="upload-wrap" style="
+                    justify-content: center;
+                    align-items: center;
+                    height: 200px;
+                    border: 2px dashed #959ca0;
+                    border-radius: 10px;
+                    padding: 15px
+                  ">
+                    <div
+                      class="drop-zone"
+                      @dragover.prevent
+                      @dragenter="dragging = true"
+                      @dragleave="dragging = false"
+                      @drop="handleDrop"
+                      @click.stop="uploadFile"
+                      style="display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer
+                      "
+                    >
+                      <div>
+                        <div v-for="(itemFileView, indexFile) in tepUpload" :key="indexFile" class="my-2 px-2 py-1"
+                          style="display: flex; border: 1px solid #d7d7d7; width: 500px; margin: 0 auto; align-items: center;justify-content: center;"
+                        >
+                          <span class="ml-1" style="cursor: pointer;text-decoration: underline;">
+                            <v-icon class="mr-2" :color="getDocumentTypeIcon(itemFileView.Ext)['color']"
+                              :size="16">
+                              {{getDocumentTypeIcon(itemFileView.Ext)['icon']}}
+                            </v-icon>
+                            <span style="font-size: 16px">{{itemFileView.TenTep}}</span>
+                          </span>
+                          <v-btn title="Xóa" color="red" flat icon v-on:click.stop="deleteTepUpload(itemFileView, indexFile)" class="mx-0 my-0">
+                            <v-icon size="20" color="red">close</v-icon>
+                          </v-btn>
+                        </div>
+                      </div>
+                      <div>
+                        <span v-if="dragging">Thả tệp vào đây</span>
+                        <div v-else>
+                          <div style="text-align: center;margin-bottom: 10px;">
+                            <v-icon size="48" color="#0072bc">
+                              fas fa fa-cloud-upload
+                            </v-icon>
+                          </div>
+                          <span style="font-size: 14px;color: #0072bc">Kéo và thả tệp vào đây hoặc nhấp để chọn tệp</span>
+                        </div>
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      ref="fileInput"
+                      style="display: none" id="documentFile" multiple @input="uploadDocumentFile($event)"
+                    />
+                  </div>
                   <!-- <div v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">
                     <span style="color:red">(*) </span>
                     <span>File tải lên chấp nhận các định dạng: {{fileTemplateNoCreate.fileType}} .</span>
@@ -571,11 +656,17 @@
       'pagination': Pagination
     },
     data: () => ({
+      dragging: false,
       valid: false,
       donViList: [],
       menuActive: 0,
       loaiVanBanList: [],
       loaiVanBanCreate: '',
+      trangThaiChiaSeList: [
+        {'TenMuc': 'Không chia sẻ', 'MaMuc': 0},
+        {'TenMuc': 'Chia sẻ', 'MaMuc': 1}
+      ],
+      trangThaiChiaSeCreate: 0,
       cmndNguoiThuHuong: '',
       tenNguoiThuHuong: '',
       maHoSoDvc: '',
@@ -702,6 +793,8 @@
         }
       }
       axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId(), param).then(function(response) {
+        console.log('responseUser', response.data)
+        vm.getDanhMuc()
         try {
           vm.applicantName = response.data['applicantName']
           vm.applicantIdNo = response.data['applicantIdNo']
@@ -709,7 +802,6 @@
         } catch (error) {
         }
         vm.getDanhSachGiayToSoHoa()
-        vm.getDanhMuc()
       })
       .catch(function(error) {
       })
@@ -781,6 +873,11 @@
       // ----
     },
     methods: {
+      handleDrop(event) {
+        event.preventDefault()
+        this.dragging = false
+        this.handleDragFiles(event.dataTransfer.files)
+      },
       getDanhMuc () {
         let vm = this
         vm.getDanhSachDonVi()
@@ -874,7 +971,6 @@
         vm.searchGiayToSoHoa()
       },
       uploadFile () {
-        let vm = this
         document.getElementById('documentFile').value = ''
         document.getElementById('documentFile').click()
       },
@@ -923,11 +1019,15 @@
           orderFields: 'ThoiGianTao',
           orderType: 'desc',
           cccd: vm.applicantIdNo,
-          duocChiaSe: vm.menuActive == 0 ? false : true
+          trangThaiChiaSe: vm.menuActive == 0 ? 0 : (vm.menuActive == 1 ? 1 : 2),
+          receiveDvcqg: dataSearch && dataSearch.hasOwnProperty('receiveDvcqg') ? dataSearch.receiveDvcqg : false,
+          isDeleted: dataSearch && dataSearch.hasOwnProperty('isDeleted') ? dataSearch.isDeleted : false,
+          collection: 'giaytocanhantochuc'
         }
 
         vm.loadingTable = true
         vm.$store.dispatch('getGiayToKhoCaNhan', filter).then(function (result) {
+        // vm.$store.dispatch('getGiayToKhoCaNhan_HeThongKhoGT', filter).then(function (result) {
           vm.documentApplicantList = result.content
           vm.totalDocument = result['totalElements']
           vm.loadingTable = false
@@ -976,7 +1076,8 @@
         }
         vm.srcDownload = ''
         let filter = {
-          id: item.MaDinhDanh
+          id: item.MaDinhDanh,
+          collection: 'giaytoluutruso'
         }
         vm.loadingPdf = true
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
@@ -996,7 +1097,8 @@
         }
         vm.srcDownload = ''
         let filter = {
-          id: item.MaDinhDanh
+          id: item.MaDinhDanh,
+          collection: 'giaytoluutruso'
         }
         vm.loadingPdf = true
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
@@ -1038,6 +1140,7 @@
         vm.cmndNguoiThuHuong = item.ChuHoSo['MaDinhDanh'] && item.ChuHoSo['MaDinhDanh'].split(':')[1] ? item.ChuHoSo['MaDinhDanh'].split(':')[1] : item.ChuHoSo['MaDinhDanh']
         vm.tenNguoiThuHuong = item.ChuHoSo['TenGoi']
         vm.tepDinhKem = item.TepDuLieu
+        vm.trangThaiChiaSeCreate = item.TrangThaiChiaSe
         vm.createDate = vm.convertDate(item.NgayBanHanh)
         vm.expireDate = vm.convertDate(item.ThoiHanHieuLuc)
         vm.tepUpload = []
@@ -1063,25 +1166,43 @@
       },
       cloneMyStorage (item) {
         let vm = this
+        // let filter = {
+        //   "MaDinhDanh": item.MaDinhDanh,
+        //   "CCCDMST": vm.applicantIdNo,
+        //   "collection": 'giaytocanhantochuc'
+        // }
+        // vm.loadingAction = true
+        // vm.$store.dispatch('cloneMyStorage', filter).then(function (result) {
+        //   vm.loadingAction = false
+        //   toastr.success('Yêu cầu thực hiện thành công')
+        // }).catch(function () {
+        //   vm.loadingAction = false
+        //   toastr.error('Yêu cầu thực hiện thất bại. Vui lòng thử lại.')
+        // })
+
         let filter = {
-          "MaDinhDanh": item.MaDinhDanh,
-          // "CCCDMST": vm.applicantType === 'citizen' ? 'CaNhan:'+vm.applicantIdNo : 'DonViKinhDoanh:'+vm.applicantIdNo
-          "CCCDMST": vm.applicantIdNo
+          primKey: vm.documentSelect.primKey,
+          data: Object.assign(vm.documentSelect, {TrangThaiChiaSe: 0}),
+          collection: 'giaytocanhantochuc'
         }
-        vm.loadingAction = true
-        vm.$store.dispatch('cloneMyStorage', filter).then(function (result) {
+        // vm.$store.dispatch('updateGiayToLuTru_HeThongKhoGT', filter).then(function (result) {
+        vm.$store.dispatch('updateGiayToLuTru', filter).then(function (result) {
           vm.loadingAction = false
-          toastr.success('Yêu cầu thực hiện thành công')
+          toastr.success('Lấy giấy tờ thành công.')
+          vm.showDetail = false
+          setTimeout(function () {
+            vm.getDanhSachGiayToSoHoa()
+          }, 200)
         }).catch(function () {
           vm.loadingAction = false
-          toastr.error('Yêu cầu thực hiện thất bại. Vui lòng thử lại.')
+          toastr.error('Lấy giấy tờ thất bại. Vui lòng thử lại.')
         })
       },
       deleteDocument (item) {
         let vm = this
         let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
         if (x) {
-          vm.$store.dispatch('deleteGiayToLuTru', item).then(function () {
+          vm.$store.dispatch('deleteGiayToLuTru', Object.assign(item, {"collection": "giaytocanhantochuc"})).then(function () {
             toastr.clear()
             toastr.success('Yêu cầu thực hiện thành công')
             vm.getDanhSachGiayToSoHoa(vm.dataInputSearch)
@@ -1090,6 +1211,25 @@
             toastr.error('Yêu cầu thực hiện thất bại')
           })
         }
+      },
+      handleDragFiles (files) {
+        let vm = this
+        console.log('filessss', files)
+        let arrTep = []
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          let ext = file['name'].split(".")
+          arrTep.push(
+            {
+              File: file,
+              Ext: ext[ext.length - 1],
+              KichThuocTep: file['size'],
+              TenTep: file['name'],
+              FileInput: true
+            }
+          )
+        }
+        vm.tepUpload = arrTep
       },
       uploadDocumentFile (e) {
         let vm = this
@@ -1128,6 +1268,7 @@
         vm.fileNameView = ''
         vm.fileName = ''
         vm.fileNo = ''
+        vm.trangThaiChiaSeCreate = 0
         // vm.loaiDoiTuongThuHuong = vm.applicantType === 'citizen' ? 'CANHAN' : 'DONVIKINHDOANH'
       },
       createDocument () {
@@ -1139,7 +1280,8 @@
             let arrReq = []
             vm.tepUpload.forEach(element => {
               let filter = {
-                file: element['File']
+                file: element['File'],
+                collection: 'giaytocanhantochuc'
               }
               arrReq.push(vm.$store.dispatch('uploadTep', filter))
             });
@@ -1152,19 +1294,18 @@
                 "NgayBanHanh": vm.convertDateIso(vm.createDate),
                 "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDate),
                 "CoQuanBanHanh": {
-                  "MaDinhDanh": vm.govAgencyCreate['MaDinhDanh'],
-                  "TenGoi": vm.govAgencyCreate['TenGoi']
+                  "MaDinhDanh": vm.govAgencyCreate ? vm.govAgencyCreate['MaDinhDanh'] : '',
+                  "TenGoi": vm.govAgencyCreate ? vm.govAgencyCreate['TenGoi'] : ''
                 },
                 "HieuLucVanBan": {
-                  "MaMuc": vm.statusCreate['MaMuc'],
-                  "TenMuc": vm.statusCreate['TenMuc']
+                  "MaMuc": vm.statusCreate ? vm.statusCreate['MaMuc'] : '',
+                  "TenMuc": vm.statusCreate ? vm.statusCreate['TenMuc'] : ''
                 },
                 "MaMauGiayTo": {
-                  "MaMuc": vm.fileTemplateNoCreate['MaMuc'],
-                  "TenMuc": vm.fileTemplateNoCreate['TenMuc']
+                  "MaMuc": vm.fileTemplateNoCreate ? vm.fileTemplateNoCreate['MaMuc'] : '',
+                  "TenMuc": vm.fileTemplateNoCreate ? vm.fileTemplateNoCreate['TenMuc'] : ''
                 },
                 "ChuHoSo": {
-                  // "MaDinhDanh": vm.loaiDoiTuongThuHuong + ':' + vm.cmndNguoiThuHuong,
                   "MaDinhDanh": vm.cmndNguoiThuHuong,
                   "TenGoi": vm.tenNguoiThuHuong
                 },
@@ -1173,10 +1314,10 @@
                   "TenMuc": vm.loaiVanBanCreate['TenMuc']
                 },
                 "ChuKhoLuuTru": {
-                  // "MaDinhDanh": vm.applicantType === 'citizen' ?  'CaNhan:'+vm.applicantIdNo : 'DonViKinhDoanh:'+vm.applicantIdNo,
                   "MaDinhDanh": vm.applicantIdNo,
                   "TenGoi": vm.applicantName
                 },
+                "TrangThaiChiaSe": vm.trangThaiChiaSeCreate,
                 "TepDuLieu": tepMapping,
                 "MaDinhDanh": "",
                 "HoSoDichVuCong": {
@@ -1206,8 +1347,10 @@
                 }
               }
               let filter = {
-                data: dataCreate
+                data: dataCreate,
+                collection: 'giaytocanhantochuc'
               }
+              // vm.$store.dispatch('addGiayToLuTru_HeThongKhoGT', filter).then(function (result) {
               vm.$store.dispatch('addGiayToLuTru', filter).then(function (result) {
                 vm.loadingAction = false
                 toastr.success('Thêm mới giấy tờ thành công')
@@ -1240,7 +1383,8 @@
                 tepdulieu: {
                   "TenTep": element['TenTep'],
                   "LoaiNguonDuLieu":{"MaMuc":"","TenMuc":""}
-                }
+                },
+                collection: 'giaytocanhantochuc'
               }
               arrReq.push(vm.$store.dispatch('uploadTep', filter))
             });
@@ -1277,12 +1421,15 @@
                   "MaDinhDanh": vm.applicantIdNo,
                   "TenGoi": vm.applicantName
                 },
-                "TepDuLieu": tepMapping
+                "TepDuLieu": tepMapping,
+                "TrangThaiChiaSe": vm.trangThaiChiaSeCreate
               }
               let filter = {
                 primKey: vm.documentSelect.primKey,
-                data: Object.assign(vm.documentSelect, dataCreate)
+                data: Object.assign(vm.documentSelect, dataCreate),
+                collection: 'giaytocanhantochuc'
               }
+              // vm.$store.dispatch('updateGiayToLuTru_HeThongKhoGT', filter).then(function (result) {
               vm.$store.dispatch('updateGiayToLuTru', filter).then(function (result) {
                 vm.loadingAction = false
                 toastr.success('Cập nhật giấy tờ thành công')
@@ -1368,6 +1515,11 @@
           vm.expireDate = ''
         }     
       },
+      translateDate (date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
+      },
       getStatus (val) {
         if (String(val) === '0') {
           return 'Yêu cầu số hóa'
@@ -1380,10 +1532,16 @@
         }
       },
       convertDate (date) {
+        if (!date) {
+          return ''
+        }
         let date1 = new Date(date)
         return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
       },
       convertDateIso (dateString) {
+        if (!dateString) {
+          return ''
+        }
         let parts = dateString.split('/')
         let day = parts[0]
         let month = parts[1]

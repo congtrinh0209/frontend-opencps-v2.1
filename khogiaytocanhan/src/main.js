@@ -13,9 +13,10 @@ Vue.use(VueObserveVisibility)
 Vue.use(VueContentPlaceholders)
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 
-axios.defaults.withCredentials = true
+// axios.defaults.withCredentials = true
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
+axios.defaults.headers.common['Authorization'] = 'Bearer ' + window.localStorage.getItem('TokenKhoCaNhan')
 
 Vue.config.productionTip = true
 

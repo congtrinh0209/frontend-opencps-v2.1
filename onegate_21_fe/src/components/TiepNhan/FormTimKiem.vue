@@ -42,6 +42,7 @@
             <v-flex xs12 sm6 class="px-0">
               <div class="mb-1">Mẫu giấy tờ</div>
               <v-autocomplete
+                class="v-autocomplete-height-auto"
                 :items="fileTemplateList"
                 v-model="dataSearch['fileTemplateNo']"
                 ref="autocomplete"
@@ -69,7 +70,7 @@
                 </template>
               </v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm3 class="">
+            <v-flex xs12 sm3 class="" v-if="!khoDvcqg">
               <div class="mb-1">Ngày ban hành</div>
               <v-menu
                 ref="menuDate1"
@@ -101,7 +102,7 @@
                 <v-date-picker :max="currentDate()" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('1')"></v-date-picker>
               </v-menu>
             </v-flex>
-            <v-flex xs12 sm3 class="pl-2 pr-3">
+            <v-flex xs12 sm3 class="pl-2 pr-3" v-if="!khoDvcqg">
               <div class="mb-1" style="height: 20px;"></div>
               <v-menu
                 ref="menuDate2"
@@ -129,7 +130,7 @@
                 <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" :max="currentDate()" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('2')"></v-date-picker>
               </v-menu>
             </v-flex>
-            <v-flex xs12 sm6 class="px-0">
+            <v-flex xs12 sm6 class="px-0" v-if="!khoDvcqg">
               <div class="mb-1">Hiệu lực</div>
               <v-autocomplete
                 :items="statusList"
@@ -166,7 +167,7 @@
 <script>
   export default {
     name: 'Search',
-    props: ['form', 'inputSearch'],
+    props: ['form', 'inputSearch', 'khoDvcqg'],
     data () {
       return {
         donViList: [],

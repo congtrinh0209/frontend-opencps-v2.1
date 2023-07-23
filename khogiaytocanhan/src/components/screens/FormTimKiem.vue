@@ -3,7 +3,7 @@
     <v-card-text class="px-0 pt-0 pb-0">
         <v-row>
           <v-layout wrap class="mt-0">
-            <v-flex class="px-0 pr-3 xs12 sm6">
+            <v-flex class="px-0 xs12 md12">
               <div class="mb-1">Cơ quan ban hành</div>
               <v-autocomplete
                 :items="donViList"
@@ -27,7 +27,7 @@
                 </template>
               </v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 class="px-0">
+            <v-flex xs12 md12 class="px-0">
               <div class="mb-1">Mẫu giấy tờ</div>
               <v-autocomplete
                 :items="fileTemplateList"
@@ -57,7 +57,7 @@
                 </template>
               </v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm3 class="">
+            <v-flex xs12 md3 class="">
               <div class="mb-1">Ngày ban hành</div>
               <v-menu
                 ref="menuDate1"
@@ -89,7 +89,7 @@
                 <v-date-picker :max="currentDate()" v-model="fromReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('1')"></v-date-picker>
               </v-menu>
             </v-flex>
-            <v-flex xs12 sm3 class="pl-2 pr-3">
+            <v-flex xs12 md3 class="pl-2 pr-3">
               <div class="mb-1" style="height: 20px;"></div>
               <v-menu
                 ref="menuDate2"
@@ -117,8 +117,8 @@
                 <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" :max="currentDate()" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('2')"></v-date-picker>
               </v-menu>
             </v-flex>
-            <v-flex xs12 sm6 class="px-0">
-              <div class="mb-1">Hiệu lực</div>
+            <v-flex xs12 md3 class="px-0">
+              <!-- <div class="mb-1">Hiệu lực</div>
               <v-autocomplete
                 :items="statusList"
                 v-model="dataSearch['status']"
@@ -127,8 +127,22 @@
                 clearable
                 solo
                 flat
-              ></v-autocomplete>
+              ></v-autocomplete> -->
+              <div class="mb-1" style="height: 20px;"></div>
+              <v-checkbox
+                v-model="receiveDvcqg"
+                label="Được lấy từ Cổng DVCQG"
+                style="margin-top: 0px !important"
+              ></v-checkbox>
             </v-flex>
+            <!-- <v-flex xs12 md3 class="px-0">
+              <div class="mb-1" style="height: 20px;"></div>
+              <v-checkbox
+                v-model="isDeleted"
+                label="Đã xóa"
+                style="margin-top: 0px !important"
+              ></v-checkbox>
+            </v-flex> -->
           </v-layout>
         </v-row>
         <v-flex class="text-right">
@@ -171,7 +185,9 @@
           dossierNo: '',
           govAgencyCode: '',
           fromReceiveDateFormatted: '',
-          toReceiveDateFormatted: ''
+          toReceiveDateFormatted: '',
+          receiveDvcqg: false,
+          isDeleted: false
         },
         isDvc: false,
         disableInput: false,
@@ -204,7 +220,7 @@
         vm.dataSearch = Object.assign(vm.dataSearch, vm.inputSearch)
       }
       vm.getDanhMucGiayTo()
-      vm.getDanhMucHieuLuc()
+      // vm.getDanhMucHieuLuc()
     },
     watch: {
       '$route': function (newRoute, oldRoute) {

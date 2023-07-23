@@ -52,7 +52,8 @@ export const store = new Vuex.Store({
           responseType: 'blob'
         }
         // test local
-        var url = '/o/v1/opencps/users/login/jcaptcha'
+        let ts = (new Date()).getTime()
+        var url = '/o/v1/opencps/users/login/jcaptcha?t=' +ts
         axios.get(url, param).then(response => {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
@@ -71,7 +72,8 @@ export const store = new Vuex.Store({
           responseType: 'blob'
         }
         // test local
-        var url = '/o/rest/v2/applicants/jcaptcha'
+        let ts = (new Date()).getTime()
+        var url = '/o/rest/v2/applicants/jcaptcha?t=' + ts
         axios.get(url, param).then(response => {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)

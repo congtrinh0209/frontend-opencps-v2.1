@@ -1044,6 +1044,28 @@ export const store = new Vuex.Store({
         })
       })
     },
+    cloneFileFromStorageDvcqg ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+
+        let formData = new URLSearchParams()
+        formData.append('displayName', filter.fileName)
+        formData.append('url', filter.url)
+        formData.append('viewType', 'internalViewDVCQG')
+        formData.append('dossierPartNo', filter.partNo)
+        axios.post('/o/rest/v2/dossiers/' + filter.dossierId + '/fileDVCQG', formData, {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+      })
+    },
     uploadSingleOtherFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
@@ -6309,22 +6331,67 @@ export const store = new Vuex.Store({
             params: {
               page: filter.page ? filter.page : 0,
               size: filter.size ? filter.size : 20,
-              coQuanBanHanhMaDinhDanh: filter.coQuanBanHanh_MaDinhDanh ? filter.coQuanBanHanh_MaDinhDanh : '',
-              mauGiayToMaMuc: filter.mauGiayTo_MaMuc ? filter.mauGiayTo_MaMuc : '',
-              hieuLucGiayToMaMuc: filter.hieuLucGiayTo_MaMuc,
+              coQuanBanHanh_MaDinhDanh: filter.coQuanBanHanh_MaDinhDanh ? filter.coQuanBanHanh_MaDinhDanh : '',
+              mauGiayTo_MaMuc: filter.mauGiayTo_MaMuc ? filter.mauGiayTo_MaMuc : '',
+              hieuLucGiayTo_MaMuc: filter.hieuLucGiayTo_MaMuc,
               keyword: filter.keyword ? filter.keyword : '',
-              ngayBanHanhTuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
-              ngayBanHanhDenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
+              ngayBanHanh_TuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
+              ngayBanHanh_DenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
               orderFields: 'ThoiGianTao',
               orderType: 'desc',
-              cccd: filter.cccd ? filter.cccd : ''
+              cccdmst: filter.cccd ? filter.cccd : '',
+              trangThaiChiaSe: filter.trangThaiChiaSe
             },
             data: {}
           }
 
-          axios.get('/o/systemintegration/giaytoluutruso', param).then(function (response) {
+          axios.get(`/o/systemintegration/${filter.collection}`, param).then(function (response) {
             resolve(response.data)
           }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getGiayToDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          // let param = {
+          //   headers: {
+          //     groupId: state.initData.groupId,
+          //     'Accept': 'application/json',
+          //     'Content-Type': 'application/json',
+          //   }
+          // }
+          // let dataPost = new URLSearchParams()
+          // dataPost.append('MaThuTuc', filter.maThuTuc ? filter.maThuTuc : '')
+          // dataPost.append('DanhSachDanhMucKetQua', filter.danhSachDanhMucKetQua ? filter.danhSachDanhMucKetQua : [])
+          // dataPost.append('SoDinhDanhChuSoHuu', filter.cccd ? filter.cccd : '')
+          // dataPost.append('HoTenNguoiYeuCau', '')
+          // dataPost.append('KenhThucHien', '2')
+          // dataPost.append('SoDinhDanhNguoiYeuCau', '')
+          
+          let data = {
+            'MaThuTuc': filter.maThuTuc ? filter.maThuTuc : '',
+            'DanhSachDanhMucKetQua': filter.danhSachDanhMucKetQua ? filter.danhSachDanhMucKetQua : [],
+            'SoDinhDanhChuSoHuu': filter.cccd ? filter.cccd : '',
+            'HoTenNguoiYeuCau': '',
+            'KenhThucHien': '2',
+            'SoDinhDanhNguoiYeuCau': ''
+          }
+          let settings = {
+            method: 'post',
+            url: '/o/rest/v2/nps/getDanhMucGiayToCaNhan',
+            headers: { 
+              'Accept': 'application/json', 
+              'Content-Type': 'application/json'
+            },
+            data: data,
+            params: filter.hasOwnProperty('params') ? filter.params : {}
+          }
+          axios(settings).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
             reject(error)
           })
         }).catch(function (){})
@@ -6343,7 +6410,7 @@ export const store = new Vuex.Store({
             data: {}
           }
 
-          axios.get('/o/systemintegration/giaytoluutruso/' + filter.primKey, param).then(function (response) {
+          axios.get(`/o/systemintegration/${filter.collection}/${filter.primKey}`, param).then(function (response) {
             resolve(response.data)
           }, error => {
             reject(error)
@@ -6363,7 +6430,7 @@ export const store = new Vuex.Store({
             data: {}
           }
 
-          axios.get('/o/systemintegration/giaytoluutruso/download/' + filter.id, param).then(function (response) {
+          axios.get(`/o/systemintegration/${filter.collection}/download/${filter.id}`, param).then(function (response) {
             let url = window.URL.createObjectURL(response.data)
             console.log('blob', url)
             resolve(url)
@@ -6371,6 +6438,23 @@ export const store = new Vuex.Store({
             reject(error)
           })
         }).catch(function (){})
+      })
+    },
+    getTepDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.groupIdSite ? state.groupIdSite : window.themeDisplay.getScopeGroupId()
+          },
+          responseType: 'blob'
+        }
+        
+        axios.get(filter.url, param).then(response => {
+          let url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
       })
     },
     // ----End---------

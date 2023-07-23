@@ -401,7 +401,7 @@ export const store = new Vuex.Store({
         let data = JSON.stringify(filter.data)
         let config = {
           method: 'post',
-          url: '/o/systemintegration/giaytoluutruso',
+          url: `/o/systemintegration/${filter.collection}`,
           headers: { 
             'groupId': window.themeDisplay.getScopeGroupId(),
             'Content-Type': 'application/json', 
@@ -425,7 +425,7 @@ export const store = new Vuex.Store({
         let data = JSON.stringify(filter.data)
         let config = {
           method: 'put',
-          url: '/o/systemintegration/giaytoluutruso/' + filter.primKey,
+          url: `/o/systemintegration/${filter.collection}/${filter.primKey}`,
           headers: { 
             'groupId': window.themeDisplay.getScopeGroupId(),
             'Content-Type': 'application/json', 
@@ -448,7 +448,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let config = {
           method: 'delete',
-          url: '/o/systemintegration/giaytoluutruso/' + filter.primKey,
+          url: `/o/systemintegration/${filter.collection}/${filter.primKey}`,
           headers: { 
             'groupId': window.themeDisplay.getScopeGroupId(),
             'Content-Type': 'application/json', 
@@ -471,7 +471,7 @@ export const store = new Vuex.Store({
         let data = JSON.stringify(filter)
         let config = {
           method: 'put',
-          url: '/o/systemintegration/giaytoluutruso/clone',
+          url: `/o/systemintegration/${filter.collection}/clone`,
           headers: { 
             'groupId': window.themeDisplay.getScopeGroupId(),
             'Content-Type': 'application/json', 
@@ -554,21 +554,23 @@ export const store = new Vuex.Store({
             params: {
               page: filter.page ? filter.page : 0,
               size: filter.size ? filter.size : 20,
-              coQuanBanHanhMaDinhDanh: filter.coQuanBanHanh_MaDinhDanh ? filter.coQuanBanHanh_MaDinhDanh : '',
-              mauGiayToMaMuc: filter.mauGiayTo_MaMuc ? filter.mauGiayTo_MaMuc : '',
-              hieuLucGiayToMaMuc: filter.hieuLucGiayTo_MaMuc,
+              coQuanBanHanh_MaDinhDanh: filter.coQuanBanHanh_MaDinhDanh ? filter.coQuanBanHanh_MaDinhDanh : '',
+              mauGiayTo_MaMuc: filter.mauGiayTo_MaMuc ? filter.mauGiayTo_MaMuc : '',
+              hieuLucGiayTo_MaMuc: filter.hieuLucGiayTo_MaMuc,
               keyword: filter.keyword ? filter.keyword : '',
-              ngayBanHanhTuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
-              ngayBanHanhDenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
+              ngayBanHanh_TuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
+              ngayBanHanh_DenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
               orderFields: 'ThoiGianTao',
               orderType: 'desc',
-              cccd: filter.cccd ? filter.cccd : '',
-              duocChiaSe: filter.duocChiaSe
+              cccdmst: filter.cccd ? filter.cccd : '',
+              trangThaiChiaSe: filter.trangThaiChiaSe,
+              receiveDvcqg: filter.receiveDvcqg,
+              isDeleted: filter.isDeleted
             },
             data: {}
           }
 
-          axios.get('/o/systemintegration/giaytoluutruso', param).then(function (response) {
+          axios.get(`/o/systemintegration/${filter.collection}`, param).then(function (response) {
             resolve(response.data)
           }, error => {
             reject(error)
@@ -589,7 +591,7 @@ export const store = new Vuex.Store({
             data: {}
           }
 
-          axios.get('/o/systemintegration/giaytoluutruso/' + filter.primKey, param).then(function (response) {
+          axios.get(`/o/systemintegration/${filter.collection}/${filter.primKey}`, param).then(function (response) {
             resolve(response.data)
           }, error => {
             reject(error)
@@ -632,13 +634,171 @@ export const store = new Vuex.Store({
             data: {}
           }
 
-          axios.get('/o/systemintegration/giaytoluutruso/download/' + filter.id, param).then(function (response) {
+          axios.get(`/o/systemintegration/${filter.collection}/download/${filter.id}`, param).then(function (response) {
             let url = window.URL.createObjectURL(response.data)
             resolve(url)
           }, error => {
             reject(error)
           })
         }).catch(function (){})
+      })
+    },
+
+    // api call trực tiếp sang hệ thống khogiayto
+    addGiayToLuTru_HeThongKhoGT ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter.data)
+        let config = {
+          method: 'post',
+          url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0',
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json'
+          },
+          data : data
+        };
+        axios(config)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+    },
+    updateGiayToLuTru_HeThongKhoGT ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter.data)
+        let config = {
+          method: 'put',
+          url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/' + filter.primKey,
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'Token': Liferay.authToken
+          },
+          data : data
+        };
+        
+        axios(config)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+    },
+    deleteGiayToLuTru_HeThongKhoGT ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          method: 'delete',
+          url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/' + filter.primKey,
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'Token': Liferay.authToken
+          }
+        };
+        
+        axios(config)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+    },
+    getGiayToKhoCaNhan_HeThongKhoGT ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let settings = {
+          method: 'get',
+          url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/opencps/filter',
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          params: {
+            page: filter.page ? filter.page : 0,
+            size: filter.size ? filter.size : 20,
+            coQuanBanHanh_MaDinhDanh: filter.hasOwnProperty('coQuanBanHanh_MaDinhDanh') ? filter.coQuanBanHanh_MaDinhDanh : '',
+            mauGiayTo_MaMuc: filter.hasOwnProperty('mauGiayTo_MaMuc') ? filter.mauGiayTo_MaMuc : '',
+            hieuLucGiayTo_MaMuc: filter.hieuLucGiayTo_MaMuc,
+            keyword: filter.keyword ? filter.keyword : '',
+            ngayBanHanh_TuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
+            ngayBanHanh_DenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
+            orderFields: 'ThoiGianCapNhat',
+            orderType: 'desc',
+            cccdmst: filter.cccd ? filter.cccd : '',
+            duocChiaSe: filter.duocChiaSe,
+            receiveDvcqg: filter.receiveDvcqg,
+            isDeleted: filter.isDeleted,
+            trangThaiChiaSe: filter.trangThaiChiaSe
+          },
+          data: {}
+        }
+        axios(settings).then(function (response) {
+          resolve(response.data)
+        }, error => {
+          reject(error)
+        })
+      })
+    },
+    getChiTietGiayToCaNhan_HeThongKhoGT ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            method: 'get',
+            url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/' + filter.primKey,
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId(),
+              'Accept': 'application/json', 
+              'Content-Type': 'application/json'
+            },
+            params: {},
+            data: {}
+          }
+
+          axios(param).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    getDanhMuc_HeThongKhoGT ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          method: 'get',
+          url: 'http://119.17.200.69:8004/drivemgt/internal/' + filter.tenDanhMuc + '/1.0/filter',
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          params: {
+            page: filter.hasOwnProperty('page') ? filter.page : 0,
+            size: filter.hasOwnProperty('size') ? filter.size : 20,
+            orderFields: 'maMuc',
+            orderTypes: 'asc',
+            keyword: filter.hasOwnProperty('keyword') ? filter.keyword : ''
+          },
+          data: {}
+        }
+        axios(param).then(function (response) {
+          resolve(response.data)
+        }, error => {
+          reject({
+            totalElements: 0,
+            content: []
+          })
+        })
       })
     },
   },

@@ -162,11 +162,26 @@
                       </v-list>
                     </v-menu>
                     <!--  -->
-                    <v-btn title="Lưu giấy tờ vào kho" class="my-0" flat icon color="indigo"
-                      v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa" 
+                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
+                      v-if="applicantId && !onlyView && khoTaiLieuCongDan && !khoTaiLieuTapTrung && yeuCauSoHoa" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="21" style="color: green">bookmark</v-icon>
+                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                    </v-btn>
+                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
+                      v-if="applicantId && !onlyView && khoTaiLieuTapTrung && originality == '1' &&
+                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                      @click.stop="showAddStorage(item, itemFileView)"
+                    >
+                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                    </v-btn>
+                    <!--  -->
+                    <v-btn title="Số hóa giấy tờ" class="my-0" flat icon color="indigo"
+                      v-if="originality == '3' && !onlyView && khoTaiLieuTapTrung && yeuCauSoHoa && 
+                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                      @click.stop="showAddStorage(item, itemFileView)"
+                    >
+                      <v-icon size="18" color="primary">drive_file_move</v-icon>
                     </v-btn>
                     <!--  -->
                   </div>
@@ -249,11 +264,25 @@
                       </v-list>
                     </v-menu>
                     <!--  -->
-                    <v-btn title="Lưu giấy tờ vào kho" class="my-0" flat icon color="indigo"
-                      v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa" 
+                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
+                      v-if="applicantId && !onlyView && khoTaiLieuCongDan && !khoTaiLieuTapTrung && yeuCauSoHoa" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="21" style="color: green">bookmark</v-icon>
+                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                    </v-btn>
+                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
+                      v-if="applicantId && !onlyView && khoTaiLieuTapTrung && originality == '1' &&
+                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                      @click.stop="showAddStorage(item, itemFileView)"
+                    >
+                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                    </v-btn>
+                    <v-btn title="Số hóa giấy tờ" class="my-0" flat icon color="indigo"
+                      v-if="originality == '3' && !onlyView && khoTaiLieuTapTrung && yeuCauSoHoa && 
+                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                      @click.stop="showAddStorage(item, itemFileView)"
+                    >
+                      <v-icon size="18" color="primary">drive_file_move</v-icon>
                     </v-btn>
                     <!-- <v-btn title="Đã lưu vào kho" class="my-0" flat icon color="green"
                       v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa && giayToDaLuu.indexOf(itemFileView.dossierFileId) == -1" 
@@ -431,7 +460,8 @@
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? (khoTaiLieuCongDan && partNoApplicantHasFile(item.partNo) && item.hasForm ? '150px' : '120px') : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <!-- <v-flex :style="{width: !onlyView ? (item.hasForm ? '160px' : '120px') : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1"> -->
+              <v-flex style="width: auto" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input v-if="item['multiple']"
               type="file"
               multiple
@@ -523,12 +553,20 @@
               </v-tooltip>
               <!-- <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan"> -->
               <v-tooltip class="pl-1 pt-1" top v-if="applicantId && khoTaiLieuCongDan">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="showDocumentApplicant(item, index)" name="Giấy tờ trong kho">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="showDocumentApplicant(item, index)" name="Giấy tờ trong kho">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">storage</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Sử dụng giấy tờ trong kho</span>
+                <span>Sử dụng giấy tờ trong kho cá nhân</span>
+              </v-tooltip>
+              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && khoTaiLieuDvcqg">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="showDocumentDvcqg(item, index)" name="Giấy tờ trong kho">
+                  <v-badge>
+                    <v-icon size="18" color="orange darken-3">fas fa fa-clone</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Sử dụng giấy tờ từ cổng DVCQG</span>
               </v-tooltip>
               <!-- <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa">
                 <v-btn :disabled="progress_sohoa" slot="activator" icon class="mx-0 my-0" @click="guiYeuCauSoHoa(item, index)">
@@ -648,17 +686,18 @@
     <v-dialog v-model="dialog_documentApplicant" scrollable persistent max-width="1300px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>Kho giấy tờ, tài liệu</v-toolbar-title>
+          <v-toolbar-title>Kho giấy tờ, tài liệu <span v-if="khoDvcqg">từ cổng DVCQG</span></v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="cancelDialogKhoTaiLieu">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1" style="min-height: 500px">
-          <kho-tai-lieu-tap-trung v-if="khoTaiLieuTapTrung" ref="khotailieutaptrung" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
-          <kho-tai-lieu v-else  ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" 
+          <kho-tai-lieu-tap-trung v-if="khoTaiLieuTapTrung && !khoDvcqg" ref="khotailieutaptrung" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
+          <kho-tai-lieu v-if="!khoTaiLieuTapTrung && !khoDvcqg"  ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" 
             :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage">
           </kho-tai-lieu>
+          <kho-dvcqg ref="khodvcqg" v-if="khoDvcqg" :index="applicantId" :serivceCodeProps="serviceCodeDvcqg" :thanhPhanHoSo="dossierPartAttach" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageDvcqg"></kho-dvcqg>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -1111,10 +1150,13 @@
       </v-card>
     </v-dialog>
     <!--  -->
-    <v-dialog v-model="dialog_add_giayto" scrollable persistent max-width="900px">
+    <v-dialog v-model="dialog_add_giayto" scrollable persistent max-width="1000px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>Lưu giấy tờ vào kho kết quả TTHC</v-toolbar-title>
+          <v-toolbar-title>
+            <span v-if="originality == 1">Lưu giấy tờ vào kho cá nhân</span>
+            <span v-else>Số hóa giấy tờ</span>
+          </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialog_add_giayto = false">
             <v-icon>close</v-icon>
@@ -1123,15 +1165,69 @@
         <v-card-text class="py-1">
           <v-form ref="form" v-model="validFormStorage" lazy-validation class="py-3 px-0 grid-list">
             <v-layout row wrap class="px-0 py-3">
+              <v-flex v-if="originality == 3" xs12 md6 class="">
+                <v-text-field
+                  v-model="applicantIdNoToStorage"
+                  box
+                  height="32"
+                  min-height="32"
+                  clearable
+                  label="Mã định danh chủ sở hữu"
+                ></v-text-field>
+              </v-flex>
+              <v-flex v-if="originality == 3" xs12 md6 class="">
+                <v-text-field
+                  label="Tên chủ sở hữu"
+                  v-model="applicantNameToStorage"
+                  box
+                  height="32"
+                  min-height="32"
+                  clearable
+                ></v-text-field>
+              </v-flex>
               <v-flex xs12>
                 <v-text-field label="Tên giấy tờ" v-model="tenGiayToStorage" box></v-text-field>
               </v-flex>
-              <v-flex xs12>
+              <v-flex xs12 md6>
                 <v-text-field label="Số hiệu giấy tờ" v-model="soHieuGiayToStorage" box></v-text-field>
               </v-flex>
-              <v-flex xs12 sm6 class="px-0 pr-3">
+              <v-flex xs12 md6>
+                <v-autocomplete
+                  :items="loaiVanBanList"
+                  v-model="loaiVanBanCreate"
+                  label="Loại giấy tờ"
+                  item-text="TenMuc"
+                  item-value="MaMuc"
+                  box
+                  return-object
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12>
+                <v-autocomplete
+                  label="Cơ quan ban hành"
+                  :items="donViList"
+                  v-model="coQuanBanHanhStorage"
+                  ref="autocomplete1"
+                  :search-input.sync="keywordSearchDonVi"
+                  item-text="TenGoi"
+                  item-value="MaDinhDanh"
+                  return-object
+                  clearable
+                  box
+                >
+                  <template v-slot:append-item>
+                    <div class="py-2" v-if="isShowDonVi"
+                      v-observe-visibility="{
+                        callback: visibilityChangedDonVi
+                      }"
+                    >
+                    </div>
+                  </template>
+                </v-autocomplete>
+              </v-flex>
+              <v-flex xs12 md6 class="">
                 <v-text-field
-                  label="Ngày cấp"
+                  label="Ngày ban hành"
                   v-model="createDateStorage"
                   placeholder="dd/mm/yyyy, ddmmyyyy"
                   @blur="formatDate"
@@ -1139,7 +1235,7 @@
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm6 class="px-0 pr-3">
+              <v-flex xs12 md6 class="">
                 <v-text-field
                   label="Ngày hết hạn"
                   v-model="expireDateStorage"
@@ -1148,6 +1244,17 @@
                   box
                   clearable
                 ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="">
+                <v-autocomplete
+                  :items="statusList"
+                  v-model="statusCreate"
+                  label="Hiệu lực giấy tờ"
+                  item-text="TenMuc"
+                  item-value="MaMuc"
+                  box
+                  return-object
+                ></v-autocomplete>
               </v-flex>
             </v-layout>
           </v-form>
@@ -1161,7 +1268,14 @@
             <v-icon>clear</v-icon> &nbsp;
             Thoát
           </v-btn>
-          <v-btn class="mr-3" color="primary" @click.native="addApplicantData"
+          <v-btn v-if="khoTaiLieuTapTrung" class="mr-3" color="primary" @click.native="addKhoCaNhanTapTrung"
+            :loading="progress_sohoa"
+            :disabled="progress_sohoa"
+          >
+            <v-icon>save</v-icon> &nbsp;
+            Đồng ý
+          </v-btn>
+          <v-btn v-else class="mr-3" color="primary" @click.native="addApplicantData"
             :loading="progress_sohoa"
             :disabled="progress_sohoa"
           >
@@ -1220,6 +1334,7 @@ import axios from 'axios'
 import toastr from 'toastr'
 import KhoTaiLieu from '../TiepNhan/KhoTaiLieu'
 import KhoTaiLieuTapTrung from '../TiepNhan/KhoTaiLieuTapTrung'
+import KhoDVCQG from '../TiepNhan/KhoDVCQG'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000',
@@ -1227,6 +1342,10 @@ toastr.options = {
 }
 export default {
   props: {
+    serviceCodeDvcqg: {
+      type: String,
+      default: () => ''
+    },
     onlyView: {
       type: Boolean,
       default: () => false
@@ -1259,14 +1378,28 @@ export default {
   components: {
     'kho-tai-lieu': KhoTaiLieu,
     'kho-tai-lieu-tap-trung': KhoTaiLieuTapTrung,
+    'kho-dvcqg': KhoDVCQG
   },
   data: () => ({
     dialog_add_giayto: false,
     validFormStorage: true,
     partKhoGiayTo: '',
     fileKhoGiayTo: '',
+    applicantIdNoToStorage: '',
+    applicantNameToStorage: '',
     tenGiayToStorage: '',
     soHieuGiayToStorage: '',
+    coQuanBanHanhStorage: '',
+    donViList: [],
+    keywordSearchDonVi: "",
+    isShowDonVi: false,
+    pageSelectDonVi: 0,
+    totalItemsSelectDonVi: 0,
+    timeOutSearch1: "",
+    statusList: [],
+    statusCreate: "",
+    loaiVanBanList: [],
+    loaiVanBanCreate: "",
     createDateStorage: '',
     expireDateStorage: '',
     giayToDaLuu: '',
@@ -1423,6 +1556,8 @@ export default {
       },
     },
     khoTaiLieuCongDan: false,
+    khoDvcqg: false,
+    khoTaiLieuDvcqg: false,
     allFileMark: false,
     render: true,
     showKySo: false,
@@ -1460,7 +1595,8 @@ export default {
     donViCapCA: '',
     listCertMySign: [],
     transactionInfo: '',
-    certSelected: ''
+    certSelected: '',
+    progress_sohoa: false
   }),
   created () {
     let vm = this
@@ -1490,6 +1626,11 @@ export default {
     try {
       vm.khoTaiLieuCongDan = khoTaiLieuCongDan
     } catch (error) {
+    }
+    try {
+      vm.khoTaiLieuDvcqg = khoTaiLieuDvcqg
+    } catch (error) {
+      
     }
     try {
       vm.showKySo = showKySoDvc
@@ -1607,7 +1748,7 @@ export default {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
       }
       if (vm.khoTaiLieuCongDan) {
-        vm.getDossierFileApplicants(val)
+        // vm.getDossierFileApplicants(val)
       }
     },
     dossierTemplateItemsFilter () {
@@ -1618,6 +1759,21 @@ export default {
       console.log('dossierTemplateItemsFilter222', vm.dossierTemplateItemsFilter)
     },
     dialog_documentApplicant (val) {
+      setTimeout(function () {
+        if (val) {
+          let myElements = document.querySelectorAll(".v-menu__content");
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'fixed';
+          }
+        } else {
+          let myElements = document.querySelectorAll(".v-menu__content")
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'absolute';
+          }
+        }
+      }, 300)
+    },
+    dialog_add_giayto (val) {
       setTimeout(function () {
         if (val) {
           let myElements = document.querySelectorAll(".v-menu__content");
@@ -1646,6 +1802,34 @@ export default {
           }
         }
       }, 300)
+    },
+    keywordSearchDonVi(val) {
+      let vm = this
+      if (!vm.dialog_add_giayto) {
+        return
+      }
+      if (vm.donViList.length) {
+        if (val && val !== vm.coQuanBanHanhStorage['TenGoi']) {
+          if (vm.timeOutSearch1) {
+            clearTimeout(vm.timeOutSearch1);
+          }
+          vm.timeOutSearch1 = setTimeout(function () {
+            let exits = vm.donViList.find(function (item) {
+              return String(item.TenGoi).toLowerCase().includes(String(val).toLowerCase())
+            })
+            if (!exits) {
+              vm.searchItemsDonVi()
+            }
+          }, 1000)
+        }
+      } else {
+        if (vm.timeOutSearch1) {
+          clearTimeout(vm.timeOutSearch1);
+        }
+        vm.timeOutSearch1 = setTimeout(function () {
+          vm.searchItemsDonVi()
+        }, 1000)
+      }     
     }
   },
   methods: {
@@ -1689,6 +1873,13 @@ export default {
       vm.partKhoGiayTo = part
       vm.fileKhoGiayTo = file
       vm.tenGiayToStorage = part.partName
+      vm.applicantIdNoToStorage = vm.thongTinChuHoSo['applicantIdNo']
+      vm.applicantNameToStorage = vm.thongTinChuHoSo['applicantName']
+      if (vm.khoTaiLieuTapTrung) {
+        vm.searchItemsDonVi()
+        vm.getLoaiGiayTo()
+        vm.getHieuLuc()
+      }
     },
     addApplicantData () {
       let vm = this
@@ -1726,6 +1917,221 @@ export default {
         vm.giayToDaLuu += fileLuu
       }).catch(xhr => {
         vm.progress_sohoa = false
+      })
+    },
+    addKhoCaNhanTapTrung () {
+      let vm = this
+      vm.progress_sohoa = true
+      let dataCreate = {
+        "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
+        "TenGiayTo": vm.partKhoGiayTo.partName,
+        "SoHieuVanBan": String(vm.soHieuGiayToStorage).trim(),
+        "NgayBanHanh": vm.convertDateIso(vm.createDateStorage),
+        "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDateStorage),
+        "CoQuanBanHanh": {
+          "MaDinhDanh": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['MaDinhDanh'] : '',
+          "TenGoi": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['TenGoi'] : ''
+        },
+        "HieuLucVanBan": {
+          "MaMuc": vm.statusCreate ? vm.statusCreate['MaMuc'] : '',
+          "TenMuc": vm.statusCreate ? vm.statusCreate['TenMuc'] : ''
+        },
+        "MaMauGiayTo": {
+          "MaMuc": vm.partKhoGiayTo.fileTemplateNo,
+          "TenMuc": vm.partKhoGiayTo.partName
+        },
+        "ChuHoSo": {
+          "MaDinhDanh": "",
+          "TenGoi": ""
+        },
+        "LoaiVanBanDienTu": {
+          "MaMuc": vm.loaiVanBanCreate ? vm.loaiVanBanCreate['MaMuc'] : '',
+          "TenMuc": vm.loaiVanBanCreate ? vm.loaiVanBanCreate['TenMuc'] : ''
+        },
+        "ChuKhoLuuTru": {
+          "MaDinhDanh": "",
+          "TenGoi": ""
+        },
+        "TrangThaiChiaSe": 0,
+        "TepDuLieu": [],
+        "MaDinhDanh": "",
+        "HoSoDichVuCong": {
+          "MaDinhDanh": vm.thongTinHoSo.dossierNo
+        },
+        "SoLanTaiSuDung": 0,
+        "TenLoaiVanBan": {
+          "MaMuc": "",
+          "TenMuc": ""
+        },
+        "TrichYeuVanBan": "",
+        "HoSoLuuTruSo": {
+          "MaDinhDanh": ""
+        },
+        "SoThuTu": 0,
+        "ThuMucLuuTru": {
+          "MaDinhDanh": "",
+          "TenThuMuc": ""
+        },
+        "TrangThaiDuLieu": {
+          "MaMuc": "",
+          "TenMuc": ""
+        },
+        "PhanVungDuLieu": {
+          "MaMuc": "",
+          "TenMuc": ""
+        }
+      }
+      if (vm.originality == 3) {
+        dataCreate = {
+          "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
+          "MaDinhDanh": "",
+          "TenGiayTo": vm.partKhoGiayTo.partName,
+          "MaThamChieu": "",
+          "TenLoaiVanBan": {
+            "MaMuc": "",
+            "TenMuc": ""
+          },
+          "TrichYeuVanBan": "",
+          "SoHieuVanBan": String(vm.soHieuGiayToStorage).trim(),
+          "NgayBanHanh": vm.convertDateIso(vm.createDateStorage),
+          "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDateStorage),
+          "CoQuanBanHanh": {
+            "MaDinhDanh": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['MaDinhDanh'] : '',
+            "TenGoi": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['TenGoi'] : ''
+          },
+          "HieuLucVanBan": {
+            "MaMuc": vm.statusCreate ? vm.statusCreate['MaMuc'] : '',
+            "TenMuc": vm.statusCreate ? vm.statusCreate['TenMuc'] : ''
+          },
+          "LoaiGiayToLuuTru": {
+            "MaMuc": "01",
+            "TenMuc": "Kết quả thủ tục hành chính"
+          },
+          "TepDuLieu": [],
+          "ChuKhoLuuTru": {
+            "MaDinhDanh": "",
+            "TenGoi": ""
+          },
+          "HoSoLuuTruSo": {
+            "MaDinhDanh": ""
+          },
+          "SoThuTu": 0,
+          "ThuMucLuuTru": {
+            "MaDinhDanh": "",
+            "TenThuMuc": ""
+          },
+          "ChiaSeTaiKhoan": [],
+          "ChiaSeVaiTro": [],
+          "GiayToCaNhanToChuc": {
+            "MaDinhDanh": "",
+            "MaMauGiayTo": {
+              "MaMuc": vm.partKhoGiayTo.fileTemplateNo,
+              "TenMuc": vm.partKhoGiayTo.partName
+            },
+            "ChuHoSo": {
+              "MaDinhDanh": vm.applicantIdNoToStorage,
+              "TenGoi": vm.applicantNameToStorage
+            },
+            "HoSoDichVuCong": {
+              "MaDinhDanh": vm.thongTinHoSo.dossierNo
+            },
+            "TenGiayTo": "",
+            "TenLoaiVanBan": {
+              "MaMuc": "",
+              "TenMuc": ""
+            },
+            "TrichYeuVanBan": "",
+            "SoHieuVanBan": "",
+            "NgayBanHanh": "",
+            "ThoiHanHieuLuc": "",
+            "TepDuLieu": [],
+            "LoaiGiayToLuuTru": {
+              "MaMuc": "01",
+              "TenMuc": "Kết quả thủ tục hành chính"
+            },
+            "CoQuanBanHanh": {
+              "MaDinhDanh": "",
+              "TenGoi": ""
+            },
+            "HieuLucVanBan": {
+              "MaMuc": "",
+              "TenMuc": ""
+            }
+          },
+          "TrangThaiDuLieu": {
+            "MaMuc": "",
+            "TenMuc": ""
+          },
+          "PhanVungDuLieu": {
+            "MaMuc": "",
+            "TenMuc": ""
+          }
+        }
+      }
+      console.log('dataCreate', dataCreate)
+      let filter = {
+        data: dataCreate,
+        collection: vm.originality == 1 ? 'giaytocanhantochuc' : 'giaytoluutruso'
+      }
+      let data = JSON.stringify(filter.data)
+      let config = {
+        method: 'post',
+        url: `/o/systemintegration/${filter.collection}`,
+        headers: { 
+          'groupId': window.themeDisplay.getScopeGroupId(),
+          'Content-Type': 'application/json', 
+          'Accept': 'application/json', 
+          'Token': Liferay.authToken
+        },
+        data : data
+      };
+      
+      axios.request(config)
+      .then((response) => {
+        vm.progress_sohoa = false
+        vm.dialog_add_giayto = false
+        if (vm.originality == 1) {
+          toastr.success('Lưu giấy tờ vào kho thành công')
+          let fileLuu = vm.fileKhoGiayTo + ','
+          vm.giayToDaLuu += fileLuu
+        } else {
+          toastr.success('Số hóa giấy tờ thành công')
+        }
+      })
+      .catch((error) => {
+        vm.progress_sohoa = false
+      })
+    },
+    getLoaiGiayTo () {
+      let vm = this
+      let filter = {
+        page: 0,
+        size: 100,
+        tenDanhMuc: 'loaivanbandientu'
+      }
+      vm.$store.dispatch('getDanhMuc', filter).then(function (result) {
+        if (result.hasOwnProperty('content')) {
+          vm.loaiVanBanList = result.content
+        } else {
+          vm.loaiVanBanList = []
+        }
+      }).catch(function () {
+      })
+    },
+    getHieuLuc () {
+      let vm = this
+      let filter = {
+        page: 0,
+        size: 100,
+        tenDanhMuc: 'hieulucvanban'
+      }
+      vm.$store.dispatch('getDanhMuc', filter).then(function (result) {
+        if (result.hasOwnProperty('content')) {
+          vm.statusList = result.content
+        } else {
+          vm.statusList = []
+        }
+      }).catch(function () {
       })
     },
     showValid () {
@@ -2987,7 +3393,8 @@ export default {
         window.location.assign(url)
       } else {
         let filter = {
-          id: data.url.split("/").pop()
+          id: data.url.split("/").pop(),
+          collection: 'giaytocanhantochuc'
         }
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
           vm.srcDownload = result
@@ -3104,7 +3511,8 @@ export default {
       } else {
         vm.dialogPDFLoading = true
         let filter = {
-          id: data.url.split("/").pop()
+          id: data.url.split("/").pop(),
+          collection: 'giaytocanhantochuc'
         }
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
           vm.dialogPDFLoading = false
@@ -3638,12 +4046,8 @@ export default {
     },
     attachFileFromStorageCentralized (data) {
       let vm = this
-      let tepDuLieu = []
       if (data.hasOwnProperty('TepDuLieu') && data.TepDuLieu) {
-        tepDuLieu = data.TepDuLieu
-      }
-      if (tepDuLieu.length) {
-        console.log('dataTep', tepDuLieu, vm.dossierPartAttach)
+        let tepDuLieu = data.TepDuLieu
         let arrReq = []
         tepDuLieu.forEach(element => {
           let filter = {
@@ -3654,10 +4058,10 @@ export default {
             fileType: element.DinhDangTep,
             fileSize: element.KichThuocTep,
             fileTemplateNo: vm.dossierPartAttach.fileTemplateNo,
-            referenceUid: '{urlKhoSoHoa}/' + data.MaDinhDanh + '/' + element.MaDinhDanh
+            referenceUid: '{urlKhoSoHoa}/' + element.MaDinhDanh
           }
           arrReq.push(vm.$store.dispatch('cloneFileFromStorageCentralized', filter))
-        });
+        })
         Promise.all(arrReq).then(values => {
           vm.dialog_documentApplicant = false
           vm.dossierTemplateItemsFilter[vm.indexPart]['passRequired'] = true
@@ -3668,9 +4072,26 @@ export default {
         }).catch(function () {
           toastr.error('Đính kèm tài liệu thất bại')
         })
-      } else {
-        toastr.error('Giấy tờ, tài liệu không có tệp')
       }
+    },
+    attachFileFromStorageDvcqg (data) {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinHoSo.dossierId,
+        url: data.DuongDan,
+        partNo: vm.dossierPartAttach.partNo,
+        fileName: data.TenTep
+      }
+      vm.$store.dispatch('cloneFileFromStorageDvcqg', filter).then(function (result) {
+        vm.dialog_documentApplicant = false
+        vm.dossierTemplateItemsFilter[vm.indexPart]['passRequired'] = true
+        vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+          vm.dossierFilesItems = result
+          vm.recountFileTemplates()
+        })
+      }).catch(function () {
+        toastr.error('Đính kèm tài liệu thất bại')
+      })
     },
     getDocumentTypeIcon (file) {
       let vm = this
@@ -3723,6 +4144,7 @@ export default {
     },
     showDocumentApplicant (part, index) {
       let vm = this
+      vm.khoDvcqg = false
       // vm.fileTemplateNoScope = part.fileTemplateNo
       vm.fileTemplateNoScope = ''
       vm.statusApplicantData = 1
@@ -3738,9 +4160,23 @@ export default {
         }
       }, 200)
     },
+    showDocumentDvcqg (part, index) {
+      let vm = this
+      vm.khoDvcqg = true
+      vm.fileTemplateNoScope = ''
+      vm.statusApplicantData = 1
+      vm.dossierPartAttach = part
+      vm.indexPart = index
+      vm.dialog_documentApplicant = true
+      setTimeout(function () {
+        if (vm.$refs.khodvcqg) {
+          vm.$refs.khodvcqg.initData()
+        }
+      }, 200)
+    },
     cancelDialogKhoTaiLieu () {
       let vm = this
-      if (vm.khoTaiLieuTapTrung) {
+      if (vm.khoTaiLieuTapTrung && !vm.khoDvcqg) {
         if (vm.$refs.khotailieutaptrung.showDetail) {
           vm.$refs.khotailieutaptrung.showDetail = false
         } else {
@@ -4429,7 +4865,55 @@ export default {
       let vm = this
       vm.dialogTaiSavis = false
       document.getElementById('downloadCaiDatSavis').click()
-    }
+    },
+    visibilityChangedDonVi (e) {
+      e && this.loadMoreItemsDonVi();
+    },
+    searchItemsDonVi() {
+      this.donViList = [];
+      this.pageSelectDonVi = 0;
+      this.loadMoreItemsDonVi();
+    },
+    loadMoreItemsDonVi() {
+      let vm = this
+      if (vm.donViList.length < vm.totalItemsSelectDonVi || vm.pageSelectDonVi == 0) {
+        // vm.loadingDonVi = true;
+        vm.isShowDonVi = false
+        let filter = {
+          page: vm.pageSelectDonVi,
+          size: 20,
+          keyword: vm.keywordSearchDonVi ? vm.keywordSearchDonVi : ''
+        }
+        vm.$store.dispatch('getDonVi', filter).then(results => {
+          let res = results.hasOwnProperty('content') ? results['content'] : []
+          vm.donViList = vm.donViList.concat(res);
+          if (results.hasOwnProperty('content') && results['content'].length) {
+            vm.isShowDonVi = true
+            vm.pageSelectDonVi++
+          }
+          let total = results.hasOwnProperty('totalElements') ? results['totalElements'] : 0
+          vm.totalItemsSelectDonVi = total
+          vm.loadingDonVi = false
+          if (vm.$refs.autocomplete1) {
+            vm.$refs.autocomplete1.onScroll()
+          }
+        }).catch(xhr => {
+          vm.loadingDonVi = false
+        })
+      }
+    },
+    convertDateIso (dateString) {
+      if (!dateString) {
+        return ''
+      }
+      let parts = dateString.split('/')
+      let day = parts[0]
+      let month = parts[1]
+      let year = parts[2]
+      let date = new Date(`${year}-${month}-${day}`)
+      let isoDate = date.toISOString()
+      return isoDate
+    },
   }
 }
 </script>

@@ -19,7 +19,7 @@
             <v-flex style="max-width: 170px; text-align: right;padding-top: 2px;">
               <v-btn color="#0072bc" small class="mx-0 white--text my-0" @click.stop="showTimKiem" style="">
                 <v-icon size="20">
-                  filter_alt
+                  filter_list
                 </v-icon> &nbsp;
                 Tìm kiếm nâng cao
               </v-btn>
@@ -110,7 +110,7 @@
                   </v-tooltip> -->
                   <v-tooltip top v-if="!loadingTable" class="mr-2">
                     <v-btn title="Sử dụng giấy tờ này" @click.stop="$emit('trigger-attach', props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
-                      <v-icon size="22">sync_alt</v-icon>
+                      <v-icon size="22">fas fa fa-cloud-download</v-icon>
                     </v-btn>
                     <span>Sử dụng giấy tờ này</span>
                   </v-tooltip>
@@ -435,7 +435,8 @@
       viewThongTinGiayTo (item) {
         let vm = this
         let filter = {
-          primKey: item.primKey
+          primKey: item.primKey,
+          collection: vm.originality == 3 ? 'giaytoluutruso' : 'giaytocanhantochuc'
         }
 
         vm.$store.dispatch('getChiTietGiayToCaNhan', filter).then(function (result) {
@@ -508,7 +509,9 @@
           hieuLucGiayTo_MaMuc: dataSearch ? dataSearch.status : '',
           orderFields: 'ThoiGianTao',
           orderType: 'desc',
-          cccd: dataSearch ? dataSearch.applicantIdNo : ''
+          cccd: dataSearch ? dataSearch.applicantIdNo : '',
+          collection: 'giaytocanhantochuc',
+          trangThaiChiaSe: '1'
         }
 
         vm.loadingTable = true
@@ -529,7 +532,8 @@
         }
         vm.srcDownload = ''
         let filter = {
-          id: item.MaDinhDanh
+          id: item.MaDinhDanh,
+          collection: 'giaytoluutruso'
         }
         vm.loadingPdf = true
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
@@ -549,7 +553,8 @@
         }
         vm.srcDownload = ''
         let filter = {
-          id: item.MaDinhDanh
+          id: item.MaDinhDanh,
+          collection: 'giaytoluutruso'
         }
         vm.loadingPdf = true
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
@@ -599,6 +604,11 @@
           vm.expireDate = ''
         }     
       },
+      translateDate (date) {
+        if (!date) return null
+        const [day, month, year] = date.split('/')
+        return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
+      },
       getStatus (val) {
         if (String(val) === '0') {
           return 'Yêu cầu số hóa'
@@ -611,6 +621,9 @@
         }
       },
       convertDate (date) {
+        if (!date) {
+          return ''
+        }
         let date1 = new Date(date)
         return `${date1.getDate().toString().padStart(2, '0')}/${(date1.getMonth() + 1).toString().padStart(2, '0')}/${date1.getFullYear()}`
       },
