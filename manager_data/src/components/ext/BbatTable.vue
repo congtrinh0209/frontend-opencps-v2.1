@@ -133,11 +133,11 @@
           </v-list-tile-action>
           <v-list-tile-title>Xem</v-list-tile-title>
         </v-list-tile>
-        <v-list-tile v-if="tableName !== 'opencps_services_filetemplates' && tableName !== 'opencps_userlogin'" v-on:click.native="deleteRecord()">
+        <v-list-tile v-if="(checkExitsRole('Administrator') || checkExitsRole('Administrator_data')) && tableName !== 'opencps_services_filetemplates' && tableName !== 'opencps_userlogin'" v-on:click.native="deleteRecord()">
           <v-list-tile-action>
             <v-icon color="red darken-3">clear</v-icon>
           </v-list-tile-action>
-          <v-list-tile-title>Xoá</v-list-tile-title>
+          <v-list-tile-title>Xóa</v-list-tile-title>
         </v-list-tile>
       </v-list>
     </v-menu>
@@ -192,7 +192,6 @@
 <script>
   import TinyPagination from './TinyPagination.vue'
   import axios from 'axios'
-  import saveAs from 'file-saver'
 
   export default {
     props: ['tableName'],
@@ -316,6 +315,9 @@
       }
     },
     computed: {
+      userRoles () {
+        return this.$store.getters.getUserRoles
+      },
       problem: {
         // getter
         get: function() {
@@ -383,6 +385,13 @@
       })
     },
     methods: {
+      checkExitsRole (role) {
+        let vm = this
+        if (!vm.userRoles) {
+          return ''
+        }
+        return vm.userRoles.find((item) => item.role == role)
+      },
       rePullData () {
         let vm = this
         let current = vm.$router.history.current
@@ -585,9 +594,7 @@
                 if (dataObj.respone === 'pageTotalCounter') {
                   vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
                   vm.showLoadingTable = false
-                } else if (dataObj.respone === 'loginUser') {
-                  vm.$store.commit('setloginUser', dataObj['loginUser'])
-                } else if (dataObj.respone === 'listTableMenu') {
+                }  else if (dataObj.respone === 'listTableMenu') {
                   vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
                 }
                 if (dataObj['cmd'] !== 'get') {
@@ -830,7 +837,7 @@
       },
       deleteRecord () {
         let vm = this
-        var result = confirm('Bạn có muốn xoá bản ghi này?');
+        var result = confirm('Bạn có muốn Xóa bản ghi này?');
         if (result) {
           let idEditor = 0
           let tempTableData = vm.dataSocket['tableData']

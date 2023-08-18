@@ -446,10 +446,41 @@
                 <v-icon size="16">fas fa fa-upload</v-icon> &nbsp; &nbsp;
                 Tải lên giấy tờ
               </v-btn>
-              <v-btn block color="primary" class="mx-0 px-0 d-inline-block" dark @click.native="vgsignCopy('https://kiemthu-mt-gov-vn-9001.fds.vn')" style="width: 230px">
-                <v-icon size="16">border_color</v-icon> &nbsp; &nbsp;
-                Tải lên và ký duyệt giấy tờ
-              </v-btn>
+
+              <v-menu @click.native.stop right offset-y transition="slide-x-transition">
+                <v-btn slot="activator" dark color="primary" class="mx-0 px-3 d-inline-block" name="Ký số">
+                  <v-icon size="16">border_color</v-icon> &nbsp; &nbsp;
+                  Tải lên và ký duyệt giấy tờ
+                </v-btn>
+                <v-list>
+                  <v-list-tile>
+                    <v-list-tile-title @click.stop="vgcaSignAction('approved')">
+                      <v-icon size="18" color="blue">create</v-icon> &nbsp;&nbsp; KÝ PHÊ DUYỆT
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile>
+                    <v-list-tile-title @click.stop="vgcaSignAction('issued')">
+                      <v-icon size="18" color="red">fas fa fa-dot-circle-o</v-icon> &nbsp;&nbsp; ĐÓNG DẤU PHÁT HÀNH
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile>
+                    <v-list-tile-title @click.stop="vgcaSignAction('income')">
+                      <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; KÝ SỐ CÔNG VĂN ĐẾN
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile>
+                    <v-list-tile-title @click.stop="vgcaSignAction('copy')">
+                      <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <!-- <v-list-tile v-if="kySoCongCongMotCua">
+                    <v-list-tile-title @click.stop="mySignViettel(itemFileView, index)">
+                      <v-icon size="18" color="green">create</v-icon> &nbsp;&nbsp; CHỮ KÝ SỐ CÔNG CỘNG
+                    </v-list-tile-title>
+                  </v-list-tile> -->
+                </v-list>
+              </v-menu>
+
               <div v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">
                 <span style="color:red">(*) </span>
                 <span>File tải lên chấp nhận các định dạng: {{fileTemplateNoCreate.fileType}} .</span>
@@ -770,7 +801,7 @@ export default {
     }
   },
   methods: {
-    vgsignCopy() {
+    vgcaSignAction(type) {
       let vm = this
       vm.hasEsign = true
       let prms = {}
@@ -808,7 +839,15 @@ export default {
         }
       }
       let json_prms = JSON.stringify(prms)
-      vgca_sign_approved(json_prms, signFileCallBack)
+      if (type === 'approved') {
+        vgca_sign_approved(json_prms, signFileCallBack)
+      } else if (type === 'issued') {
+        vgca_sign_issued(json_prms, signFileCallBack)
+      } else if (type === 'income') {
+        vgca_sign_income(json_prms, signFileCallBack)
+      } else {
+        vgca_sign_copy(json_prms, signFileCallBack)
+      }
     },
     getApplicantInfos () {
       let vm = this

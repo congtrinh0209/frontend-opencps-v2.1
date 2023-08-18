@@ -7,8 +7,8 @@ import DanhSachThuTuc from '@/components/screens/DanhSachThuTuc'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
   { path: '/', name: 'DanhSachThuTuc', component: DanhSachThuTuc, props: true },
-  // { path: '/', name: 'LandingApp', component: LandingApp, props: true },
-  // { path: '/thong-ke-danh-gia', name: 'LandingThongKeDanhGia', component: LandingThongKeDanhGia, props: true },
+  //{ path: '/', name: 'LandingApp', component: LandingApp, props: true },
+  //{ path: '/thong-ke-danh-gia', name: 'LandingThongKeDanhGia', component: LandingThongKeDanhGia, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

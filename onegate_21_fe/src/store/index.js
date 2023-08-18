@@ -6457,6 +6457,24 @@ export const store = new Vuex.Store({
         })
       })
     },
+    capNhatGiayToSoHoa ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPostEform = new FormData()
+        dataPostEform.append('url', data.url)
+        let url = '/o/rest/v2/dossiers/' + data.dossierId + '/url/files/' + data.referenceUid
+        axios.post(url, dataPostEform, options).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(data)
+        })
+      })
+    },
     // ----End---------
   },
   mutations: {

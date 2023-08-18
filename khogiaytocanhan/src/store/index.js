@@ -564,10 +564,12 @@ export const store = new Vuex.Store({
               orderType: 'desc',
               cccdmst: filter.cccd ? filter.cccd : '',
               trangThaiChiaSe: filter.trangThaiChiaSe,
-              receiveDvcqg: filter.receiveDvcqg,
-              isDeleted: filter.isDeleted
+              receiveDvcqg: filter.receiveDvcqg
             },
             data: {}
+          }
+          if (filter.hasOwnProperty('trangThaiDuLieu_MaMuc')) {
+            param.params['trangThaiDuLieu_MaMuc'] = filter.trangThaiDuLieu_MaMuc
           }
 
           axios.get(`/o/systemintegration/${filter.collection}`, param).then(function (response) {

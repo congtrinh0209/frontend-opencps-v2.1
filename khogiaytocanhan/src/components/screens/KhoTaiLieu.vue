@@ -35,13 +35,13 @@
           >
             <v-list-tile-avatar>
               <v-icon :class="menuActive == 1 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">
-                fas fa fa-share-square-o
+                lock
               </v-icon>
             </v-list-tile-avatar>
 
             <v-list-tile-content>
               <v-list-tile-title :style="menuActive == 1 ? 'text-transform: uppercase; font-size: 14px;padding-left: 15px;color: #0072bc;font-weight: 500;' : 'text-transform: uppercase; font-size: 14px;padding-left: 15px;'">
-                Giấy tờ chia sẻ
+                Giấy tờ không chia sẻ
               </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
@@ -52,12 +52,46 @@
             style="height: auto !important; border-bottom: 1px solid #dedede;" 
           >
             <v-list-tile-avatar>
-              <v-icon :class="menuActive == 2 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">share</v-icon>
+              <v-icon :class="menuActive == 2 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">
+                fas fa fa-share-square-o
+              </v-icon>
             </v-list-tile-avatar>
 
             <v-list-tile-content>
               <v-list-tile-title :style="menuActive == 2 ? 'text-transform: uppercase; font-size: 14px;padding-left: 15px;color: #0072bc;font-weight: 500;' : 'text-transform: uppercase; font-size: 14px;padding-left: 15px;'">
+                Giấy tờ chia sẻ
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile
+            avatar
+            @click="changeMenu(3)"
+            class="px-2 py-2"
+            style="height: auto !important; border-bottom: 1px solid #dedede;" 
+          >
+            <v-list-tile-avatar>
+              <v-icon :class="menuActive == 3 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">share</v-icon>
+            </v-list-tile-avatar>
+
+            <v-list-tile-content>
+              <v-list-tile-title :style="menuActive == 3 ? 'text-transform: uppercase; font-size: 14px;padding-left: 15px;color: #0072bc;font-weight: 500;' : 'text-transform: uppercase; font-size: 14px;padding-left: 15px;'">
                 Giấy tờ được chia sẻ
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile
+            avatar
+            @click="changeMenu(4)"
+            class="px-2 py-2"
+            style="height: auto !important; border-bottom: 1px solid #dedede;" 
+          >
+            <v-list-tile-avatar>
+              <v-icon :class="menuActive == 4 ? 'blue white--text' : 'grey lighten-1 white--text'" size="22">delete</v-icon>
+            </v-list-tile-avatar>
+
+            <v-list-tile-content>
+              <v-list-tile-title :style="menuActive == 4 ? 'text-transform: uppercase; font-size: 14px;padding-left: 15px;color: #0072bc;font-weight: 500;' : 'text-transform: uppercase; font-size: 14px;padding-left: 15px;'">
+                Giấy tờ đã xóa
               </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
@@ -69,8 +103,10 @@
             <v-flex>
               <div class="headline mb-3" style="font-size: 20px!important; text-transform: uppercase;color: #0072bc;">
                 <span v-if="menuActive == 0">Giấy tờ của tôi</span>
-                <span v-else-if="menuActive == 1">Giấy tờ chia sẻ</span>
-                <span v-else>Giấy tờ được chia sẻ</span>
+                <span v-else-if="menuActive == 1">Giấy tờ không chia sẻ</span>
+                <span v-else-if="menuActive == 2">Giấy tờ chia sẻ</span>
+                <span v-else-if="menuActive == 3">Giấy tờ được chia sẻ</span>
+                <span v-else>Giấy tờ đã xóa</span>
               </div>
             </v-flex>
             <v-flex style="width: 500px">
@@ -163,23 +199,29 @@
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
-                  <v-tooltip top v-if="!loadingTable && menuActive == 1" class="mr-2">
+                  <v-tooltip top v-if="!loadingTable && menuActive == 3" class="mr-2">
                     <v-btn :disabled="loadingAction" @click.stop="cloneMyStorage(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon size="22">sync_alt</v-icon>
                     </v-btn>
                     <span>Lấy về kho của tôi</span>
                   </v-tooltip>
-                  <v-tooltip top v-if="!loadingTable && menuActive == 0" class="mr-2">
+                  <v-tooltip top v-if="!loadingTable && menuActive == 1" class="mr-2">
                     <v-btn @click.stop="showEditDocument(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon size="22">edit</v-icon>
                     </v-btn>
                     <span>Cập nhật giấy tờ</span>
                   </v-tooltip>
-                  <v-tooltip top v-if="!loadingTable && menuActive == 0" class="">
+                  <v-tooltip top v-if="!loadingTable && menuActive == 1" class="">
                     <v-btn @click.stop="deleteDocument(props.item)" color="red" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon size="22">delete</v-icon>
                     </v-btn>
                     <span>Xóa</span>
+                  </v-tooltip>
+                  <v-tooltip top v-if="!loadingTable && menuActive == 4" class="">
+                    <v-btn :disabled="loadingAction" @click.stop="restoreDocument(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
+                      <v-icon size="22">restore_page</v-icon>
+                    </v-btn>
+                    <span>Khôi phục</span>
                   </v-tooltip>
                 </td>
               </tr>
@@ -1007,6 +1049,27 @@
       },
       getDanhSachGiayToSoHoa (dataSearch) {
         let vm = this
+        let share = ''
+        switch (vm.menuActive) {
+          case 0:
+          share = '0,1'
+            break;
+          case 1:
+          share = '0'
+            break;
+          case 2:
+          share = '1'
+            break;
+          case 3:
+          share = '2'
+            break;
+          case 4:
+          share = '3'
+            break;
+          default:
+            share = ''
+            break;
+        }
         let filter = {
           page: vm.documentPage,
           size: vm.numberPerPage,
@@ -1019,10 +1082,13 @@
           orderFields: 'ThoiGianTao',
           orderType: 'desc',
           cccd: vm.applicantIdNo,
-          trangThaiChiaSe: vm.menuActive == 0 ? 0 : (vm.menuActive == 1 ? 1 : 2),
           receiveDvcqg: dataSearch && dataSearch.hasOwnProperty('receiveDvcqg') ? dataSearch.receiveDvcqg : false,
-          isDeleted: dataSearch && dataSearch.hasOwnProperty('isDeleted') ? dataSearch.isDeleted : false,
           collection: 'giaytocanhantochuc'
+        }
+        if (vm.menuActive === 4) {
+          filter['trangThaiDuLieu_MaMuc'] = '04'
+        } else {
+          filter['trangThaiChiaSe'] = share
         }
 
         vm.loadingTable = true
@@ -1202,7 +1268,15 @@
         let vm = this
         let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
         if (x) {
-          vm.$store.dispatch('deleteGiayToLuTru', Object.assign(item, {"collection": "giaytocanhantochuc"})).then(function () {
+          let filter = {
+            primKey: item.primKey,
+            data: Object.assign(item, {TrangThaiDuLieu: {
+              "MaMuc": "04","TenMuc":"Hủy bỏ"
+            }}),
+            collection: 'giaytocanhantochuc'
+          }
+          // vm.$store.dispatch('updateGiayToLuTru_HeThongKhoGT', filter).then(function (result) {
+          vm.$store.dispatch('updateGiayToLuTru', filter).then(function (result) {
             toastr.clear()
             toastr.success('Yêu cầu thực hiện thành công')
             vm.getDanhSachGiayToSoHoa(vm.dataInputSearch)
@@ -1211,6 +1285,27 @@
             toastr.error('Yêu cầu thực hiện thất bại')
           })
         }
+      },
+      restoreDocument () {
+        let vm = this
+        vm.loadingAction = true
+        let filter = {
+          primKey: item.primKey,
+          data: Object.assign(item, {TrangThaiDuLieu: {
+            "MaMuc": "02","TenMuc":"Chính thức"
+          }}),
+          collection: 'giaytocanhantochuc'
+        }
+        vm.$store.dispatch('updateGiayToLuTru', filter).then(function (result) {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.success('Yêu cầu thực hiện thành công')
+          vm.getDanhSachGiayToSoHoa(vm.dataInputSearch)
+        }).catch(function () {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
       },
       handleDragFiles (files) {
         let vm = this
@@ -1338,8 +1433,8 @@
                   "TenThuMuc": ""
                 },
                 "TrangThaiDuLieu": {
-                  "MaMuc": "",
-                  "TenMuc": ""
+                  "MaMuc": "02",
+                  "TenMuc": "Chính thức"
                 },
                 "PhanVungDuLieu": {
                   "MaMuc": "",

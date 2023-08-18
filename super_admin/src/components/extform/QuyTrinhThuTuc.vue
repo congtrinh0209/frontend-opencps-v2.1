@@ -941,7 +941,7 @@
                   <v-flex xs12 sm6 class="pr-2">
                     <v-text-field
                       label="Mã kết quả trả về"
-                      v-model="currentAction.returnDossierFilesText"
+                      v-model="returnDossierFilesText"
                       box
                     ></v-text-field>
                   </v-flex>

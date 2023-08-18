@@ -180,9 +180,12 @@ export default {
   computed: {
   },
   created () {
-    var vm = this
+    let vm = this
     vm.$nextTick(function () {
-      var vm = this
+      try {
+        vm.showXacThucSso = urlRedirectConfig
+      } catch (error) {
+      }
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
@@ -190,7 +193,7 @@ export default {
     })
   },
   updated () {
-    var vm = this
+    let vm = this
     vm.$nextTick(function () {
     })
   },

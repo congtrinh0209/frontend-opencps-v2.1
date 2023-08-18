@@ -236,7 +236,7 @@
                                 </v-btn>
                                 <span>Sửa</span>
                             </v-tooltip>
-                            <v-tooltip top class="mx-2">
+                            <v-tooltip top class="mx-2" v-if="(checkExitsRole('Administrator') || checkExitsRole('Administrator_data'))">
                                 <v-btn :disabled="loading" @click="deleteServiceinfo(props.item)" color="red" slot="activator" flat icon class="mx-0 my-0">
                                     <v-icon>delete</v-icon>
                                 </v-btn>
@@ -455,6 +455,9 @@ export default {
     ]
   }),
   computed: {
+    userRoles () {
+      return this.$store.getters.getUserRoles
+    },
     agencyListManager() {
       return this.$store.getters.getAgencyListManager
     },
@@ -573,6 +576,13 @@ export default {
     },
   },
   methods: {
+    checkExitsRole (role) {
+      let vm = this
+      if (!vm.userRoles) {
+        return ''
+      }
+      return vm.userRoles.find((item) => item.role == role)
+    },
     exportTableData() {
       let vm = this
       let options = {

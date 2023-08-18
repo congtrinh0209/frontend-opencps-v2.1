@@ -64,6 +64,15 @@
                         <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index2, index)" class="mx-0 my-0">
                           <v-icon style="color: red">delete_outline</v-icon>
                         </v-btn>
+                        <!--  -->
+                        <v-btn title="Số hóa giấy tờ" class="my-0" flat icon color="indigo"
+                          v-if="originality == '3' && !onlyView && khoTaiLieuTapTrung && yeuCauSoHoa && 
+                          (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                          @click.stop="showAddStorage(item, itemFileView)"
+                        >
+                          <v-icon size="18" color="primary">drive_file_move</v-icon>
+                        </v-btn>
+                          <!--  -->
                         <!-- <v-btn title="Đính kèm cho hồ sơ khác" v-if="itemFileView['dossierPartType'] === 7" icon ripple v-on:click.stop="attachOtherDossier(itemFileView)" class="mx-0 my-0">
                           <v-icon color="primary" size="13">fas fa fa-clone</v-icon>
                         </v-btn> -->
@@ -325,7 +334,6 @@
       </v-card>
     </v-dialog>
     <!--  -->
-    <!--  -->
     <v-dialog v-model="dialog_editor_pdf" fullscreen hide-overlay scrollable transition="dialog-bottom-transition">
       <v-card v-if="activePdfEditor && showViewerPdfEditor">
         <v-card-text>
@@ -396,7 +404,28 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-
+    <!--  -->
+    <v-dialog v-model="dialog_add_giayto" scrollable persistent max-width="1000px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>
+            <span v-if="originality == 1">Lưu giấy tờ vào kho cá nhân</span>
+            <span v-else>Số hóa giấy tờ</span>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_add_giayto = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <so-hoa-giay-to ref="formSoHoaGiayTo" :fileKhoGiayTo="fileKhoGiayTo" :partKhoGiayTo="partKhoGiayTo" :thongTinHoSo="detailDossier"
+          @callBackSoHoaGiayTo="callBackSoHoa"
+        ></so-hoa-giay-to>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <div style="display:none">
+      <a id="downloadFileKhoKQ" :href="srcDownload" download></a>
+    </div>
   </div>
 </template>
 
@@ -404,6 +433,7 @@
   // import $ from 'jquery'
   import toastr from 'toastr'
   import HoSoTrongNhom from '.././TiepNhan/HoSoTrongNhom'
+  import SoHoaGiayTo from '.././TiepNhan/FormSoHoaGiayTo'
   toastr.options = {
     'closeButton': true,
     'timeOut': '5000'
@@ -434,9 +464,16 @@
       dossierSelected: []
     },
     components: {
-      'ho-so-nhom': HoSoTrongNhom
+      'ho-so-nhom': HoSoTrongNhom,
+      'so-hoa-giay-to': SoHoaGiayTo
     },
     data: () => ({
+      dialog_add_giayto: false,
+      partKhoGiayTo: '',
+      fileKhoGiayTo: '',
+      yeuCauSoHoa: false,
+      khoTaiLieuTapTrung: false,
+      srcDownload: '',
       dialog_editor_pdf: false,
       activePdfEditor: false,
       showViewerPdfEditor: false,
@@ -513,6 +550,14 @@
     created () {
       let vm = this
       try {
+        vm.yeuCauSoHoa = yeuCauSoHoa
+      } catch (error) {
+      }
+      try {
+        vm.khoTaiLieuTapTrung = khoTaiLieuTapTrung
+      } catch (error) {
+      }
+      try {
         vm.activePdfEditor = activePdfEditor
       } catch (error) {
       }
@@ -531,7 +576,6 @@
       vm.receiveMessage = function (event) {
         vm.saveAlpacaFormCallBack(event)
       }
-      vm.page = 1
       vm.$nextTick(function () {
         console.log('vm.detailDossier--TLKQ--', vm.detailDossier)
         try {
@@ -613,7 +657,22 @@
         // vm.selectedFileKySo = Array.from(fileKq, function (e) {
         //   return Object.assign(e, {selected: true})
         // })
-      }
+      },
+      dialog_add_giayto (val) {
+        setTimeout(function () {
+          if (val) {
+            let myElements = document.querySelectorAll(".v-menu__content");
+            for (let i = 0; i < myElements.length; i++) {
+              myElements[i].style.position = 'fixed';
+            }
+          } else {
+            let myElements = document.querySelectorAll(".v-menu__content")
+            for (let i = 0; i < myElements.length; i++) {
+              myElements[i].style.position = 'absolute';
+            }
+          }
+        }, 300)
+      },
     },
     mounted () {
       var vm = this
@@ -1799,28 +1858,55 @@
       viewFile2 (data, index) {
         var vm = this
         console.log('fileView', vm.dossierFilesItems[index])
-        if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
-          var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
-          window.location.assign(url)
-        } else {
-          vm.dialogPDFLoading = true
-          vm.documentType = 'Tài liệu đính kèm'
-          vm.dialogPDF = true
-          data['dossierId'] = vm.detailDossier.dossierId
-          if (vm.dossierFilesItems[index]['preview']) {
-            vm.dialogPDFLoading = false
-            document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['preview']
+        let fileKhoSoHoa = data.hasOwnProperty('url') && data.url && data.url.indexOf('{urlKhoSoHoa}/') == 0
+        if (!fileKhoSoHoa) {
+          if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
+            var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
+            window.location.assign(url)
           } else {
-            if (vm.esignType === 'plugin' && vm.dossierFilesItems[index]['isSigned']) {
+            vm.dialogPDFLoading = true
+            vm.documentType = 'Tài liệu đính kèm'
+            vm.dialogPDF = true
+            data['dossierId'] = vm.detailDossier.dossierId
+            if (vm.dossierFilesItems[index]['preview']) {
               vm.dialogPDFLoading = false
-              document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['pdfSigned']
+              document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['preview']
             } else {
-              vm.$store.dispatch('viewFile', data).then(result => {
+              if (vm.esignType === 'plugin' && vm.dossierFilesItems[index]['isSigned']) {
                 vm.dialogPDFLoading = false
-                document.getElementById('dialogPDFPreview' + vm.id).src = result
-              })
+                document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['pdfSigned']
+              } else {
+                vm.$store.dispatch('viewFile', data).then(result => {
+                  vm.dialogPDFLoading = false
+                  document.getElementById('dialogPDFPreview' + vm.id).src = result
+                })
+              }
             }
           }
+        } else {
+          vm.dialogPDFLoading = true
+          let filter = {
+            id: data.url.split("/").pop(),
+            collection: 'giaytoluutruso'
+          }
+          vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
+            vm.dialogPDFLoading = false
+            vm.dialogPDF = true
+            let fileType = data.displayName.split(".")[1].toLowerCase()
+            if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+              fileType === 'tif' || fileType === 'tiff'
+            ) {
+              document.getElementById('dialogPDFPreview' + vm.id).src = result
+            } else {
+              vm.srcDownload = result
+              setTimeout(function () {
+                document.getElementById('downloadFileKhoKQ').click()
+              }, 100)
+            }
+          }).catch(function () {
+            vm.dialogPDFLoading = false
+            toastr.error('Tải xuống không thành công')
+          })
         }
       },
       viewFileWithPartNo (item) {
@@ -2345,6 +2431,34 @@
           vm.dialog_editor_pdf = false
           vm.showViewerPdfEditor = false
         }
+      },
+      showAddStorage (part, file) {
+        let vm = this
+        vm.partKhoGiayTo = part
+        vm.fileKhoGiayTo = file
+        vm.dialog_add_giayto = true
+        setTimeout(function () {
+          vm.$refs.formSoHoaGiayTo.initData()
+        }, 100)
+      },
+      callBackSoHoa(data) {
+        let vm = this
+        vm.dialog_add_giayto = false
+        console.log('fileKhoGiayTo', vm.fileKhoGiayTo)
+        console.log('dossierFilesItems', vm.dossierFilesItems)
+        let filter = {
+          dossierId: vm.detailDossier.dossierId,
+          referenceUid: vm.fileKhoGiayTo.referenceUid,
+          url: '{urlKhoSoHoa}/' + data.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
+        }
+        vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
+          setTimeout(function () {
+            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+              vm.dossierFilesItems = resFiles
+            }).catch(reject => {
+            })
+          }, 200)
+        })
       }
     }
   }

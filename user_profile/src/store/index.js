@@ -633,7 +633,32 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
-    }
+    },
+    signatureMySign ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = JSON.stringify(filter);
+        
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/signature/NEAC/sign',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          let serializable = response.data
+          resolve(serializable)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+      })
+    },
   },
   mutations: {
     setsnackbarerror (state, payload) {

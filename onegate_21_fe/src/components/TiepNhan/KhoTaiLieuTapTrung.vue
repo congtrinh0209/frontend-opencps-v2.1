@@ -511,7 +511,7 @@
           orderType: 'desc',
           cccd: dataSearch ? dataSearch.applicantIdNo : '',
           collection: 'giaytocanhantochuc',
-          trangThaiChiaSe: '1'
+          trangThaiChiaSe: vm.originality == 3 ? '1,2' : ''
         }
 
         vm.loadingTable = true

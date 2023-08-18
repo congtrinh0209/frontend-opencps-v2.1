@@ -930,8 +930,6 @@
                 } else {
                   vm.data = {}
                 }
-              } else if (dataObj.respone === 'loginUser') {
-                vm.$store.commit('setloginUser', dataObj['loginUser'])
               } 
             }).catch(function (error) {
             })
@@ -1026,8 +1024,6 @@
               } else {
                 vm.data = {}
               }
-            } else if (dataObj.respone === 'loginUser') {
-              vm.$store.commit('setloginUser', dataObj['loginUser'])
             } 
             if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
               vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')

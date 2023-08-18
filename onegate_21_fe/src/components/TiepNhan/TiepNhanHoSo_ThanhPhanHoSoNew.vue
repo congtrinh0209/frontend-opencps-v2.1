@@ -159,6 +159,11 @@
                             <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
                           </v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile v-if="kySoCongCongMotCua">
+                          <v-list-tile-title @click.stop="mySignViettel(itemFileView, index)">
+                            <v-icon size="18" color="green">create</v-icon> &nbsp;&nbsp; CHỮ KÝ SỐ CÔNG CỘNG
+                          </v-list-tile-title>
+                        </v-list-tile>
                       </v-list>
                     </v-menu>
                     <!--  -->
@@ -259,6 +264,11 @@
                         <v-list-tile>
                           <v-list-tile-title @click.stop="vgcaSignAction(itemFileView, index, 'copy')">
                             <v-icon size="16" color="green">fas fa fa-file-text</v-icon> &nbsp;&nbsp; SAO VĂN BẢN ĐIỆN TỬ
+                          </v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile v-if="kySoCongCongMotCua">
+                          <v-list-tile-title @click.stop="mySignViettel(itemFileView, index)">
+                            <v-icon size="18" color="green">create</v-icon> &nbsp;&nbsp; CHỮ KÝ SỐ CÔNG CỘNG
                           </v-list-tile-title>
                         </v-list-tile>
                       </v-list>
@@ -552,7 +562,7 @@
                 <span v-else>Tải giấy tờ từ máy (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
               <!-- <v-tooltip class="pl-1 pt-1" top v-if="applicantId && partNoApplicantHasFile(item.partNo) && khoTaiLieuCongDan"> -->
-              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && khoTaiLieuCongDan">
+              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView && applicantId && khoTaiLieuCongDan">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="showDocumentApplicant(item, index)" name="Giấy tờ trong kho">
                   <v-badge>
                     <v-icon size="20" color="orange darken-3">storage</v-icon>
@@ -560,7 +570,7 @@
                 </v-btn>
                 <span>Sử dụng giấy tờ trong kho cá nhân</span>
               </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="applicantId && khoTaiLieuDvcqg">
+              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView && applicantId && khoTaiLieuDvcqg">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="showDocumentDvcqg(item, index)" name="Giấy tờ trong kho">
                   <v-badge>
                     <v-icon size="18" color="orange darken-3">fas fa fa-clone</v-icon>
@@ -623,7 +633,7 @@
                   <v-text-field
                   label="Tên giấy tờ:"
                   v-model="otherDossierTemplate"
-                  :rules="[v => !!v || 'Bạn phải điền tên giấy tờ.']"
+                  :rules="[v => !!v || 'Tên giấy tờ là bắt buộc']"
                   required
                   ></v-text-field>
                 </v-flex>
@@ -1163,48 +1173,65 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="py-1">
-          <v-form ref="form" v-model="validFormStorage" lazy-validation class="py-3 px-0 grid-list">
-            <v-layout row wrap class="px-0 py-3">
-              <v-flex v-if="originality == 3" xs12 md6 class="">
+          <v-form id="form-search" ref="formStorage" v-model="validFormStorage" lazy-validation class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 pb-3">
+              <v-flex v-if="originality == 3" xs12 md6 class="py-0">
+                <div class="mb-1">Mã định danh chủ sở hữu <span style="color: red"> (*)</span></div>
                 <v-text-field
                   v-model="applicantIdNoToStorage"
-                  box
+                  solo
+                  flat
                   height="32"
                   min-height="32"
                   clearable
-                  label="Mã định danh chủ sở hữu"
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
                 ></v-text-field>
               </v-flex>
-              <v-flex v-if="originality == 3" xs12 md6 class="">
+              <v-flex v-if="originality == 3" xs12 md6 class="py-0">
+                <div class="mb-1">Tên chủ sở hữu <span style="color: red"> (*)</span></div>
                 <v-text-field
-                  label="Tên chủ sở hữu"
                   v-model="applicantNameToStorage"
-                  box
+                  solo
+                  flat
                   height="32"
                   min-height="32"
                   clearable
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12>
-                <v-text-field label="Tên giấy tờ" v-model="tenGiayToStorage" box></v-text-field>
+              <v-flex xs12 class="py-0">
+                <div class="mb-1">Tên giấy tờ <span style="color: red"> (*)</span></div>
+                <v-text-field 
+                  v-model="tenGiayToStorage" solo flat
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
+                ></v-text-field>
               </v-flex>
-              <v-flex xs12 md6>
-                <v-text-field label="Số hiệu giấy tờ" v-model="soHieuGiayToStorage" box></v-text-field>
+              <v-flex xs12 md6 class="py-0">
+                <div class="mb-1">Số hiệu giấy tờ <span style="color: red"> (*)</span></div>
+                <v-text-field label="Số hiệu giấy tờ" v-model="soHieuGiayToStorage" solo flat
+                :rules="[v => !!v || 'Thông tin bắt buộc']"
+                required
+                ></v-text-field>
               </v-flex>
-              <v-flex xs12 md6>
+              <v-flex xs12 md6 class="py-0">
+                <div class="mb-1">Loại văn bản điện tử <span style="color: red"> (*)</span></div>
                 <v-autocomplete
                   :items="loaiVanBanList"
                   v-model="loaiVanBanCreate"
-                  label="Loại giấy tờ"
                   item-text="TenMuc"
                   item-value="MaMuc"
-                  box
+                  solo flat
                   return-object
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12>
+              <v-flex xs12 class="py-0">
+                <div class="mb-1">Cơ quan ban hành <span style="color: red"> (*)</span></div>
                 <v-autocomplete
-                  label="Cơ quan ban hành"
                   :items="donViList"
                   v-model="coQuanBanHanhStorage"
                   ref="autocomplete1"
@@ -1213,7 +1240,9 @@
                   item-value="MaDinhDanh"
                   return-object
                   clearable
-                  box
+                  solo flat
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
                 >
                   <template v-slot:append-item>
                     <div class="py-2" v-if="isShowDonVi"
@@ -1225,35 +1254,37 @@
                   </template>
                 </v-autocomplete>
               </v-flex>
-              <v-flex xs12 md6 class="">
+              <v-flex xs12 md6 class="py-0">
+                <div class="mb-1">Ngày ban hành</div>
                 <v-text-field
-                  label="Ngày ban hành"
                   v-model="createDateStorage"
                   placeholder="dd/mm/yyyy, ddmmyyyy"
                   @blur="formatDate"
-                  box
+                  solo flat
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 md6 class="">
+              <v-flex xs12 md6 class="py-0">
+                <div class="mb-1">Ngày hết hạn</div>
                 <v-text-field
-                  label="Ngày hết hạn"
                   v-model="expireDateStorage"
                   placeholder="dd/mm/yyyy, ddmmyyyy"
                   @blur="formatExpireDate"
-                  box
+                  solo flat
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 class="">
+              <v-flex xs12 class="py-0">
+                <div class="mb-1">Hiệu lực giấy tờ <span style="color: red"> (*)</span></div>
                 <v-autocomplete
                   :items="statusList"
                   v-model="statusCreate"
-                  label="Hiệu lực giấy tờ"
                   item-text="TenMuc"
                   item-value="MaMuc"
-                  box
+                  solo flat
                   return-object
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
                 ></v-autocomplete>
               </v-flex>
             </v-layout>
@@ -1562,6 +1593,7 @@ export default {
     render: true,
     showKySo: false,
     showKySoMotCua: false,
+    kySoCongCongMotCua: false,
     dialogSignDigital: false,
     dialogXacThucVnptSmartCa: false,
     dialogChoKySoBatDongBo: false,
@@ -1642,6 +1674,10 @@ export default {
     }
     try {
       vm.showKySoMotCua = showKySoMotCua
+    } catch (error) {
+    }
+    try {
+      vm.kySoCongCongMotCua = kySoCongCongMotCua
     } catch (error) {
     }
     try {
@@ -1921,6 +1957,10 @@ export default {
     },
     addKhoCaNhanTapTrung () {
       let vm = this
+      let valid = vm.$refs.formStorage.validate()
+      if (!valid) {
+        return
+      }
       vm.progress_sohoa = true
       let dataCreate = {
         "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
@@ -1952,7 +1992,7 @@ export default {
           "MaDinhDanh": "",
           "TenGoi": ""
         },
-        "TrangThaiChiaSe": 0,
+        "TrangThaiChiaSe": 2,
         "TepDuLieu": [],
         "MaDinhDanh": "",
         "HoSoDichVuCong": {
@@ -2097,6 +2137,16 @@ export default {
         } else {
           toastr.success('Số hóa giấy tờ thành công')
         }
+
+        let dataSoHoa = response.data.resp
+        let filter = {
+          dossierId: vm.thongTinHoSo.dossierId,
+          referenceUid: vm.fileKhoGiayTo.referenceUid,
+          url: '{urlKhoSoHoa}/' + dataSoHoa.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
+        }
+        vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
+          vm.loadFiles()
+        })
       })
       .catch((error) => {
         vm.progress_sohoa = false
@@ -3394,7 +3444,7 @@ export default {
       } else {
         let filter = {
           id: data.url.split("/").pop(),
-          collection: 'giaytocanhantochuc'
+          collection: 'giaytoluutruso'
         }
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
           vm.srcDownload = result
@@ -3512,7 +3562,7 @@ export default {
         vm.dialogPDFLoading = true
         let filter = {
           id: data.url.split("/").pop(),
-          collection: 'giaytocanhantochuc'
+          collection: 'giaytoluutruso'
         }
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
           vm.dialogPDFLoading = false
@@ -4872,12 +4922,13 @@ export default {
     searchItemsDonVi() {
       this.donViList = [];
       this.pageSelectDonVi = 0;
-      this.loadMoreItemsDonVi();
+      if (vm.khoTaiLieuTapTrung) {
+        this.loadMoreItemsDonVi()
+      }
     },
     loadMoreItemsDonVi() {
       let vm = this
       if (vm.donViList.length < vm.totalItemsSelectDonVi || vm.pageSelectDonVi == 0) {
-        // vm.loadingDonVi = true;
         vm.isShowDonVi = false
         let filter = {
           page: vm.pageSelectDonVi,
@@ -4893,12 +4944,10 @@ export default {
           }
           let total = results.hasOwnProperty('totalElements') ? results['totalElements'] : 0
           vm.totalItemsSelectDonVi = total
-          vm.loadingDonVi = false
           if (vm.$refs.autocomplete1) {
             vm.$refs.autocomplete1.onScroll()
           }
         }).catch(xhr => {
-          vm.loadingDonVi = false
         })
       }
     },

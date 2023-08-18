@@ -75,31 +75,6 @@
         let vm = this
         if (vm.isConnected) {
           vm.isConnected = false
-          /*
-          vm.$socket.onmessage = function (data) {
-            let dataObj = eval('( ' + data.data + ' )')
-            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && (dataObj.respone === 'detail' || dataObj.respone === 'tableConfig')) {
-              if (vm.dataSocket['detail'] !== '[]') {
-                vm.nameScreen = vm.dataSocket['detail'][0][dataObj.title]
-                vm.showDetailForm = true
-                vm.noDetail = false
-              } else {
-                vm.noDetail = true
-              }
-            }
-            if (dataObj.respone === 'listTableMenu') {
-              vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-            } else if (dataObj.respone === 'loginUser') {
-              vm.$store.commit('setloginUser', dataObj['loginUser'])
-            } 
-            if (String(vm.id) === '0') {
-              vm.nameScreen = 'Thêm mới dữ liệu'
-              vm.showDetailForm = true
-              vm.noDetail = false
-            }
-          }
-          */
           let dataPost = new URLSearchParams()
           //dataPost.append('delegacy', filter.delegacy)
           let textPost = {
@@ -144,8 +119,6 @@
               }
               if (dataObj.respone === 'listTableMenu') {
                 vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-              } else if (dataObj.respone === 'loginUser') {
-                vm.$store.commit('setloginUser', dataObj['loginUser'])
               } 
               if (String(vm.id) === '0') {
                 console.log('Thêm mới 1 -=-=-=-=')
@@ -164,31 +137,6 @@
       var vm = this
       vm.$nextTick(function () {
         vm.noDetail = false
-        /*
-        vm.$socket.onmessage = function (data) {
-          let dataObj = eval('( ' + data.data + ' )')
-          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && (dataObj.respone === 'detail' || dataObj.respone === 'tableConfig')) {
-            if (vm.dataSocket['detail'] !== '[]') {
-              vm.nameScreen = vm.dataSocket['detail'][0][dataObj.title]
-              vm.showDetailForm = true
-              vm.noDetail = false
-            } else {
-              vm.noDetail = true
-            }
-          }
-          if (dataObj.respone === 'listTableMenu') {
-            vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-          } else if (dataObj.respone === 'loginUser') {
-            vm.$store.commit('setloginUser', dataObj['loginUser'])
-          } 
-          if (String(vm.id) === '0') {
-            vm.nameScreen = 'Thêm mới dữ liệu'
-            vm.showDetailForm = true
-            vm.noDetail = false
-          }
-        }
-        */
         if(vm.$router.history.current.query.hasOwnProperty('idCopy')){
            vm.idCopy =  vm.$router.history.current.query.idCopy
         } else {
@@ -243,9 +191,7 @@
               console.log('run 1 -=-=-=-=', vm.id)
               if (dataObj.respone === 'listTableMenu') {
                 vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-              } else if (dataObj.respone === 'loginUser') {
-                vm.$store.commit('setloginUser', dataObj['loginUser'])
-              }
+              } 
               console.log('run 2 -=-=-=-=')
               if (String(vm.id) === '0') {
                 console.log('Thêm mới -=-=-=-=')

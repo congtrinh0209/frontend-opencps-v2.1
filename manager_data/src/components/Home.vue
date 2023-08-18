@@ -193,9 +193,6 @@
       items() {
         return this.$store.getters.getlistTableMenu
       },
-      loginUser() {
-        return this.$store.getters.getloginUser
-      },
       userRoles () {
         return this.$store.getters.getUserRoles
       },

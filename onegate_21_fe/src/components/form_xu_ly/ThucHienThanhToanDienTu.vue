@@ -178,6 +178,13 @@
                 </v-avatar>
                 <span class="py-2" :style="loadingPay ? 'pointer-events: none;' : 'cursor: pointer'">Thanh toán qua ứng dụng ViettelPay</span>
               </v-chip>
+
+              <div class="d-inline-block py-2" v-if="thanhToanQuetVietQR && urlVietQR" style="position:relative;text-align: center;">
+                <img class="logo" :src="urlVietQR" width="175" style="display: flex">
+                <v-chip class="my-0 ml-1" color="#3b5ab5" text-color="white" style="width:135px;margin-top:-5px !important">
+                  <span style="font-size:13px !important">Quét để thanh toán</span>
+                </v-chip>
+              </div>
             </div>
             <!--  -->
             <div v-if="isBank" class="ml-0 mt-2 px-2 py-1" style="border: 1px solid #004b9485;border-radius: 3px;">
@@ -352,6 +359,8 @@ export default {
     ipAddress:'',
     loadingPay: false,
     thanhToanChuyenKhoan: true,
+    thanhToanQuetVietQR: false,
+    urlVietQR: '',
     paymentNote: '',
     feeList: [],
     headers: [
@@ -391,6 +400,10 @@ export default {
     } catch (error) {
     }
     try {
+      vm.thanhToanQuetVietQR = thanhToanQuetVietQR
+    } catch (error) {
+    }
+    try {
       vm.thanhToanKeypay = thanhToanKeypay
     } catch (error) {
     }
@@ -402,6 +415,20 @@ export default {
         vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
         vm.$store.commit('setPaymentProfile', vm.data_payment)
       })
+      if (vm.originality == 1 && vm.thanhToanQuetVietQR) {
+        var settings = {
+          "url": "/o/pgi/vietqr/qrcode?dossierId=" + vm.detailDossier.dossierId,
+          "method": "GET",
+          "headers": {
+            "groupId": window.themeDisplay.getScopeGroupId(),
+            "Accept": "application/json"
+          }
+        };
+
+        $.ajax(settings).done(function (response) {
+          vm.urlVietQR = response && response.qrcode_url ? response.qrcode_url : ''
+        })
+      }
     }
   },
   computed: {
@@ -412,7 +439,11 @@ export default {
       if (val === true) {
         this.errorNotSelect = false
       }
-    }
+    },
+    originality () {
+      let vm = this
+      return vm.getOriginality()
+    },
   },
   watch: {
     paymentProfile (val) {

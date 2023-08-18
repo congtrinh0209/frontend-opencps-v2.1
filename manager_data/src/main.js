@@ -91,121 +91,54 @@ new Vue({
   created() {
     var vm = this
     vm.$nextTick(function() {
-      setTimeout(() => {
-       vm.dataSocket = {}
-       let dataPost = new URLSearchParams()
-       
-       let textPost = {
-         'type': 'api',
-         'cmd': 'get',
-         'respone': 'loginUser',
-         'api': '/o/v1/opencps/users/login',
-         'headers': {
-           'Token': vm.getAuthToken(),
-           'groupId': vm.getScopeGroupId(),
-           'USER_ID': vm.getUserId()
-         }
-       }
-       dataPost = new URLSearchParams()
-
-       dataPost.append('text', JSON.stringify(textPost))
-       axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
-         let dataObj = response.data
-         vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-         if (dataObj.respone === 'loginUser') {
-          let dataSet
-          try {
-            dataSet = dataObj['loginUser']
-          } catch (error) {
-            dataSet = ''
+      let paramGetRole = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        }
+      }
+      axios.get('/o/rest/v2/users/login', paramGetRole).then(function (response) {
+        let serializable = response.data
+        if (serializable && serializable.length > 0) {
+          vm.$store.commit('setloginUser', serializable)
+          let roles = []
+          for (let key in serializable) {
+            if (serializable[key]['role']) {
+              roles.push(serializable[key]['role'])
+            }
           }
-          console.log('dataSet123', dataSet)
-          vm.$store.commit('setloginUser', dataSet)
-         }
-        // 
-        let paramGetRole = {
-          headers: {
-            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          let roleExits = roles.findIndex(item => String(item).indexOf("GLOBAL_QUAN_TRI_NHAN_SU") >= 0)
+          if (roleExits >= 0) {
+            let menuTableEmployee =  [
+              {
+                icon: 'keyboard_arrow_up',
+                'icon-alt': 'keyboard_arrow_down',
+                text: 'Nghiệp vụ',
+                model: true,
+                children: [
+                  {
+                    icon: 'filter_1',
+                    link: '/table/opencps_employee',
+                    code: 'opencps_employee',
+                    text: 'Quản lý nhân sự'
+                  }
+                ]
+              }
+            ]
+            vm.$store.commit('setListTableMenuFollowRole', menuTableEmployee)
+          }
+          let checkExitsRole = function (role) {
+            return serializable.find((item) => item.role == role)
+          }
+          if (window.location.href.endsWith('#/')) {
+            if (checkExitsRole('GLOBAL_UPDATE_MASTER_DATA')) {
+              vm.$router.push('/table/opencps_serviceinfo')
+            } else {
+              vm.$router.push('/table/opencps_employee')
+            }
           }
         }
-        axios.get('/o/rest/v2/users/login', paramGetRole).then(function (response) {
-          let serializable = response.data
-          if (serializable && serializable.length > 0) {
-            let roles = []
-            for (let key in serializable) {
-              if (serializable[key]['role']) {
-                roles.push(serializable[key]['role'])
-              }
-            }
-            let roleExits = roles.findIndex(item => String(item).indexOf("GLOBAL_QUAN_TRI_NHAN_SU") >= 0)
-            if (roleExits >= 0) {
-              let menuTableEmployee =  [
-                {
-                  icon: 'keyboard_arrow_up',
-                  'icon-alt': 'keyboard_arrow_down',
-                  text: 'Nghiệp vụ',
-                  model: true,
-                  children: [
-                    {
-                      icon: 'filter_1',
-                      link: '/table/opencps_employee',
-                      code: 'opencps_employee',
-                      text: 'Quản lý nhân sự'
-                    }
-                  ]
-                }
-              ]
-              vm.$store.commit('setListTableMenuFollowRole', menuTableEmployee)
-            }
-          }
-        }).catch(function (error) {
-        })
-        // 
-        //  dataPost = new URLSearchParams();
-        //  textPost = {
-        //    'type': 'admin',
-        //    'cmd': 'get',
-        //    'responeType': 'menu',
-        //    'code': 'opencps_adminconfig',
-        //    'respone': 'listTableMenu',
-        //    'start': -1,
-        //    'end': -1              
-        //  }
-        //  dataPost.append('text', JSON.stringify(textPost))
-        //  axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
-        //    let dataObj = response.data
-        //    vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-        //    if (dataObj.respone === 'listTableMenu') {
-        //      vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-        //    }  
-        //  }).catch(function (error) {
-        //  })
-       }).catch(function (error) {
-        //  dataPost = new URLSearchParams();
-        //  textPost = {
-        //    'type': 'admin',
-        //    'cmd': 'get',
-        //    'responeType': 'menu',
-        //    'code': 'opencps_adminconfig',
-        //    'respone': 'listTableMenu',
-        //    'start': -1,
-        //    'end': -1              
-        //  }
-        //  dataPost.append('text', JSON.stringify(textPost))
-        //  axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
-        //    let dataObj = response.data
-        //    vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-        //    if (dataObj.respone === 'listTableMenu') {
-        //      vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
-        //    }  
-        //  }).catch(function (error) {
-        //  })
-       })
-        
-       if (window.location.href.endsWith('#/')) {
-         vm.$router.push('/table/opencps_employee')
-       }
-      }, 300)
+      }).catch(function (error) {
+      })
     })
   },
   computed: {

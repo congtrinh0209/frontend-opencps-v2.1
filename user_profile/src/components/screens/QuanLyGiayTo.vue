@@ -241,16 +241,17 @@
                   </template> 
                 </v-text-field>
               </v-flex>
-
               <v-flex xs12 class="mt-2">
                 <div v-if="fileNameView" class="mb-3">
                   <v-icon size="18" color="#004b94">attach_file</v-icon>
                   <span class="ml-2" style="font-style: italic">{{fileNameView}}</span>
                 </div>
                 <input type="file" id="documentFile" @input="uploadDocumentFile($event)" style="display:none">
+              </v-flex>
+              <v-flex xs12 md6 class="mt-2 pr-2">
                 <v-btn block color="primary" class="mx-0" dark @click.native="uploadFile" style="height: 42px;">
                   <v-icon size="20">fas fa fa-upload</v-icon> &nbsp; &nbsp;
-                  Chọn file tải lên
+                  Tải lên giấy tờ
                 </v-btn>
                 <div>
                   <span style="color:red">(*) </span>
@@ -258,6 +259,17 @@
                   <span>Dung lượng tải lên tối đa {{fileTemplateNoCreate && fileTemplateNoCreate.size ? fileTemplateNoCreate.size : maxFileSize}}MB.</span>
                 </div>
               </v-flex>
+              <v-flex xs12 md6 class="mt-2 pl-2">
+                <v-btn block color="primary" class="mx-0" dark @click.native="uploadFile" style="height: 42px;">
+                  <v-icon size="20">border_color</v-icon> &nbsp; &nbsp;
+                  Tải lên và ký số giấy tờ
+                </v-btn>
+              </v-flex>
+              <div class="flex xs12">
+                <span style="color:red">(*) </span>
+                <span v-if="fileTemplateNoCreate && fileTemplateNoCreate.fileType">File tải lên chấp nhận các định dạng: {{fileTemplateNoCreate.fileType}} .</span>
+                <span>Dung lượng tải lên tối đa {{fileTemplateNoCreate && fileTemplateNoCreate.size ? fileTemplateNoCreate.size : maxFileSize}}MB.</span>
+              </div>
             </v-layout>
           </v-form>
         </v-card-text>
@@ -294,6 +306,65 @@
         </iframe>
       </v-card>
     </v-dialog>
+    <!-- ký số điện tử -->
+    <v-dialog
+      v-model="dialogInputMobile"
+      max-width="550"
+      persistent
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title style="font-size: 14px">KÝ SỐ SỬ DỤNG CHỮ KÝ SỐ CÔNG CỘNG</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogInputMobile = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="px-0 pb-0">
+          <v-layout wrap>
+            <v-flex xs12 class="px-3" style="cursor: pointer">
+              <div>Chọn nhà cung cấp : <span style="color: red"> (*)</span></div>
+              <v-autocomplete
+                :items="dsCungCapCA"
+                hide-no-data
+                v-model="donViCapCA"
+                item-text="name"
+                item-value="value"
+                box
+                class="my-2"
+              ></v-autocomplete>
+              <div>Mã số thuế / Số CMND/CCCD, hộ chiếu<span style="color: red"> (*)</span>:</div>
+              <v-text-field class="mt-2"
+                v-model="userIdMySign"
+                box
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 class="text-xs-center mb-3">
+              <v-btn :loading="loadingAction" :disabled="loadingAction" class="mr-0" style="width: 100px" color="primary" @click="getCertMySign()" >
+                <v-icon>save</v-icon> &nbsp;
+                Xác nhận
+              </v-btn>
+            </v-flex>
+            <v-flex xs12 class="px-3 mb-4" v-if="listCertMySign.length">
+              <div style="display: flex;align-items: center;">
+                <v-icon size="20" color="#5a770d" class="mr-2">double_arrow</v-icon>
+                <span style="text-transform: uppercase; color: #5a770d;font-weight: 500; font-size: 14px;">Chọn chứng thư số:</span>
+              </div>
+              <v-flex class="py-2 mt-2" v-for="(item, index) in listCertMySign" :key="index" xs12 
+                style="border: 1px dotted #5a770d; background: #5a770d24;"
+                @click="submitMySign(item)"
+              >
+                <p style="cursor: pointer !important;text-decoration: underline;padding-left: 15px;margin-bottom: 0px;">
+                  <v-icon class="mr-2" size="18">edit</v-icon>
+                  <span style="font-size: 14px;">{{item.cert_id}}</span>
+                </p>
+              </v-flex>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!--  -->
     <div style="display:none">
       <a id="downloadFile" :href="srcDownload" download></a>
     </div>
@@ -314,6 +385,21 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    dialogInputMobile: false,
+    loadingAction: false,
+    userIdMySign: '',
+    dsCungCapCA: [
+      {name: 'Viettel CA', value: 'Viettel-CA'},
+      {name: 'VNPT CA', value: 'VNPT-CA'},
+      {name: 'FPT CA', value: 'FPT-CA'},
+      {name: 'BKAV CA', value: 'BkavCA'},
+      {name: 'Nacencom', value: 'CA2'},
+      {name: 'MISA CA', value: 'MISA-CA'}
+    ],
+    donViCapCA: '',
+    certSelected: '',
+    dialogChoKySoBatDongBo: false,
+    fileKySo: '',
     applicantInfos: '',
     nameTitle: '',
     creditTitle: '',
@@ -414,6 +500,73 @@ export default {
   watch: {
   },
   methods: {
+    getCertMySign () {
+      let vm = this
+      if (String(vm.userIdMySign).trim()) {
+        let user = {
+          user_id: String(vm.userIdMySign).trim(),
+          ca_name: vm.donViCapCA,
+          serial_number: ''
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('getCertMySign', user).then(res => {
+          vm.loadingAction = false
+          vm.listCertMySign = []
+          try {
+            vm.listCertMySign = res.data.user_certificates
+          } catch (error) {
+          }
+          if (!vm.listCertMySign.length) {
+            toastr.error('Không có thông tin chứng thư số')
+          }
+        }).catch(function () {
+          vm.loadingAction = false
+          toastr.error('Không có thông tin chứng thư số')
+        })
+      }  
+    },
+    submitMySign (item) {
+      let vm = this
+      vm.certSelected = item
+      if (vm.loadingAction) {
+        return;
+      }
+      let dataInsertSignature = {
+        "user_id": String(vm.userIdMySign).trim(),
+        "ca_name": vm.donViCapCA,
+        "serial_number": item.serial_number,
+        "dossierId": vm.fileKySo.dossierId,
+        "referenceUid": vm.fileKySo.referenceUid,
+        "cert_data": item.cert_data
+      }
+      vm.loadingAction = true
+      toastr.success('Yêu cầu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.')
+      vm.dialogChoKySoBatDongBo = true
+      vm.dialogInputMobile = false
+      vm.$store.dispatch('signatureMySign', dataInsertSignature).then(res => {
+        vm.loadingAction = false
+        let dataUpdateFile = {
+          fileEntryIdStr: res ? res['fileEntryIdStr'] : '',
+          dossierFileIdStr: vm.fileKySo.dossierFileId
+        }
+        vm.$store.dispatch('updateSignatureVtCa', dataUpdateFile).then(res => {
+          toastr.clear()
+          toastr.success('Thực hiện ký số thành công')
+          vm.dialogChoKySoBatDongBo = false
+          // vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+          //   vm.dossierFilesItems = resFiles
+          // }).catch(reject => {
+          // })
+        }).catch(function() {
+          toastr.error('Lỗi trong quá trình cập nhật tài liệu ký số')
+          vm.dialogChoKySoBatDongBo = false
+        })
+      }).catch(function () {
+        vm.loadingAction = false
+        vm.dialogChoKySoBatDongBo = false
+        toastr.error('Gửi yêu cầu ký số thất bại')
+      })
+    },
     getApplicantInfos () {
       let vm = this
       let filter = {

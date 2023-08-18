@@ -24,6 +24,15 @@
                           {{itemFileView.displayName ? itemFileView.displayName : itemFileView.dossierTemplateNo}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
+                        <!--  -->
+                        <v-btn title="Số hóa giấy tờ" class="my-0" flat icon color="indigo"
+                          v-if="originality == '3' && !onlyView && khoTaiLieuTapTrung && yeuCauSoHoa && 
+                          (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                          @click.stop="showAddStorage(item, itemFileView)"
+                        >
+                          <v-icon size="18" color="primary">drive_file_move</v-icon>
+                        </v-btn>
+                        <!--  -->
                       </div>
                     </div>
                   </div>
@@ -65,18 +74,38 @@
               indeterminate
               ></v-progress-circular>
             </div>
-            <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+            <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreviewTkq' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
             </iframe>
           </v-card>
         </v-dialog>
+        <!--  -->
+        <v-dialog v-model="dialog_add_giayto_trakq" scrollable persistent max-width="1000px">
+          <v-card>
+            <v-toolbar dark color="primary">
+              <v-toolbar-title>
+                <span>Số hóa giấy tờ</span>
+              </v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon dark @click.native="dialog_add_giayto_trakq = false">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </v-toolbar>
+            <so-hoa-giay-to ref="formSoHoaGiayToTraKq" @callBackSoHoaGiayTo="callBackSoHoa" :fileKhoGiayTo="fileKhoGiayTo" :partKhoGiayTo="partKhoGiayTo" :thongTinHoSo="detailDossier"></so-hoa-giay-to>
+          </v-card>
+        </v-dialog>
+        <!--  -->
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <div style="display:none">
+      <a id="downloadFileKhoTKQ" :href="srcDownload" download></a>
+    </div>
   </div>
 </template>
 
 <script>
   // import $ from 'jquery'
   import toastr from 'toastr'
+  import SoHoaGiayTo from '.././TiepNhan/FormSoHoaGiayTo'
   toastr.options = {
     'closeButton': true,
     'timeOut': '5000'
@@ -96,7 +125,16 @@
         default: () => []
       }
     },
+    components: {
+      'so-hoa-giay-to': SoHoaGiayTo
+    },
     data: () => ({
+      dialog_add_giayto_trakq: false,
+      partKhoGiayTo: '',
+      fileKhoGiayTo: '',
+      yeuCauSoHoa: false,
+      khoTaiLieuTapTrung: false,
+      srcDownload: '',
       dossierTemplateItems: [],
       dossierMarksItems: [],
       dossierFilesItems: [],
@@ -131,14 +169,37 @@
         return this.$store.getters.loadingInitData
       }
     },
+    watch: {
+      dialog_add_giayto_trakq (val) {
+        setTimeout(function () {
+          if (val) {
+            let myElements = document.querySelectorAll(".v-menu__content");
+            for (let i = 0; i < myElements.length; i++) {
+              myElements[i].style.position = 'fixed';
+            }
+          } else {
+            let myElements = document.querySelectorAll(".v-menu__content")
+            for (let i = 0; i < myElements.length; i++) {
+              myElements[i].style.position = 'absolute';
+            }
+          }
+        }, 300)
+      },
+    },
     created () {
       var vm = this
-      vm.page = 1
+      try {
+        vm.yeuCauSoHoa = yeuCauSoHoa
+      } catch (error) {
+      }
+      try {
+        vm.khoTaiLieuTapTrung = khoTaiLieuTapTrung
+      } catch (error) {
+      }
       vm.$nextTick(function () {
         if (vm.detailDossier['dossierId']) {
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
-            // vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
             let arr = []
             for (let key in vm.createFiles) {
               let exits = arr.filter(function (item) {
@@ -283,7 +344,7 @@
               setTimeout(function () {
                 vm.$store.dispatch('viewFile', file).then(result => {
                   vm.dialogPDFLoading = false
-                  document.getElementById('dialogPDFPreview' + vm.id).src = result
+                  document.getElementById('dialogPDFPreviewTkq' + vm.id).src = result
                 })
               }, 1000)
             }).catch(reject => {
@@ -303,16 +364,43 @@
       },
       viewFile2 (data) {
         var vm = this
-        if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
-          var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
-          window.open(url)
+        let fileKhoSoHoa = data.hasOwnProperty('url') && data.url && data.url.indexOf('{urlKhoSoHoa}/') == 0
+        if (!fileKhoSoHoa) {
+          if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
+            var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
+            window.open(url)
+          } else {
+            vm.dialogPDFLoading = true
+            vm.dialogPDF = true
+            data['dossierId'] = vm.detailDossier.dossierId
+            vm.$store.dispatch('viewFile', data).then(result => {
+              vm.dialogPDFLoading = false
+              document.getElementById('dialogPDFPreviewTkq' + vm.id).src = result
+            })
+          }
         } else {
           vm.dialogPDFLoading = true
-          vm.dialogPDF = true
-          data['dossierId'] = vm.detailDossier.dossierId
-          vm.$store.dispatch('viewFile', data).then(result => {
+          let filter = {
+            id: data.url.split("/").pop(),
+            collection: 'giaytoluutruso'
+          }
+          vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
             vm.dialogPDFLoading = false
-            document.getElementById('dialogPDFPreview' + vm.id).src = result
+            vm.dialogPDF = true
+            let fileType = data.displayName.split(".")[1].toLowerCase()
+            if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg' || fileType === 'pdf' || fileType === 'gif' ||
+              fileType === 'tif' || fileType === 'tiff'
+            ) {
+              document.getElementById('dialogPDFPreviewTkq' + vm.id).src = result
+            } else {
+              vm.srcDownload = result
+              setTimeout(function () {
+                document.getElementById('downloadFileKhoTKQ').click()
+              }, 100)
+            }
+          }).catch(function () {
+            vm.dialogPDFLoading = false
+            toastr.error('Tải xuống không thành công')
           })
         }
       },
@@ -336,6 +424,34 @@
           }
         }
         return
+      },
+      showAddStorage (part, file) {
+        let vm = this
+        vm.partKhoGiayTo = part
+        vm.fileKhoGiayTo = file
+        vm.dialog_add_giayto_trakq = true
+        setTimeout(function () {
+          vm.$refs.formSoHoaGiayToTraKq.initData()
+        }, 100)
+      },
+      callBackSoHoa(data) {
+        let vm = this
+        vm.dialog_add_giayto = false
+        console.log('fileKhoGiayTo', vm.fileKhoGiayTo)
+        console.log('dossierFilesItems', vm.dossierFilesItems)
+        let filter = {
+          dossierId: vm.detailDossier.dossierId,
+          referenceUid: vm.fileKhoGiayTo.referenceUid,
+          url: '{urlKhoSoHoa}/' + data.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
+        }
+        vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
+          setTimeout(function () {
+            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+              vm.dossierFilesItems = resFiles
+            }).catch(reject => {
+            })
+          }, 200)
+        })
       },
       checkStyle (item) {
         return 'calc(100% - ' + 50 + 'px)'

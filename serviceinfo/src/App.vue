@@ -243,6 +243,7 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        console.log('current', current)
         if (newQuery.hasOwnProperty('setAgency')) {
           vm.setAgency = true
         }
@@ -393,6 +394,11 @@
               if (vm.thuTucTinhHauGiang) {
                 agencyArray = result.concat([
                   {
+                    administrationCode: "BHXH",
+                    administrationName: "Bảo hiểm xã hội",
+                    count: ""
+                  },
+                  {
                     administrationCode: "DLHG",
                     administrationName: "Điện lực tỉnh Hậu Giang",
                     count: ""
@@ -440,6 +446,7 @@
                     }
                   })
                 } else {
+                  console.log('vm.pathRouter + queryString + 1', vm.pathRouter + queryString)
                   vm.$router.push({
                     path: '/thu-tuc-hanh-chinh?page=1',
                     query: {
@@ -533,6 +540,11 @@
               if (vm.thuTucTinhHauGiang) {
                 agencyArray = result.concat([
                   {
+                    administrationCode: "BHXH",
+                    administrationName: "Bảo hiểm xã hội",
+                    count: ""
+                  },
+                  {
                     administrationCode: "DLHG",
                     administrationName: "Điện lực tỉnh Hậu Giang",
                     count: ""
@@ -579,12 +591,20 @@
                     }
                   })
                 } else {
+                  console.log('vm.pathRouter + queryString + 2', vm.pathRouter + queryString)
+                  let pathCurrent = current.path == '/' ? vm.pathRouter : current.path
                   vm.$router.push({
-                    path: '/thu-tuc-hanh-chinh?page=1',
+                    path: pathCurrent + queryString,
                     query: {
                       renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
                     }
                   })
+                  // vm.$router.push({
+                  //   path: '/thu-tuc-hanh-chinh?page=1',
+                  //   query: {
+                  //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                  //   }
+                  // })
                 }
 
               } else {
@@ -660,12 +680,20 @@
                 }
               })
             } else {
+              console.log('vm.pathRouter + queryString + 3', vm.pathRouter + queryString)
+              let pathCurrent = current.path == '/' ? vm.pathRouter : current.path
               vm.$router.push({
-                path: '/thu-tuc-hanh-chinh?page=1',
+                path: pathCurrent + queryString,
                 query: {
                   renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
                 }
               })
+              // vm.$router.push({
+              //   path: '/thu-tuc-hanh-chinh?page=1',
+              //   query: {
+              //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              //   }
+              // })
             }
           })
           // 
@@ -844,6 +872,10 @@
         console.log('filterAction', index, item1)
         if (vm.thuTucTinhHauGiang && item1.administrationCode === 'DLHG') {
           window.open("https://cskh.evnspc.vn", "_blank")
+          return
+        }
+        if (vm.thuTucTinhHauGiang && item1.administrationCode === 'BHXH') {
+          window.open("https://dichvucong.baohiemxahoi.gov.vn/#/dich-vu-cong", "_blank")
           return
         }
         if (vm.hasCoQuanThucHien) {

@@ -115,10 +115,11 @@
               :items="serviceInfoList"
               v-model="serviceInfoSearch"
               ref="autocomplete"
+              return-object
               :loading="loading"
               :search-input.sync="keywordSearchSelect"
               item-text="serviceName"
-              item-value="serviceCode"
+              item-value="serviceConfigId"
               @change="changeService('search')"
               clearable
               label="Chọn thủ tục"
@@ -403,7 +404,7 @@ export default {
     keywordSearchSelect(val) {
       let vm = this
       if (vm.serviceInfoList.length) {
-        if (val && val !== vm.serviceInfoSearch) {
+        if (val && val !== vm.serviceInfoSearch['serviceName']) {
           if (vm.timeOutSearch) {
             clearTimeout(vm.timeOutSearch);
           }
@@ -593,7 +594,7 @@ export default {
         if (vm.serviceInfoSearch) {
           console.log('vm.serviceInfoSearch', vm.serviceInfoSearch)
           let exits = vm.serviceInfoList.find(function (item) {
-            return item.serviceCode === vm.serviceInfoSearch
+            return item.serviceCode === vm.serviceInfoSearch['serviceCode']
           })
           let filter = {
             serviceConfigId: exits ? exits.serviceConfigId : ''
@@ -610,14 +611,14 @@ export default {
           })
           // 
           let filer2 = {
-            keyword: vm.serviceInfoSearch
+            keyword: vm.serviceInfoSearch['serviceName']
           }
           vm.$store.dispatch('getServiceInfos', filer2).then(function (result) {
             let serviceList = result.data
             let service = serviceList.find(function (item) {
-              return item.serviceCode == vm.serviceInfoSearch
+              return item.serviceCode == vm.serviceInfoSearch['serviceCode']
             })
-            vm.serviceCodeDvcqg = service['serviceCodeDVCQG'] ? service['serviceCodeDVCQG'] : vm.serviceInfoSearch
+            vm.serviceCodeDvcqg = service['serviceCodeDVCQG'] ? service['serviceCodeDVCQG'] : vm.serviceInfoSearch['serviceCode']
           }).catch(function () {
           })
           // 

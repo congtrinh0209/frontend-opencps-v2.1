@@ -2899,12 +2899,14 @@ export const store = new Vuex.Store({
     },
     setloginUser (state, payload) {
       if (payload) {
-        let currentLogin = payload[0]
-        if (currentLogin['role'] === 'Administrator') {
+        let checkExitsRole = function (role) {
+          return payload.find((item) => item.role == role)
+        }
+        if (checkExitsRole('Administrator')) {
           console.log('admin login')
-        } else if (currentLogin['role'] === 'Administrator_data') {
+        } else if (checkExitsRole('Administrator_data')) {
           state.listTableMenu.splice(3, 1)
-        } else if (currentLogin['role'] === 'Administrator_data_user') {
+        } else if (checkExitsRole('Administrator_data_user')) {
           state.listTableMenu.splice(2, 1)
           state.listTableMenu.splice(2, 1)
         } else {
@@ -2971,9 +2973,6 @@ export const store = new Vuex.Store({
     },
     getsnackbarsocket (state) {
       return state.snackbarsocket
-    },
-    getloginUser (state) {
-      return state.loginUser[0]
     },
     getUserRoles (state) {
       return state.loginUser

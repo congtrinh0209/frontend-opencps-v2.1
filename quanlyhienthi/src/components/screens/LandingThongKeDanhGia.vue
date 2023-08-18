@@ -402,7 +402,8 @@ export default {
             fromDate: 1640995200000,
             toDate: (new Date()).getTime(),
             listGroupId: element.value,
-            listGov: element.code
+            listGov: element.code,
+            workingStatus: 1
           }
         }
         axios.get('/o/rest/v2/votings/reportVE', param).then(function (response) {
@@ -504,7 +505,8 @@ export default {
           fromDate: 1640995200000,
           toDate: (new Date()).getTime(),
           listGroupId: window.themeDisplay.getScopeGroupId(),
-          listGov: ''
+          listGov: '',
+          workingStatus: 1
         }
       }
       vm.loading = true

@@ -28,20 +28,21 @@
               </div>
             </v-flex>
           </v-layout>
-          <v-layout wrap class="mt-2">
+          <v-layout wrap class="mt-2" id="form-search">
             <v-flex xs12 md12 class="px-0">
+              <div class="mb-1">Thủ tục hành chính <span style="color: red"> (*)</span></div>
               <v-autocomplete
                 :items="serviceInfoList"
                 v-model="serviceInfoSearch"
+                return-object
                 ref="autocomplete"
                 :loading="loading"
                 :search-input.sync="keywordSearchSelect"
                 item-text="serviceName"
-                item-value="serviceCode"
+                item-value="serviceConfigId"
                 @change="changeService('search')"
                 clearable
-                label="Chọn thủ tục"
-                box
+                solo flat
               >
                 <template slot="selection" slot-scope="{ item }">
                   <b class="labelCodeItemSelect">{{item.serviceCode}}</b>&nbsp;-&nbsp;{{item.serviceName}}
@@ -60,29 +61,29 @@
               </v-autocomplete>
             </v-flex>
             <v-flex xs12 md6 class="px-0 pr-2">
+              <div class="mb-1">Trường hợp <span style="color: red"> (*)</span></div>
               <v-autocomplete
                 :items="optionListSearch"
                 v-model="optionSearch"
-                label="Chọn trường hợp"
                 item-text="optionName"
                 item-value="templateNo"
                 return-object
                 :hide-selected="true"
-                box
+                solo flat
                 clearable
                 @change="changeOptionSearch"
               ></v-autocomplete>
             </v-flex>
             <v-flex xs12 sm6 class="px-0 pl-2">
+              <div class="mb-1">Loại giấy tờ <span style="color: red"> (*)</span></div>
               <v-autocomplete
                 :items="fileTemplateListSearch"
                 v-model="fileTemplateNo"
-                label="Chọn loại giấy tờ"
                 item-text="partName"
                 item-value="fileTemplateNo"
                 :hide-selected="true"
                 clearable
-                box
+                solo flat
               ></v-autocomplete>
             </v-flex>
             <v-flex class="text-right">
@@ -299,7 +300,7 @@
       keywordSearchSelect(val) {
         let vm = this
         if (vm.serviceInfoList.length) {
-          if (val && val !== vm.serviceInfoSearch) {
+          if (val && val !== vm.serviceInfoSearch['serviceName']) {
             if (vm.timeOutSearch) {
               clearTimeout(vm.timeOutSearch);
             }
@@ -515,7 +516,7 @@
           if (vm.serviceInfoSearch) {
             console.log('vm.serviceInfoSearch', vm.serviceInfoSearch)
             let exits = vm.serviceInfoList.find(function (item) {
-              return item.serviceCode === vm.serviceInfoSearch
+              return item.serviceCode === vm.serviceInfoSearch['serviceCode']
             })
             let filter = {
               serviceConfigId: exits ? exits.serviceConfigId : ''
@@ -532,14 +533,14 @@
             })
             // 
             let filer2 = {
-              keyword: vm.serviceInfoSearch
+              keyword: vm.serviceInfoSearch['serviceName']
             }
             vm.$store.dispatch('getServiceInfos', filer2).then(function (result) {
               let serviceList = result.data
               let service = serviceList.find(function (item) {
-                return item.serviceCode == vm.serviceInfoSearch
+                return item.serviceCode == vm.serviceInfoSearch['serviceCode']
               })
-              vm.serviceCodeDvcqg = service['serviceCodeDVCQG'] ? service['serviceCodeDVCQG'] : vm.serviceInfoSearch
+              vm.serviceCodeDvcqg = service['serviceCodeDVCQG'] ? service['serviceCodeDVCQG'] : vm.serviceInfoSearch['serviceCode']
             }).catch(function () {
             })
             // 

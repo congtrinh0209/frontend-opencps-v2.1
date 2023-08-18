@@ -305,6 +305,12 @@
                     <span style="font-size:13px !important">Quét để thanh toán</span>
                   </v-chip>
                 </div>
+                <div class="d-inline-block py-2 ml-3" v-if="thanhToanQuetVietQR && urlVietQR" style="position:relative;text-align: center;">
+                  <img class="logo" :src="urlVietQR" width="175" style="display: flex">
+                  <v-chip class="my-0 ml-1" color="#3b5ab5" text-color="white" style="width:135px;margin-top:-5px !important">
+                    <span style="font-size:13px !important">Quét để thanh toán</span>
+                  </v-chip>
+                </div>
                 <!--  -->
               </div>
             </v-card>
@@ -442,7 +448,9 @@
       isMobile: false,
       two_system: true,
       paymentInfo: false,
-      configDongThap: false
+      configDongThap: false,
+      thanhToanQuetVietQR: false,
+      urlVietQR: '',
     }),
     computed: {
       secretCode () {
@@ -464,6 +472,10 @@
     },
     created () {
       let vm = this
+      try {
+        vm.thanhToanQuetVietQR = thanhToanQuetVietQR
+      } catch (error) {
+      }
       try {
         vm.votingVersion = votingVersion
       } catch (error) {
@@ -508,6 +520,22 @@
             vm.xacthuc_BNG = true
           }
         } catch (error) {
+        }
+        if (vm.thanhToanQuetVietQR && vm.dossierDetail.dossierId) {
+          var settings = {
+            "url": "/o/pgi/vietqr/qrcode?dossierId=" + vm.dossierDetail.dossierId,
+            "method": "GET",
+            "headers": {
+              "groupId": window.themeDisplay.getScopeGroupId(),
+              "Accept": "application/json"
+            }
+          };
+
+          $.ajax(settings).done(function (response) {
+            vm.urlVietQR = response && response.qrcode_url ? response.qrcode_url : ''
+          }).catch(function () {
+            vm.urlVietQR = ""
+          })
         }
       })
     },
