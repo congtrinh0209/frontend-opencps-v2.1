@@ -13,10 +13,15 @@ export const store = new Vuex.Store({
     isMobile: false,
     userLogin: '',
     submissionNote: '',
-    thongTinChiTietHoSo: null
+    thongTinChiTietHoSo: null,
+    dialogState: false,
+    payloadDialogs: {}
   },
   actions: {
-    loadInitResource ({commit, state}) {
+    loadInitResource({
+      commit,
+      state
+    }) {
       return new Promise((resolve, reject) => {
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
           state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
@@ -36,7 +41,10 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    getFileItems ({commit, state}, filter) {
+    getFileItems({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -56,10 +64,13 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getDanhMuc ({commit, state}, filter) {
+    getDanhMuc({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -76,10 +87,13 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    loadDictItems ({ commit, state }, data) {
+    loadDictItems({
+      commit,
+      state
+    }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -95,10 +109,13 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getFileItemsFromDvc ({commit, state}, filter) {
+    getFileItemsFromDvc({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -120,10 +137,13 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getApplicantDocument ({commit, state}, filter) {
+    getApplicantDocument({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -148,12 +168,10 @@ export const store = new Vuex.Store({
               if (Array.isArray(response['data']['data'])) {
                 resolve(response.data)
               } else {
-                resolve(
-                  {
-                    data: [response['data']['data']],
-                    total: response['data']['total']
-                  }
-                )
+                resolve({
+                  data: [response['data']['data']],
+                  total: response['data']['total']
+                })
               }
             } else {
               reject(response)
@@ -161,10 +179,13 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getApplicantDocumentFromDvc ({commit, state}, filter) {
+    getApplicantDocumentFromDvc({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -193,12 +214,10 @@ export const store = new Vuex.Store({
               if (Array.isArray(response['data']['data'])) {
                 resolve(response.data)
               } else {
-                resolve(
-                  {
-                    data: [response['data']['data']],
-                    total: response['data']['total']
-                  }
-                )
+                resolve({
+                  data: [response['data']['data']],
+                  total: response['data']['total']
+                })
               }
             } else {
               reject(response)
@@ -206,10 +225,13 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getFileAttachProxy ({commit, state}, filter) {
+    getFileAttachProxy({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -222,7 +244,7 @@ export const store = new Vuex.Store({
         dataPost.append('url', '/applicantdatas/' + filter.applicantDataId + '/preview')
         dataPost.append('dataType', 'binary')
         dataPost.append('data', '')
-        
+
         axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
           let url = window.URL.createObjectURL(response.data)
           resolve(url)
@@ -231,7 +253,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getFileAttach ({commit, state}, filter) {
+    getFileAttach({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -247,7 +272,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    deleteUser ({commit, state}, filter) {
+    deleteUser({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -262,7 +290,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    addUser ({commit, state}, filter) {
+    addUser({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -284,7 +315,7 @@ export const store = new Vuex.Store({
         dataPutUser.append('districtName', filter['districtName'])
         dataPutUser.append('wardCode', filter['wardCode'])
         dataPutUser.append('wardName', filter['wardName'])
-        
+
         axios.post(url, dataPutUser, param).then(result1 => {
           resolve(result1)
         }).catch(err => {
@@ -292,7 +323,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    putUser ({commit, state}, filter) {
+    putUser({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -321,7 +355,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    putVerification ({commit, state}, filter) {
+    putVerification({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -338,7 +375,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    makeImageCapLogin ({commit, state}) {
+    makeImageCapLogin({
+      commit,
+      state
+    }) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -357,7 +397,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    goToDangNhap({ commit, state }, filter) {
+    goToDangNhap({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let configs = {
@@ -375,7 +418,7 @@ export const store = new Vuex.Store({
               setTimeout(function () {
                 window.location.href = window.location.origin + '/web/kho-dien-tu#/so-hoa-giay-to'
               }, 200)
-              
+
             } else if (response.data === 'captcha') {
               if (filter.j_captcha_response && response['status'] !== undefined && response['status'] === 203) {
                 toastr.error("Mã captcha không chính xác")
@@ -386,116 +429,135 @@ export const store = new Vuex.Store({
               toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
             } else {
               resolve('fail')
-              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", {
+                autoClose: 2000
+              });
             }
           }).catch(function (error) {
             reject(error)
-            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", {
+              autoClose: 2000
+            });
           })
         })
       })
     },
     // 
-    addGiayToLuTru ({commit, state}, filter) {
+    addGiayToLuTru({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let data = JSON.stringify(filter.data)
         let config = {
           method: 'post',
           url: `/o/systemintegration/${filter.collection}`,
-          headers: { 
+          headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json', 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'Token': Liferay.authToken
           },
-          data : data
+          data: data
         };
-        
+
         axios.request(config)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
-    updateGiayToLuTru ({commit, state}, filter) {
+    updateGiayToLuTru({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let data = JSON.stringify(filter.data)
         let config = {
           method: 'put',
           url: `/o/systemintegration/${filter.collection}/${filter.primKey}`,
-          headers: { 
+          headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json', 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'Token': Liferay.authToken
           },
-          data : data
+          data: data
         };
-        
+
         axios.request(config)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
-    deleteGiayToLuTru ({commit, state}, filter) {
+    deleteGiayToLuTru({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let config = {
           method: 'delete',
           url: `/o/systemintegration/${filter.collection}/${filter.primKey}`,
-          headers: { 
+          headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json', 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'Token': Liferay.authToken
           }
         };
-        
+
         axios.request(config)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
-    cloneMyStorage ({commit, state}, filter) {
+    cloneMyStorage({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let data = JSON.stringify(filter)
         let config = {
           method: 'put',
           url: `/o/systemintegration/${filter.collection}/clone`,
-          headers: { 
+          headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json', 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'Token': Liferay.authToken
           },
-          data : data
+          data: data
         };
-        
+
         axios.request(config)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
-    getDanhMuc ({commit, state}, filter) {
+    getDanhMuc({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
             groupId: window.themeDisplay.getScopeGroupId(),
-            'Accept': 'application/json', 
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
           params: {
@@ -517,12 +579,15 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDonVi ({commit, state}, filter) {
+    getDonVi({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
             groupId: window.themeDisplay.getScopeGroupId(),
-            'Accept': 'application/json', 
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
           params: {
@@ -542,13 +607,16 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getGiayToKhoCaNhan ({commit, state}, filter) {
+    getGiayToKhoCaNhan({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: window.themeDisplay.getScopeGroupId(),
-              'Accept': 'application/json', 
+              'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
             params: {
@@ -557,14 +625,15 @@ export const store = new Vuex.Store({
               coQuanBanHanh_MaDinhDanh: filter.coQuanBanHanh_MaDinhDanh ? filter.coQuanBanHanh_MaDinhDanh : '',
               mauGiayTo_MaMuc: filter.mauGiayTo_MaMuc ? filter.mauGiayTo_MaMuc : '',
               hieuLucGiayTo_MaMuc: filter.hieuLucGiayTo_MaMuc,
-              keyword: filter.keyword ? filter.keyword : '',
+              keyword: filter.soHieuGiayTo || filter.keyword || '',
               ngayBanHanh_TuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
               ngayBanHanh_DenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
               orderFields: 'ThoiGianTao',
               orderType: 'desc',
               cccdmst: filter.cccd ? filter.cccd : '',
               trangThaiChiaSe: filter.trangThaiChiaSe,
-              receiveDvcqg: filter.receiveDvcqg
+              receiveDvcqg: filter.receiveDvcqg,
+              hoSoDichVuCong: filter.hoSoDichVuCong ? filter.hoSoDichVuCong : '',
             },
             data: {}
           }
@@ -577,16 +646,19 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getChiTietGiayToCaNhan ({commit, state}, filter) {
+    getChiTietGiayToCaNhan({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: window.themeDisplay.getScopeGroupId(),
-              'Accept': 'application/json', 
+              'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
             params: {},
@@ -598,10 +670,13 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    uploadTep ({commit, state}, filter) {
+    uploadTep({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -611,20 +686,23 @@ export const store = new Vuex.Store({
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
-        
+
           let dataCreateFile = new FormData()
           let url = '/o/systemintegration/giaytoluutruso/upload/file'
           dataCreateFile.append('file', filter.file)
-          
+
           axios.post(url, dataCreateFile, param).then(result => {
             resolve(result.data.resp)
           }).catch(xhr => {
             reject(xhr)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getTepDuLieu ({commit, state}, filter) {
+    getTepDuLieu({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -642,87 +720,99 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
 
     // api call trực tiếp sang hệ thống khogiayto
-    addGiayToLuTru_HeThongKhoGT ({commit, state}, filter) {
+    addGiayToLuTru_HeThongKhoGT({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let data = JSON.stringify(filter.data)
         let config = {
           method: 'post',
           url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0',
-          headers: { 
+          headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          data : data
+          data: data
         };
         axios(config)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
-    updateGiayToLuTru_HeThongKhoGT ({commit, state}, filter) {
+    updateGiayToLuTru_HeThongKhoGT({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let data = JSON.stringify(filter.data)
         let config = {
           method: 'put',
           url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/' + filter.primKey,
-          headers: { 
+          headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json', 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'Token': Liferay.authToken
           },
-          data : data
+          data: data
         };
-        
+
         axios(config)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
-    deleteGiayToLuTru_HeThongKhoGT ({commit, state}, filter) {
+    deleteGiayToLuTru_HeThongKhoGT({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let config = {
           method: 'delete',
           url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/' + filter.primKey,
-          headers: { 
+          headers: {
             'groupId': window.themeDisplay.getScopeGroupId(),
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json', 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'Token': Liferay.authToken
           }
         };
-        
+
         axios(config)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
-    getGiayToKhoCaNhan_HeThongKhoGT ({commit, state}, filter) {
+    getGiayToKhoCaNhan_HeThongKhoGT({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let settings = {
           method: 'get',
           url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/opencps/filter',
           headers: {
             groupId: window.themeDisplay.getScopeGroupId(),
-            'Accept': 'application/json', 
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
           params: {
@@ -751,7 +841,10 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getChiTietGiayToCaNhan_HeThongKhoGT ({commit, state}, filter) {
+    getChiTietGiayToCaNhan_HeThongKhoGT({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -759,7 +852,7 @@ export const store = new Vuex.Store({
             url: 'http://119.17.200.69:8004/publicadministrativemgt/internal/giaytocanhantochuc/1.0/' + filter.primKey,
             headers: {
               groupId: window.themeDisplay.getScopeGroupId(),
-              'Accept': 'application/json', 
+              'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
             params: {},
@@ -771,17 +864,20 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        }).catch(function (){})
+        }).catch(function () {})
       })
     },
-    getDanhMuc_HeThongKhoGT ({commit, state}, filter) {
+    getDanhMuc_HeThongKhoGT({
+      commit,
+      state
+    }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
           method: 'get',
           url: 'http://119.17.200.69:8004/drivemgt/internal/' + filter.tenDanhMuc + '/1.0/filter',
           headers: {
             groupId: window.themeDisplay.getScopeGroupId(),
-            'Accept': 'application/json', 
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
           params: {
@@ -803,26 +899,61 @@ export const store = new Vuex.Store({
         })
       })
     },
+
+    getCapacityAction({
+      commit,
+      state
+    }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            method: 'get',
+            params: filter,
+            url: '/o/systemintegration/info/giaytoluutruso'
+          }
+
+          axios(config).then(function (response) {
+            resolve(response.data)
+          }, error => {
+            reject(error)
+          })
+        }).catch(function () {})
+      })
+    }
+
   },
   mutations: {
-    setLoading (state, payload) {
+    setLoading(state, payload) {
       state.loading = payload
     },
-    setSubmissionNote(state, payload){
+    setSubmissionNote(state, payload) {
       state.submissionNote = payload
     },
-    setThongTinChiTietHoSo(state, payload){
+    setThongTinChiTietHoSo(state, payload) {
       state.thongTinChiTietHoSo = payload
     },
+    SET_STATE_DIALOG(state, payload) {
+      console.log("state:", state, payload)
+      state.dialogState = true
+      state.payloadDialogs = {
+        ...payload
+      }
+    },
+    CLOSE_DIALOG(state) {
+      state.dialogState = false
+    }
   },
   getters: {
-    loading (state) {
+    loading(state) {
       return state.loading
     },
     submissionNote(state) {
       return state.submissionNote
     },
-    thongTinChiTietHoSo (state) {
+    thongTinChiTietHoSo(state) {
       return state.thongTinChiTietHoSo
     },
   }
