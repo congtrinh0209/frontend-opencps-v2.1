@@ -37,14 +37,14 @@
               required
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 md6 class="py-0">
+          <v-flex xs12 :class="khoTaiLieuTapTrung ? 'py-0 md6' : 'py-0'">
             <div class="mb-1">Số hiệu giấy tờ <span style="color: red"> (*)</span></div>
             <v-text-field label="Số hiệu giấy tờ" v-model="soHieuGiayToStorage" solo flat
             :rules="[v => !!v || 'Thông tin bắt buộc']"
             required
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 md6 class="py-0">
+          <v-flex xs12 md6 class="py-0" v-if="khoTaiLieuTapTrung">
             <div class="mb-1">Loại văn bản điện tử <span style="color: red"> (*)</span></div>
             <v-autocomplete
               :items="loaiVanBanList"
@@ -60,6 +60,7 @@
           <v-flex xs12 class="py-0">
             <div class="mb-1">Cơ quan ban hành <span style="color: red"> (*)</span></div>
             <v-autocomplete
+              v-if="khoTaiLieuTapTrung"
               :items="donViList"
               v-model="coQuanBanHanhStorage"
               ref="autocomplete1"
@@ -81,6 +82,10 @@
                 </div>
               </template>
             </v-autocomplete>
+            <v-text-field v-else v-model="coQuanBanHanhStorage" solo flat
+            :rules="[v => !!v || 'Thông tin bắt buộc']"
+            required
+            ></v-text-field>
           </v-flex>
           <v-flex xs12 md6 class="py-0">
             <div class="mb-1">Ngày ban hành</div>
@@ -102,7 +107,7 @@
               clearable
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 class="py-0">
+          <v-flex xs12 class="py-0" v-if="khoTaiLieuTapTrung">
             <div class="mb-1">Hiệu lực giấy tờ <span style="color: red"> (*)</span></div>
             <v-autocomplete
               :items="statusList"
@@ -118,7 +123,14 @@
         </v-layout>
       </v-form>
       <v-flex class="mb-3">
-        <v-btn class="" color="primary" @click.native="addKhoCaNhanTapTrung"
+        <v-btn v-if="khoTaiLieuTapTrung" class="" color="primary" @click.native="addKhoCaNhanTapTrung"
+          :loading="loading"
+          :disabled="loading"
+        >
+          <v-icon>save</v-icon> &nbsp;
+          Đồng ý
+        </v-btn>
+        <v-btn v-else class="mr-3" color="primary" @click.native="addApplicantData"
           :loading="loading"
           :disabled="loading"
         >
@@ -162,7 +174,8 @@
       expireDateStorage: "",
       statusList: [],
       statusCreate: "",
-      loading: false
+      loading: false,
+      khoTaiLieuTapTrung: false
     }),
     computed: {
       originality () {
@@ -180,6 +193,10 @@
     created () {
       let vm = this
       let currentQuery = vm.$router.history.current.query
+      try {
+        vm.khoTaiLieuTapTrung = khoTaiLieuTapTrung
+      } catch (error) {
+      }
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -218,9 +235,13 @@
         vm.tenGiayToStorage = vm.partKhoGiayTo.partName
         vm.applicantIdNoToStorage = vm.thongTinHoSo['applicantIdNo']
         vm.applicantNameToStorage = vm.thongTinHoSo['applicantName']
-        vm.searchItemsDonVi()
-        vm.getLoaiGiayTo()
-        vm.getHieuLuc()
+        if (vm.khoTaiLieuTapTrung) {
+          vm.searchItemsDonVi()
+          vm.getLoaiGiayTo()
+          vm.getHieuLuc()
+        } else {
+          vm.coQuanBanHanhStorage = vm.thongTinHoSo.govAgencyName
+        }
       },
       validate () {
         return this.$refs.formStorageKqxl.validate()
@@ -270,6 +291,52 @@
             vm.statusList = []
           }
         }).catch(function () {
+        })
+      },
+      addApplicantData () {
+        let vm = this
+        vm.loading = true
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let dataCreateFile = new FormData()
+        let url = '/o/rest/v2/applicantdatas'
+        dataCreateFile.append('fileTemplateNo', vm.partKhoGiayTo.fileTemplateNo)
+        dataCreateFile.append('status', 1)
+        dataCreateFile.append('fileNo', vm.soHieuGiayToStorage)
+        dataCreateFile.append('fileName', vm.tenGiayToStorage)
+        dataCreateFile.append('applicantIdNo', vm.applicantIdNoToStorage)
+        dataCreateFile.append('file', '')
+        dataCreateFile.append('fileEntryId', vm.fileKhoGiayTo.hasOwnProperty('fileEntryId') ? vm.fileKhoGiayTo.fileEntryId : '')
+        dataCreateFile.append('applicantName', vm.applicantNameToStorage)
+        dataCreateFile.append('govAgencyName', vm.coQuanBanHanhStorage)
+        dataCreateFile.append('serviceCode', vm.thongTinHoSo['serviceCode'])
+        dataCreateFile.append('templateNo', vm.partKhoGiayTo.fileTemplateNo)
+        dataCreateFile.append('issueDate', vm.createDateStorage)
+        dataCreateFile.append('expireDate', vm.expireDateStorage)
+        dataCreateFile.append('desciption', '')
+        dataCreateFile.append('dossierNo', '')
+          
+        axios.post(url, dataCreateFile, param).then(result1 => {
+          vm.loading = false
+          vm.dialog_add_giayto = false
+          if (vm.originality == 3) {
+            toastr.success('Số hóa giấy tờ thành công')
+          } else {
+            toastr.success('Lưu giấy tờ vào kho thành công')
+          }
+          vm.$emit('callBackSoHoaGiayTo', response.data.resp)
+        }).catch(xhr => {
+          vm.loading = false
+          if (vm.originality == 3) {
+            toastr.error('Số hóa giấy tờ thất bại')
+          } else {
+            toastr.error('Lưu giấy tờ vào kho thất bại')
+          }
         })
       },
       addKhoCaNhanTapTrung () {
@@ -444,13 +511,21 @@
         vm.loading = true
         axios.request(config)
         .then((response) => {
-          toastr.success('Số hóa giấy tờ thành công')
+          if (vm.originality == 3) {
+            toastr.success('Số hóa giấy tờ thành công')
+          } else {
+            toastr.success('Lưu giấy tờ vào kho thành công')
+          }
           vm.loading = false
           vm.$emit('callBackSoHoaGiayTo', response.data.resp)
         })
         .catch((error) => {
           vm.loading = false
-          toastr.error('Số hóa giấy tờ thất bại')
+          if (vm.originality == 3) {
+            toastr.error('Số hóa giấy tờ thất bại')
+          } else {
+            toastr.error('Lưu giấy tờ vào kho thất bại')
+          }
         })
       },
       visibilityChangedDonVi (e) {

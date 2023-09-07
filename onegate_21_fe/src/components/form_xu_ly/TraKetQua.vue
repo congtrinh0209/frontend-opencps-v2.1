@@ -25,12 +25,14 @@
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
                         <!--  -->
-                        <v-btn title="Số hóa giấy tờ" class="my-0" flat icon color="indigo"
-                          v-if="originality == '3' && !onlyView && khoTaiLieuTapTrung && yeuCauSoHoa && 
-                          (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                        <v-btn class="my-0 ml-2" small color="primary" style="height: 24px;"
+                          v-if="(khoTaiLieuTapTrung || khoTaiLieuCongDan) && 
+                          (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                           @click.stop="showAddStorage(item, itemFileView)"
                         >
-                          <v-icon size="18" color="primary">drive_file_move</v-icon>
+                          <v-icon size="18" class="white--text">folder_shared</v-icon> &nbsp;
+                          <span v-if="originality == 1">Lưu giấy tờ vào kho</span>
+                          <span v-else>Số hóa</span>
                         </v-btn>
                         <!--  -->
                       </div>
@@ -134,6 +136,7 @@
       fileKhoGiayTo: '',
       yeuCauSoHoa: false,
       khoTaiLieuTapTrung: false,
+      khoTaiLieuCongDan: false,
       srcDownload: '',
       dossierTemplateItems: [],
       dossierMarksItems: [],
@@ -196,10 +199,18 @@
         vm.khoTaiLieuTapTrung = khoTaiLieuTapTrung
       } catch (error) {
       }
+      try {
+        vm.khoTaiLieuCongDan = khoTaiLieuCongDan
+      } catch (error) {
+      }
       vm.$nextTick(function () {
         if (vm.detailDossier['dossierId']) {
-          vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
-            vm.dossierFilesItems = resFiles
+          var arrTemp = []
+          arrTemp.push(vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId))
+          arrTemp.push(vm.$store.dispatch('loadDossierTemplates', vm.detailDossier))
+          Promise.all(arrTemp).then(values => {
+            let dossierFiles = values[0]
+            vm.dossierFilesItems = dossierFiles
             let arr = []
             for (let key in vm.createFiles) {
               let exits = arr.filter(function (item) {
@@ -209,8 +220,14 @@
                 arr.push(vm.createFiles[key])
               }
             }
+            let dossierPart = values[1]['dossierParts']
+            arr.forEach(element => {
+              let part = dossierPart.find(function (item) {
+                return item.partNo === element.dossierPartNo
+              })
+              element['partName'] = part.partName
+            });
             vm.createFiles = arr
-          }).catch(reject => {
           })
         }
       })
@@ -439,19 +456,65 @@
         vm.dialog_add_giayto = false
         console.log('fileKhoGiayTo', vm.fileKhoGiayTo)
         console.log('dossierFilesItems', vm.dossierFilesItems)
-        let filter = {
-          dossierId: vm.detailDossier.dossierId,
-          referenceUid: vm.fileKhoGiayTo.referenceUid,
-          url: '{urlKhoSoHoa}/' + data.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
-        }
-        vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
-          setTimeout(function () {
+        if (vm.khoTaiLieuTapTrung) {
+          let filter = {
+            dossierId: vm.detailDossier.dossierId,
+            referenceUid: vm.fileKhoGiayTo.referenceUid,
+            url: '{urlKhoSoHoa}/' + data.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
+          }
+          vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
+            setTimeout(function () {
+              if (vm.originality == 3) {
+                let params = {
+                  dossierId: vm.detailDossier.dossierId,
+                  referenceUid: vm.fileKhoGiayTo.referenceUid,
+                  payload: {
+                    isTaiSuDung: 3
+                  }
+                }
+                vm.$store.dispatch('updateDossierFile', params).then(result => {
+                  setTimeout(function () {
+                    vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+                      vm.dossierFilesItems = resFiles
+                    }).catch(reject => {
+                    })
+                  }, 200)
+                }).catch(reject => {
+                })
+              } else {
+                vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+                  vm.dossierFilesItems = resFiles
+                }).catch(reject => {
+                })
+              }
+            }, 200)
+          })
+        } else {
+          if (vm.originality == 3) {
+            let params = {
+              dossierId: vm.detailDossier.dossierId,
+              referenceUid: vm.fileKhoGiayTo.referenceUid,
+              payload: {
+                isTaiSuDung: 3
+              }
+            }
+            vm.$store.dispatch('updateDossierFile', params).then(result => {
+              setTimeout(function () {
+                vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+                  vm.dossierFilesItems = resFiles
+                }).catch(reject => {
+                })
+              }, 200)
+            }).catch(reject => {
+            })
+          } else {
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
             })
-          }, 200)
-        })
+          }
+        }
+        
       },
       checkStyle (item) {
         return 'calc(100% - ' + 50 + 'px)'

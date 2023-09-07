@@ -233,19 +233,6 @@
                     {{groupDossierName}}
                   </span>
                 </div>
-                <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
-                  v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
-                  String(thongTinChiTietHoSo.dossierNote).indexOf('<br/>') < 0 &&String(thongTinChiTietHoSo.dossierNote).indexOf('</br>') < 0">
-                  Ghi chú:
-                </div>
-                <!-- brief note -->
-                <!-- <div class="xs12 sm12 pb-1 overHidden">
-                  <span class="pr-2">Nội dung: </span>
-                  <v-tooltip top v-if="thongTinChiTietHoSo.briefNote">
-                    <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.briefNote}}</span>
-                    <span class="pl-0">{{thongTinChiTietHoSo.briefNote}} </span>
-                  </v-tooltip>
-                </div> -->
               </v-flex>
               <v-flex xs12 sm4 v-else style="word-break: break-word;">
                 <div class="xs12 sm12 pb-1" style="color:#0b72ba" 

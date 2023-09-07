@@ -1098,7 +1098,10 @@ export const store = new Vuex.Store({
             axios.get(filter.api, param).then(function (result) {
               if (result.data) {
                 let dataMapping = []
-                let dataOutput = result.data.data
+                let resData = result.data.hasOwnProperty('data') ? result.data.data : result.data
+                let dataOutput = resData.filter(function (item) {
+                  return item.scope === filter.code
+                })
                 if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
                   for (let index in dataOutput) {
                     let x = {

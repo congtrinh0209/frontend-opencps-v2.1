@@ -1,8 +1,8 @@
 <template>
   <div style="padding: 0px 0px; max-width: 1500px; margin: 0px auto;border-radius: 12px" class="pb-3" id="top-header">
     <v-layout wrap>
-      <v-flex class="px-2">
-        <v-card v-if="!showDetail" class="px-3 py-3" style="width: 100%; background: #ffffff;">
+      <v-flex class="px-0">
+        <v-card v-if="!showDetail" class="px-0 py-3" style="width: 100%; background: #ffffff;">
           <v-layout wrap>
             <v-flex>
             </v-flex>

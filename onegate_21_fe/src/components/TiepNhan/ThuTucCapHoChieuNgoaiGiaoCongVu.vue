@@ -250,7 +250,7 @@
                         
                     >
                         <template slot="items" slot-scope="props">
-                        <tr v-if="(props.item.dossierPartNo != 'TP01' && props.item.dossierPartNo != 'TP02') && props.item.partType === 1">
+                        <tr v-if="(doAction || (!doAction && props.item.dossierPartNo != 'TP01' && props.item.dossierPartNo != 'TP02')) && props.item.partType === 1">
                             <td>          
                                 <v-checkbox
                                     v-model="selected"
@@ -2244,9 +2244,13 @@ export default {
             axios.request(config).then(res => {
                 let data = res.data.data
                 if(data.length){
-                    vm.dossierFileAttach = data.filter(function (item) {
-                        return !item.eForm
-                    })
+                    if (!vm.doAction) {
+                        vm.dossierFileAttach = data.filter(function (item) {
+                            return !item.eForm
+                        })
+                    } else {
+                        vm.dossierFileAttach = data
+                    }
                     for(let i =0; i<data.length; i++){
                         let tg = {
                             partNo: data[i]['dossierPartNo'],
@@ -2262,7 +2266,8 @@ export default {
                                 vm.listThanhVien = formData.thanh_vien_doan
                             }
                             if (vm.doAction && !formData.thanh_vien_doan) {
-                                vm.fillTableThanhVien(formData, '')
+                                vm.fillTableThanhVien(formData, '');
+                                vm.fillTableVanBan(formData)
                             }
                         }
                         if(data[i]['dossierPartNo'] === 'TP02'){

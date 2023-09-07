@@ -47,6 +47,8 @@
                   <div class="header__tphs" style="text-align: justify;">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
                       <span slot="activator">
+                        <span style="font-weight: 500;">{{item.hasOwnProperty('fileTemplateNoDVCQG') && item.fileTemplateNoDVCQG ? item.fileTemplateNoDVCQG : item.fileTemplateNo}}</span>
+                        <span v-if="(item.hasOwnProperty('fileTemplateNoDVCQG') && item.fileTemplateNoDVCQG) || item.fileTemplateNo"> - </span>
                         {{item.partName}}
                         <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
                         <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
@@ -54,7 +56,10 @@
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
                     <span v-else>
-                      {{item.partName}} <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
+                      <span style="font-weight: 500;">{{item.hasOwnProperty('fileTemplateNoDVCQG') && item.fileTemplateNoDVCQG ? item.fileTemplateNoDVCQG : item.fileTemplateNo}}</span>
+                      <span v-if="(item.hasOwnProperty('fileTemplateNoDVCQG') && item.fileTemplateNoDVCQG) || item.fileTemplateNo"> - </span>
+                      {{item.partName}} 
+                      <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
                       <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                     </span>
                     <!-- <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
@@ -98,7 +103,7 @@
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
                   <span>Chỉnh sửa lý do</span>
                 </v-tooltip>
-                <div class="mt-0" v-for="(itemFileView, index) in dossierFilesItems" :key="index" 
+                <div class="mt-1" v-for="(itemFileView, index) in dossierFilesItems" :key="index" 
                   v-if="item.partNo === itemFileView.dossierPartNo" :style="loadingFile ? 'opacity: 0.6' : ''">
                   <div v-if="originality === 1 && itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView, index)" class="ml-1" style="cursor: pointer;">
@@ -114,14 +119,16 @@
                     </v-btn>
 
                     <v-btn class="my-0" title="Ký số giấy tờ" flat icon color="indigo" name="Ký số"
-                      v-if="originality === 1 && !onlyView && showKySo && !kySoSavis" 
+                      v-if="originality === 1 && !onlyView && showKySo && !kySoSavis && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="mySignViettel(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
                     </v-btn>
                     <!--  -->
                     <v-btn title="Ký số giấy tờ" class="my-0" flat icon color="indigo" name="Ký số"
-                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck != 1 && kySoSavis" 
+                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck != 1 && kySoSavis && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)"
                       @click.stop="kySoPdfUrlSavis(itemFileView, index)"
                     >
                       <v-icon size="18">fa fa-pencil-square-o</v-icon>
@@ -133,10 +140,11 @@
                     </v-btn>
 
                     <v-menu @click.native.stop right offset-y 
-                      transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
-                      v-if="originality === 3 && showKySoMotCua && String(itemFileView.fileType).toLowerCase() === 'pdf'">
-                      <v-btn slot="activator" flat icon color="indigo" name="Ký số">
-                        <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                      transition="slide-x-transition" 
+                      v-if="originality === 3 && showKySoMotCua && String(itemFileView.fileType).toLowerCase() === 'pdf' &&
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)">
+                      <v-btn slot="activator" small color="primary" name="Ký số" style="height: 24px;">
+                        <v-icon size="16">fa fa-pencil-square-o</v-icon>&nbsp; Ký số
                       </v-btn>
                       <v-list>
                         <v-list-tile>
@@ -167,26 +175,30 @@
                       </v-list>
                     </v-menu>
                     <!--  -->
-                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
-                      v-if="applicantId && !onlyView && khoTaiLieuCongDan && !khoTaiLieuTapTrung && yeuCauSoHoa" 
+                    <v-btn class="my-0" small color="primary" style="height: 24px;"
+                      v-if="khoTaiLieuCongDan && !khoTaiLieuTapTrung && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                      <v-icon size="18" class="white--text">folder_shared</v-icon> &nbsp; 
+                      <span v-if="originality == 1">Lưu giấy tờ vào kho</span>
+                      <span v-else>Số hóa</span>
                     </v-btn>
-                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
-                      v-if="applicantId && !onlyView && khoTaiLieuTapTrung && originality == '1' &&
-                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                    <v-btn class="my-0" small color="primary" style="height: 24px;"
+                      v-if="khoTaiLieuTapTrung && originality == '1' &&
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                      <v-icon size="18" class="white--text">folder_shared</v-icon> &nbsp;
+                      <span>Lưu giấy tờ vào kho</span>
                     </v-btn>
                     <!--  -->
-                    <v-btn title="Số hóa giấy tờ" class="my-0" flat icon color="indigo"
-                      v-if="originality == '3' && !onlyView && khoTaiLieuTapTrung && yeuCauSoHoa && 
-                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                    <v-btn class="my-0" small color="primary" style="height: 24px;"
+                      v-if="originality == '3' && khoTaiLieuTapTrung && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="18" color="primary">drive_file_move</v-icon>
+                      <v-icon size="18" class="white--text">drive_file_move</v-icon> &nbsp; Số hóa
                     </v-btn>
                     <!--  -->
                   </div>
@@ -213,18 +225,19 @@
                       <span>Ghi chú trên giấy tờ</span>
                     </v-tooltip>
                     <!--  -->
-                    <v-btn title="Ký số giấy tờ đính kèm" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && !onlyView && showKySo  && !kySoSavis && !kySoVnptSmartCa" 
+                    <v-btn class="my-0" small color="primary" style="height: 24px"
+                      v-if="originality === 1 && !onlyView && showKySo  && !kySoSavis && !kySoVnptSmartCa && (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="mySignViettel(itemFileView, index)"
                     >
-                      <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                      <v-icon size="16">fa fa-pencil-square-o</v-icon> &nbsp; Ký số
                     </v-btn>
                     <!--  -->
-                    <v-btn title="Ký số giấy tờ đính kèm" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck != 1 && kySoSavis" 
+                    <v-btn class="my-0" small color="primary" style="height: 24px"
+                      v-if="originality === 1 && !onlyView && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck != 1 && kySoSavis && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="kySoPdfUrlSavis(itemFileView, index)"
                     >
-                      <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                      <v-icon size="16">fa fa-pencil-square-o</v-icon>&nbsp; Ký số
                     </v-btn>
                     <v-btn title="Giấy tờ đã được ký số" class="my-0" flat icon color="green"
                       v-if="originality === 1 && showKySo && String(itemFileView.fileType).toLowerCase() === 'pdf' && itemFileView.signCheck == 1 && kySoSavis" 
@@ -232,18 +245,20 @@
                       <v-icon style="color: green !important" size="18">verified</v-icon>
                     </v-btn>
                     <!--  -->
-                    <v-btn title="Ký số VNPT Smart CA" class="my-0" flat icon color="indigo"
-                      v-if="originality === 1 && kySoVnptSmartCa && String(itemFileView.fileType).toLowerCase() === 'pdf'" 
+                    <v-btn title="Ký số VNPT Smart CA" class="my-0" small color="primary" style="height: 24px"
+                      v-if="originality === 1 && kySoVnptSmartCa && String(itemFileView.fileType).toLowerCase() === 'pdf' && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="showXacThucVnptSmartCa(itemFileView, index)"
                     >
-                      <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                      <v-icon size="16">fa fa-pencil-square-o</v-icon> &nbsp; Ký số
                     </v-btn>
                     <!--  -->
                     <v-menu @click.native.stop right offset-y 
-                      transition="slide-x-transition" title="Ký số tài liệu đính kèm" 
-                      v-if="originality === 3 && showKySoMotCua && String(itemFileView.fileType).toLowerCase() === 'pdf'">
-                      <v-btn slot="activator" flat icon color="indigo">
-                        <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                      transition="slide-x-transition"
+                      v-if="originality === 3 && showKySoMotCua && String(itemFileView.fileType).toLowerCase() === 'pdf' && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)">
+                      <v-btn slot="activator" small color="primary" style="height: 24px">
+                        <v-icon size="16">fa fa-pencil-square-o</v-icon> &nbsp; Ký số
                       </v-btn>
                       <v-list>
                         <v-list-tile>
@@ -274,32 +289,31 @@
                       </v-list>
                     </v-menu>
                     <!--  -->
-                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
-                      v-if="applicantId && !onlyView && khoTaiLieuCongDan && !khoTaiLieuTapTrung && yeuCauSoHoa" 
+                    <v-btn class="my-0" small color="primary" style="height: 24px;"
+                      v-if="khoTaiLieuCongDan && !khoTaiLieuTapTrung && 
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)"
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                      <v-icon size="18" class="white--text">folder_shared</v-icon> &nbsp; 
+                      <span v-if="originality == 1">Lưu giấy tờ vào kho</span>
+                      <span v-else>Số hóa</span>
                     </v-btn>
-                    <v-btn title="Lưu giấy tờ vào kho cá nhân" class="my-0" flat icon color="indigo"
-                      v-if="applicantId && !onlyView && khoTaiLieuTapTrung && originality == '1' &&
-                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                    <v-btn class="my-0" small color="primary" style="height: 24px;"
+                      v-if="khoTaiLieuTapTrung && originality == '1' &&
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="18" color="primary">folder_shared</v-icon>
+                      <v-icon size="18" class="white--text">folder_shared</v-icon> &nbsp; 
+                      <span v-if="originality == 1">Lưu giấy tờ vào kho</span>
+                      <span v-else>Số hóa</span>
                     </v-btn>
-                    <v-btn title="Số hóa giấy tờ" class="my-0" flat icon color="indigo"
-                      v-if="originality == '3' && !onlyView && khoTaiLieuTapTrung && yeuCauSoHoa && 
-                      (!itemFileView.hasOwnProperty('url') || !itemFileView.url || (itemFileView.url && itemFileView.url.indexOf('{urlKhoSoHoa}/') !== 0))" 
+                    <v-btn title="Số hóa giấy tờ" class="my-0" small color="primary" style="height: 24px;"
+                      v-if="originality == '3' && khoTaiLieuTapTrung &&
+                      (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
-                      <v-icon size="18" color="primary">drive_file_move</v-icon>
+                      <v-icon size="18" class="white--text">drive_file_move</v-icon> &nbsp; Số hóa
                     </v-btn>
-                    <!-- <v-btn title="Đã lưu vào kho" class="my-0" flat icon color="green"
-                      v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa && giayToDaLuu.indexOf(itemFileView.dossierFileId) == -1" 
-                    >
-                      <v-icon size="18">task_alt</v-icon>
-                    </v-btn> -->
-                    <!--  -->
                   </div>
                 </div>
                 <div v-if="dossierFilesApplicant && dossierFilesApplicant.length" class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" 
@@ -471,7 +485,7 @@
               </v-tooltip>
             </v-flex>
             <!-- <v-flex :style="{width: !onlyView ? (item.hasForm ? '160px' : '120px') : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1"> -->
-              <v-flex style="width: auto" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <v-flex style="width: auto" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input v-if="item['multiple']"
               type="file"
               multiple
@@ -568,15 +582,7 @@
                     <v-icon size="20" color="orange darken-3">storage</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Sử dụng giấy tờ trong kho cá nhân</span>
-              </v-tooltip>
-              <v-tooltip class="pl-1 pt-1" top v-if="!onlyView && applicantId && khoTaiLieuDvcqg">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="showDocumentDvcqg(item, index)" name="Giấy tờ trong kho">
-                  <v-badge>
-                    <v-icon size="18" color="orange darken-3">fas fa fa-clone</v-icon>
-                  </v-badge>
-                </v-btn>
-                <span>Sử dụng giấy tờ từ cổng DVCQG</span>
+                <span>Sử dụng giấy tờ trong kho</span>
               </v-tooltip>
               <!-- <v-tooltip class="pl-1 pt-1" top v-if="originality === 3 && applicantId && !onlyView && khoTaiLieuCongDan && yeuCauSoHoa">
                 <v-btn :disabled="progress_sohoa" slot="activator" icon class="mx-0 my-0" @click="guiYeuCauSoHoa(item, index)">
@@ -696,18 +702,38 @@
     <v-dialog v-model="dialog_documentApplicant" scrollable persistent max-width="1300px">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>Kho giấy tờ, tài liệu <span v-if="khoDvcqg">từ cổng DVCQG</span></v-toolbar-title>
+          <v-toolbar-title>Kho giấy tờ, tài liệu</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="cancelDialogKhoTaiLieu">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text class="py-1" style="min-height: 500px">
-          <kho-tai-lieu-tap-trung v-if="khoTaiLieuTapTrung && !khoDvcqg" ref="khotailieutaptrung" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
-          <kho-tai-lieu v-if="!khoTaiLieuTapTrung && !khoDvcqg"  ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" 
-            :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage">
-          </kho-tai-lieu>
-          <kho-dvcqg ref="khodvcqg" v-if="khoDvcqg" :index="applicantId" :serivceCodeProps="serviceCodeDvcqg" :thanhPhanHoSo="dossierPartAttach" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageDvcqg"></kho-dvcqg>
+        <v-card-text class="pa-0" style="min-height: 500px">
+          <v-tabs icons-and-text v-model="activeTabKho">
+            <v-tabs-slider color="primary"></v-tabs-slider>
+            <v-tab :key="1" href="#tabs-cn" class="px-3">
+              <v-btn flat class="px-0 py-0 mx-0 my-0">
+                Giấy tờ trong kho cá nhân
+              </v-btn>
+            </v-tab>
+            <v-tab :key="2" href="#tabs-dvcqg" class="px-3" v-if="khoTaiLieuDvcqg" @click="showDocumentDvcqg">
+              <v-btn flat class="px-0 py-0 mx-0 my-0">
+                Giấy tờ từ Cổng DVCQG
+              </v-btn>
+            </v-tab>
+            <v-tabs-items v-model="activeTabKho" class="px-3" reverse-transition="fade-transition" transition="fade-transition">
+              <v-tab-item value="tabs-cn" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+                <kho-tai-lieu-tap-trung v-if="khoTaiLieuTapTrung" ref="khotailieutaptrung" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
+                <kho-tai-lieu v-if="!khoTaiLieuTapTrung"  ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" 
+                  :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage">
+                </kho-tai-lieu>
+              </v-tab-item>
+              <v-tab-item v-if="khoTaiLieuDvcqg" value="tabs-dvcqg" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+                <kho-dvcqg ref="khodvcqg" :index="applicantId" :serivceInfo="{'serviceCode' : serviceCodeDvcqg, 'serviceName': thongTinHoSo.serviceName}"
+                 :thanhPhanHoSo="dossierPartAttach" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageDvcqg"></kho-dvcqg>
+              </v-tab-item>
+            </v-tabs-items>
+          </v-tabs>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -1209,14 +1235,14 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 md6 class="py-0">
+              <v-flex xs12 :class="khoTaiLieuTapTrung ? 'py-0 md6' : 'py-0'">
                 <div class="mb-1">Số hiệu giấy tờ <span style="color: red"> (*)</span></div>
                 <v-text-field label="Số hiệu giấy tờ" v-model="soHieuGiayToStorage" solo flat
                 :rules="[v => !!v || 'Thông tin bắt buộc']"
                 required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 md6 class="py-0">
+              <v-flex xs12 md6 class="py-0" v-if="khoTaiLieuTapTrung">
                 <div class="mb-1">Loại văn bản điện tử <span style="color: red"> (*)</span></div>
                 <v-autocomplete
                   :items="loaiVanBanList"
@@ -1232,6 +1258,7 @@
               <v-flex xs12 class="py-0">
                 <div class="mb-1">Cơ quan ban hành <span style="color: red"> (*)</span></div>
                 <v-autocomplete
+                  v-if="khoTaiLieuTapTrung"
                   :items="donViList"
                   v-model="coQuanBanHanhStorage"
                   ref="autocomplete1"
@@ -1253,6 +1280,11 @@
                     </div>
                   </template>
                 </v-autocomplete>
+
+                <v-text-field v-else v-model="coQuanBanHanhStorage" solo flat
+                  :rules="[v => !!v || 'Thông tin bắt buộc']"
+                  required
+                ></v-text-field>
               </v-flex>
               <v-flex xs12 md6 class="py-0">
                 <div class="mb-1">Ngày ban hành</div>
@@ -1274,7 +1306,7 @@
                   clearable
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 class="py-0">
+              <v-flex xs12 class="py-0" v-if="khoTaiLieuTapTrung">
                 <div class="mb-1">Hiệu lực giấy tờ <span style="color: red"> (*)</span></div>
                 <v-autocomplete
                   :items="statusList"
@@ -1412,6 +1444,7 @@ export default {
     'kho-dvcqg': KhoDVCQG
   },
   data: () => ({
+    activeTabKho: 'tabs-cn',
     dialog_add_giayto: false,
     validFormStorage: true,
     partKhoGiayTo: '',
@@ -1433,7 +1466,6 @@ export default {
     loaiVanBanCreate: "",
     createDateStorage: '',
     expireDateStorage: '',
-    giayToDaLuu: '',
     access_token_vnpt: '',
     userSignSmartVnpt: '',
     tranId_vnpt: '',
@@ -1915,6 +1947,8 @@ export default {
         vm.searchItemsDonVi()
         vm.getLoaiGiayTo()
         vm.getHieuLuc()
+      } else {
+        vm.coQuanBanHanhStorage = vm.thongTinHoSo.govAgencyName
       }
     },
     addApplicantData () {
@@ -1937,7 +1971,7 @@ export default {
       dataCreateFile.append('file', '')
       dataCreateFile.append('fileEntryId', vm.fileKhoGiayTo.hasOwnProperty('fileEntryId') ? vm.fileKhoGiayTo.fileEntryId : '')
       dataCreateFile.append('applicantName', vm.thongTinChuHoSo['applicantName'] ? vm.thongTinChuHoSo['applicantName'] : '')
-      dataCreateFile.append('govAgencyName', vm.thongTinHoSo.govAgencyName)
+      dataCreateFile.append('govAgencyName', vm.coQuanBanHanhStorage)
       dataCreateFile.append('serviceCode', vm.thongTinHoSo['serviceCode'])
       dataCreateFile.append('templateNo', vm.partKhoGiayTo.fileTemplateNo)
       dataCreateFile.append('issueDate', vm.createDateStorage)
@@ -1948,9 +1982,25 @@ export default {
       axios.post(url, dataCreateFile, param).then(result1 => {
         vm.progress_sohoa = false
         vm.dialog_add_giayto = false
-        toastr.success('Lưu giấy tờ vào kho thành công')
-        let fileLuu = vm.fileKhoGiayTo + ','
-        vm.giayToDaLuu += fileLuu
+        if (vm.originality == 1) {
+          toastr.success('Lưu giấy tờ vào kho thành công')
+        } else {
+          toastr.success('Số hóa giấy tờ thành công')
+        }
+        
+        if (vm.originality == 3) {
+          let params = {
+            dossierId: vm.thongTinHoSo.dossierId,
+            referenceUid: vm.fileKhoGiayTo.referenceUid,
+            payload: {
+              isTaiSuDung: 3
+            }
+          }
+          vm.$store.dispatch('updateDossierFile', params).then(result => {
+            vm.loadFiles()
+          }).catch(reject => {
+          })
+        }
       }).catch(xhr => {
         vm.progress_sohoa = false
       })
@@ -1961,77 +2011,11 @@ export default {
       if (!valid) {
         return
       }
-      vm.progress_sohoa = true
-      let dataCreate = {
-        "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
-        "TenGiayTo": vm.partKhoGiayTo.partName,
-        "SoHieuVanBan": String(vm.soHieuGiayToStorage).trim(),
-        "NgayBanHanh": vm.convertDateIso(vm.createDateStorage),
-        "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDateStorage),
-        "CoQuanBanHanh": {
-          "MaDinhDanh": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['MaDinhDanh'] : '',
-          "TenGoi": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['TenGoi'] : ''
-        },
-        "HieuLucVanBan": {
-          "MaMuc": vm.statusCreate ? vm.statusCreate['MaMuc'] : '',
-          "TenMuc": vm.statusCreate ? vm.statusCreate['TenMuc'] : ''
-        },
-        "MaMauGiayTo": {
-          "MaMuc": vm.partKhoGiayTo.fileTemplateNo,
-          "TenMuc": vm.partKhoGiayTo.partName
-        },
-        "ChuHoSo": {
-          "MaDinhDanh": "",
-          "TenGoi": ""
-        },
-        "LoaiVanBanDienTu": {
-          "MaMuc": vm.loaiVanBanCreate ? vm.loaiVanBanCreate['MaMuc'] : '',
-          "TenMuc": vm.loaiVanBanCreate ? vm.loaiVanBanCreate['TenMuc'] : ''
-        },
-        "ChuKhoLuuTru": {
-          "MaDinhDanh": "",
-          "TenGoi": ""
-        },
-        "TrangThaiChiaSe": 2,
-        "TepDuLieu": [],
-        "MaDinhDanh": "",
-        "HoSoDichVuCong": {
-          "MaDinhDanh": vm.thongTinHoSo.dossierNo
-        },
-        "SoLanTaiSuDung": 0,
-        "TenLoaiVanBan": {
-          "MaMuc": "",
-          "TenMuc": ""
-        },
-        "TrichYeuVanBan": "",
-        "HoSoLuuTruSo": {
-          "MaDinhDanh": ""
-        },
-        "SoThuTu": 0,
-        "ThuMucLuuTru": {
-          "MaDinhDanh": "",
-          "TenThuMuc": ""
-        },
-        "TrangThaiDuLieu": {
-          "MaMuc": "",
-          "TenMuc": ""
-        },
-        "PhanVungDuLieu": {
-          "MaMuc": "",
-          "TenMuc": ""
-        }
-      }
-      if (vm.originality == 3) {
-        dataCreate = {
+      let action = function () {
+        vm.progress_sohoa = true
+        let dataCreate = {
           "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
-          "MaDinhDanh": "",
           "TenGiayTo": vm.partKhoGiayTo.partName,
-          "MaThamChieu": "",
-          "TenLoaiVanBan": {
-            "MaMuc": "",
-            "TenMuc": ""
-          },
-          "TrichYeuVanBan": "",
           "SoHieuVanBan": String(vm.soHieuGiayToStorage).trim(),
           "NgayBanHanh": vm.convertDateIso(vm.createDateStorage),
           "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDateStorage),
@@ -2043,15 +2027,34 @@ export default {
             "MaMuc": vm.statusCreate ? vm.statusCreate['MaMuc'] : '',
             "TenMuc": vm.statusCreate ? vm.statusCreate['TenMuc'] : ''
           },
-          "LoaiGiayToLuuTru": {
-            "MaMuc": "01",
-            "TenMuc": "Kết quả thủ tục hành chính"
+          "MaMauGiayTo": {
+            "MaMuc": vm.partKhoGiayTo.fileTemplateNo,
+            "TenMuc": vm.partKhoGiayTo.partName
           },
-          "TepDuLieu": [],
+          "ChuHoSo": {
+            "MaDinhDanh": "",
+            "TenGoi": ""
+          },
+          "LoaiVanBanDienTu": {
+            "MaMuc": vm.loaiVanBanCreate ? vm.loaiVanBanCreate['MaMuc'] : '',
+            "TenMuc": vm.loaiVanBanCreate ? vm.loaiVanBanCreate['TenMuc'] : ''
+          },
           "ChuKhoLuuTru": {
             "MaDinhDanh": "",
             "TenGoi": ""
           },
+          "TrangThaiChiaSe": 0,
+          "TepDuLieu": [],
+          "MaDinhDanh": "",
+          "HoSoDichVuCong": {
+            "MaDinhDanh": vm.thongTinHoSo.dossierNo
+          },
+          "SoLanTaiSuDung": 0,
+          "TenLoaiVanBan": {
+            "MaMuc": "",
+            "TenMuc": ""
+          },
+          "TrichYeuVanBan": "",
           "HoSoLuuTruSo": {
             "MaDinhDanh": ""
           },
@@ -2059,44 +2062,6 @@ export default {
           "ThuMucLuuTru": {
             "MaDinhDanh": "",
             "TenThuMuc": ""
-          },
-          "ChiaSeTaiKhoan": [],
-          "ChiaSeVaiTro": [],
-          "GiayToCaNhanToChuc": {
-            "MaDinhDanh": "",
-            "MaMauGiayTo": {
-              "MaMuc": vm.partKhoGiayTo.fileTemplateNo,
-              "TenMuc": vm.partKhoGiayTo.partName
-            },
-            "ChuHoSo": {
-              "MaDinhDanh": vm.applicantIdNoToStorage,
-              "TenGoi": vm.applicantNameToStorage
-            },
-            "HoSoDichVuCong": {
-              "MaDinhDanh": vm.thongTinHoSo.dossierNo
-            },
-            "TenGiayTo": "",
-            "TenLoaiVanBan": {
-              "MaMuc": "",
-              "TenMuc": ""
-            },
-            "TrichYeuVanBan": "",
-            "SoHieuVanBan": "",
-            "NgayBanHanh": "",
-            "ThoiHanHieuLuc": "",
-            "TepDuLieu": [],
-            "LoaiGiayToLuuTru": {
-              "MaMuc": "01",
-              "TenMuc": "Kết quả thủ tục hành chính"
-            },
-            "CoQuanBanHanh": {
-              "MaDinhDanh": "",
-              "TenGoi": ""
-            },
-            "HieuLucVanBan": {
-              "MaMuc": "",
-              "TenMuc": ""
-            }
           },
           "TrangThaiDuLieu": {
             "MaMuc": "",
@@ -2107,50 +2072,157 @@ export default {
             "TenMuc": ""
           }
         }
-      }
-      console.log('dataCreate', dataCreate)
-      let filter = {
-        data: dataCreate,
-        collection: vm.originality == 1 ? 'giaytocanhantochuc' : 'giaytoluutruso'
-      }
-      let data = JSON.stringify(filter.data)
-      let config = {
-        method: 'post',
-        url: `/o/systemintegration/${filter.collection}`,
-        headers: { 
-          'groupId': window.themeDisplay.getScopeGroupId(),
-          'Content-Type': 'application/json', 
-          'Accept': 'application/json', 
-          'Token': Liferay.authToken
-        },
-        data : data
-      };
-      
-      axios.request(config)
-      .then((response) => {
-        vm.progress_sohoa = false
-        vm.dialog_add_giayto = false
-        if (vm.originality == 1) {
-          toastr.success('Lưu giấy tờ vào kho thành công')
-          let fileLuu = vm.fileKhoGiayTo + ','
-          vm.giayToDaLuu += fileLuu
-        } else {
-          toastr.success('Số hóa giấy tờ thành công')
+        if (vm.originality == 3) {
+          dataCreate = {
+            "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
+            "MaDinhDanh": "",
+            "TenGiayTo": vm.partKhoGiayTo.partName,
+            "MaThamChieu": "",
+            "TenLoaiVanBan": {
+              "MaMuc": "",
+              "TenMuc": ""
+            },
+            "TrichYeuVanBan": "",
+            "SoHieuVanBan": String(vm.soHieuGiayToStorage).trim(),
+            "NgayBanHanh": vm.convertDateIso(vm.createDateStorage),
+            "ThoiHanHieuLuc": vm.convertDateIso(vm.expireDateStorage),
+            "CoQuanBanHanh": {
+              "MaDinhDanh": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['MaDinhDanh'] : '',
+              "TenGoi": vm.coQuanBanHanhStorage ? vm.coQuanBanHanhStorage['TenGoi'] : ''
+            },
+            "HieuLucVanBan": {
+              "MaMuc": vm.statusCreate ? vm.statusCreate['MaMuc'] : '',
+              "TenMuc": vm.statusCreate ? vm.statusCreate['TenMuc'] : ''
+            },
+            "LoaiGiayToLuuTru": {
+              "MaMuc": "01",
+              "TenMuc": "Kết quả thủ tục hành chính"
+            },
+            "TepDuLieu": [],
+            "ChuKhoLuuTru": {
+              "MaDinhDanh": "",
+              "TenGoi": ""
+            },
+            "HoSoLuuTruSo": {
+              "MaDinhDanh": ""
+            },
+            "SoThuTu": 0,
+            "ThuMucLuuTru": {
+              "MaDinhDanh": "",
+              "TenThuMuc": ""
+            },
+            "ChiaSeTaiKhoan": [],
+            "ChiaSeVaiTro": [],
+            "GiayToCaNhanToChuc": {
+              "MaDinhDanh": "",
+              "MaMauGiayTo": {
+                "MaMuc": vm.partKhoGiayTo.fileTemplateNo,
+                "TenMuc": vm.partKhoGiayTo.partName
+              },
+              "ChuHoSo": {
+                "MaDinhDanh": vm.applicantIdNoToStorage,
+                "TenGoi": vm.applicantNameToStorage
+              },
+              "HoSoDichVuCong": {
+                "MaDinhDanh": vm.thongTinHoSo.dossierNo
+              },
+              "TenGiayTo": "",
+              "TenLoaiVanBan": {
+                "MaMuc": "",
+                "TenMuc": ""
+              },
+              "TrichYeuVanBan": "",
+              "SoHieuVanBan": "",
+              "NgayBanHanh": "",
+              "ThoiHanHieuLuc": "",
+              "TepDuLieu": [],
+              "LoaiGiayToLuuTru": {
+                "MaMuc": "01",
+                "TenMuc": "Kết quả thủ tục hành chính"
+              },
+              "CoQuanBanHanh": {
+                "MaDinhDanh": "",
+                "TenGoi": ""
+              },
+              "HieuLucVanBan": {
+                "MaMuc": "",
+                "TenMuc": ""
+              }
+            },
+            "TrangThaiDuLieu": {
+              "MaMuc": "",
+              "TenMuc": ""
+            },
+            "PhanVungDuLieu": {
+              "MaMuc": "",
+              "TenMuc": ""
+            }
+          }
         }
-
-        let dataSoHoa = response.data.resp
+        console.log('dataCreate', dataCreate)
         let filter = {
-          dossierId: vm.thongTinHoSo.dossierId,
-          referenceUid: vm.fileKhoGiayTo.referenceUid,
-          url: '{urlKhoSoHoa}/' + dataSoHoa.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
+          data: dataCreate,
+          collection: vm.originality == 1 ? 'giaytocanhantochuc' : 'giaytoluutruso'
         }
-        vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
-          vm.loadFiles()
+        let data = JSON.stringify(filter.data)
+        let config = {
+          method: 'post',
+          url: `/o/systemintegration/${filter.collection}`,
+          headers: { 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'Token': Liferay.authToken
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          vm.progress_sohoa = false
+          vm.dialog_add_giayto = false
+          if (vm.originality == 1) {
+            toastr.success('Lưu giấy tờ vào kho thành công')
+          } else {
+            toastr.success('Số hóa giấy tờ thành công')
+          }
+
+          let dataSoHoa = response.data.resp
+          let filter = {
+            dossierId: vm.thongTinHoSo.dossierId,
+            referenceUid: vm.fileKhoGiayTo.referenceUid,
+            url: '{urlKhoSoHoa}/' + dataSoHoa.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
+          }
+          vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
+            if (vm.originality == 3) {
+              let params = {
+                dossierId: vm.thongTinHoSo.dossierId,
+                referenceUid: vm.fileKhoGiayTo.referenceUid,
+                payload: {
+                  isTaiSuDung: 3
+                }
+              }
+              vm.$store.dispatch('updateDossierFile', params).then(result => {
+                vm.loadFiles()
+              }).catch(reject => {
+              })
+            } else {
+              vm.loadFiles()
+            }
+          })
         })
-      })
-      .catch((error) => {
-        vm.progress_sohoa = false
-      })
+        .catch((error) => {
+          vm.progress_sohoa = false
+        })
+      }
+      if (vm.originality == 1) {
+        let x = confirm('Bạn có chắc chắn thực hiện thao tác này?')
+        if (x) {
+          action()
+        }
+      } else {
+        action()
+      }
     },
     getLoaiGiayTo () {
       let vm = this
@@ -3983,17 +4055,6 @@ export default {
         return true
       }
     },
-    checkSoHoa (partNo) {
-      let vm = this
-      let hasFile = vm.dossierFilesApplicant.find(file => {
-        return (file.partNo === partNo && file.yeucausohoa)
-      })
-      if (hasFile) {
-        return true
-      } else {
-        return false
-      }
-    },
     partNoApplicantHasFile (partNo) {
       let vm = this
       try {
@@ -4194,12 +4255,12 @@ export default {
     },
     showDocumentApplicant (part, index) {
       let vm = this
-      vm.khoDvcqg = false
       // vm.fileTemplateNoScope = part.fileTemplateNo
       vm.fileTemplateNoScope = ''
       vm.statusApplicantData = 1
       vm.dossierPartAttach = part
       vm.indexPart = index
+      vm.activeTabKho = 'tabs-cn'
       vm.dialog_documentApplicant = true
       setTimeout(function () {
         if (vm.$refs.khotailieu) {
@@ -4210,23 +4271,17 @@ export default {
         }
       }, 200)
     },
-    showDocumentDvcqg (part, index) {
+    showDocumentDvcqg () {
       let vm = this
-      vm.khoDvcqg = true
-      vm.fileTemplateNoScope = ''
-      vm.statusApplicantData = 1
-      vm.dossierPartAttach = part
-      vm.indexPart = index
-      vm.dialog_documentApplicant = true
       setTimeout(function () {
         if (vm.$refs.khodvcqg) {
           vm.$refs.khodvcqg.initData()
         }
-      }, 200)
+      }, 100)
     },
     cancelDialogKhoTaiLieu () {
       let vm = this
-      if (vm.khoTaiLieuTapTrung && !vm.khoDvcqg) {
+      if (vm.khoTaiLieuTapTrung) {
         if (vm.$refs.khotailieutaptrung.showDetail) {
           vm.$refs.khotailieutaptrung.showDetail = false
         } else {
@@ -4922,7 +4977,7 @@ export default {
     searchItemsDonVi() {
       this.donViList = [];
       this.pageSelectDonVi = 0;
-      if (vm.khoTaiLieuTapTrung) {
+      if (this.khoTaiLieuTapTrung) {
         this.loadMoreItemsDonVi()
       }
     },

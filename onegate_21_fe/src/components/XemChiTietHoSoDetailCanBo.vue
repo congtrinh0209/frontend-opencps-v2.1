@@ -1548,7 +1548,7 @@ export default {
           vm.showInVanBanKySo = false
         }
         vm.loadDetailTempalte()
-        vm.loadThanhToan()
+        // vm.loadThanhToan()
         if (vm.originality === 3) {
           vm.loadHoSoLienThong()
         }

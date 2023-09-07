@@ -1,181 +1,183 @@
 <template>
   <div>
     <v-card>
-      <v-card-text class="px-0 pt-0 mt-4">
-        <v-layout wrap class="mt-0" v-if="!index">
-          <v-flex xs12 sm6 class="pr-2" v-if="originality === 3">
-            <v-text-field
-              label="Số CMND/ căn cước công dân, mã số thuế doanh nghiệp, mã tổ chức"
-              v-model="applicantIdNo"
-              @keyup.enter="changeFilterSearch"
-              append-icon="search"
-              box
-              clear-icon="clear"
-              clearable
-              @click:clear="changeFilterSearch"
-              @click:append="changeFilterSearch"
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs12 sm6 class="" v-if="originality === 3">
-            <v-text-field
-              label="Tìm theo mã tài liệu"
-              v-model="fileNoSearch"
-              @keyup.enter="changeFilterSearch"
-              append-icon="search"
-              box
-              clear-icon="clear"
-              clearable
-              @click:clear="changeFilterSearch"
-              @click:append="changeFilterSearch"
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs12 sm4 class="pr-2">
-            <v-autocomplete
-              :items="fileTemplateList"
-              v-model="fileTemplateNo"
-              label="Chọn loại tài liệu"
-              item-text="name"
-              item-value="fileTemplateNo"
-              :hide-selected="true"
-              clearable
-              @change="changeFilterSearch"
-              box
-            ></v-autocomplete>
-          </v-flex>
-          <v-flex xs12 sm4 class="pr-2" v-if="originality === 3">
-            <v-autocomplete
-              :items="statusList"
-              v-model="status"
-              label="Chọn tình trạng"
-              item-text="text"
-              item-value="value"
-              :hide-selected="true"
-              clearable
-              @change="changeFilterSearch"
-              box
-            ></v-autocomplete>
-          </v-flex>
-          <v-flex xs12 sm4 class="pr-2" v-if="originality === 1">
-            <v-text-field
-              label="Tìm theo mã tài liệu"
-              v-model="fileNoSearch"
-              @keyup.enter="changeFilterSearch"
-              append-icon="search"
-              box
-              clear-icon="clear"
-              clearable
-              @click:clear="changeFilterSearch"
-              @click:append="changeFilterSearch"
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs12 sm4 class="">
-            <v-text-field
-              label="Tìm theo tên tài liệu"
-              v-model="keySearch"
-              @keyup.enter="changeFilterSearch"
-              append-icon="search"
-              box
-              clear-icon="clear"
-              clearable
-              @click:clear="changeFilterSearch"
-              @click:append="changeFilterSearch"
-            ></v-text-field>
-          </v-flex>
-          
-        </v-layout>
-        <v-layout wrap class="mt-0" v-if="index && thongTinChuHoSo">
-          <v-flex xs12 sm5 class="pr-2">
-            <div class="xs12 sm12 pb-1 mb-1">
-              <span class="pr-2">Tên công dân, tổ chức, doanh nghiệp: </span>
-              <span class="pl-0 text-bold"> {{thongTinChuHoSo.applicantName}}</span>
-            </div>
-          </v-flex>
-          <v-flex xs12 sm7 class="mb-1">
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Số định danh: </span>
-              <span class="pl-0 text-bold"> {{thongTinChuHoSo.applicantIdNo}}</span>
-            </div>
-          </v-flex>
-          <v-flex xs12 sm5 class="pr-2 mb-1">
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Điện thoại: </span>
-              <span class="pl-0 text-bold"> {{thongTinChuHoSo.contactTelNo}} </span>
-            </div>
-          </v-flex>
-          <v-flex xs12 sm7 class="mb-1">
-            <div class="xs12 sm12 pb-1">
-              <span class="pl-0">Thư điện tử: </span>
-              <span class="pl-0 text-bold"> {{thongTinChuHoSo.contactEmail}} </span>
-            </div>
-          </v-flex>
-        </v-layout>
-        <v-layout wrap class="mt-2" v-if="index && thongTinChuHoSo">
-          <v-flex xs12 md12 class="px-0">
-            <v-autocomplete
-              :items="serviceInfoList"
-              v-model="serviceInfoSearch"
-              ref="autocomplete"
-              return-object
-              :loading="loading"
-              :search-input.sync="keywordSearchSelect"
-              item-text="serviceName"
-              item-value="serviceConfigId"
-              @change="changeService('search')"
-              clearable
-              label="Chọn thủ tục"
-              box
-            >
-              <template slot="selection" slot-scope="{ item }">
-                <b class="labelCodeItemSelect">{{item.serviceCode}}</b>&nbsp;-&nbsp;{{item.serviceName}}
-              </template>
-              <template slot="item" slot-scope="{ item }">
-                <b>{{item.serviceCode}}</b>&nbsp;-&nbsp;{{item.serviceName}}
-              </template>
-              <template v-slot:append-item>
-                <div class="py-2" v-if="isShow"
-                  v-observe-visibility="{
-                    callback: visibilityChanged
-                  }"
-                >
-                </div>
-              </template>
-            </v-autocomplete>
-          </v-flex>
-          <v-flex xs12 md6 class="px-0 pr-2">
-            <v-autocomplete
-              :items="optionListSearch"
-              v-model="optionSearch"
-              label="Chọn trường hợp"
-              item-text="optionName"
-              item-value="templateNo"
-              return-object
-              :hide-selected="true"
-              box
-              clearable
-              @change="changeOptionSearch"
-            ></v-autocomplete>
-          </v-flex>
-          <v-flex xs12 sm6 class="px-0 pl-2">
-            <v-autocomplete
-              :items="fileTemplateListSearch"
-              v-model="fileTemplateNo"
-              label="Chọn loại giấy tờ"
-              item-text="partName"
-              item-value="fileTemplateNo"
-              :hide-selected="true"
-              clearable
-              box
-            ></v-autocomplete>
-          </v-flex>
-          <v-flex class="text-right">
-            <v-btn color="primary" small class="mx-0 white--text" @click.stop="changeFilterSearch">
-                <v-icon size="20" style="color: #fff !important">
-                search
-                </v-icon> &nbsp;
-                Tìm kiếm
-            </v-btn>
-          </v-flex>
-        </v-layout>
+      <v-card-text class="px-0 pt-0 mt-3">
+        <div class="form-search">
+          <v-layout wrap class="mt-0" v-if="!index">
+            <v-flex xs12 sm6 class="pr-2" v-if="originality === 3">
+              <div class="mb-1">Số CMND/ căn cước công dân, mã số thuế doanh nghiệp, mã tổ chức</div>
+              <v-text-field
+                v-model="applicantIdNo"
+                @keyup.enter="changeFilterSearch"
+                append-icon="search"
+                solo flat
+                clear-icon="clear"
+                clearable
+                @click:clear="changeFilterSearch"
+                @click:append="changeFilterSearch"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 class="" v-if="originality === 3">
+              <div class="mb-1">Mã tài liệu</div>
+              <v-text-field
+                v-model="fileNoSearch"
+                @keyup.enter="changeFilterSearch"
+                append-icon="search"
+                solo flat
+                clear-icon="clear"
+                clearable
+                @click:clear="changeFilterSearch"
+                @click:append="changeFilterSearch"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm4 class="pr-2">
+              <div class="mb-1">Loại tài liệu</div>
+              <v-autocomplete
+                :items="fileTemplateList"
+                v-model="fileTemplateNo"
+                item-text="name"
+                item-value="fileTemplateNo"
+                :hide-selected="true"
+                clearable
+                @change="changeFilterSearch"
+                solo flat
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm4 class="pr-2" v-if="originality === 3">
+              <div class="mb-1">Tình trạng</div>
+              <v-autocomplete
+                :items="statusList"
+                v-model="status"
+                item-text="text"
+                item-value="value"
+                :hide-selected="true"
+                clearable
+                @change="changeFilterSearch"
+                solo flat
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm4 class="pr-2" v-if="originality === 1">
+              <div class="mb-1">Mã tài liệu</div>
+              <v-text-field
+                v-model="fileNoSearch"
+                @keyup.enter="changeFilterSearch"
+                append-icon="search"
+                solo flat
+                clear-icon="clear"
+                clearable
+                @click:clear="changeFilterSearch"
+                @click:append="changeFilterSearch"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm4 class="">
+              <div class="mb-1">Tên tài liệu</div>
+              <v-text-field
+                v-model="keySearch"
+                @keyup.enter="changeFilterSearch"
+                append-icon="search"
+                solo flat
+                clear-icon="clear"
+                clearable
+                @click:clear="changeFilterSearch"
+                @click:append="changeFilterSearch"
+              ></v-text-field>
+            </v-flex>
+            
+          </v-layout>
+          <v-layout wrap class="mt-0" v-if="index && thongTinChuHoSo">
+            <v-flex xs12 sm5 class="pr-2">
+              <div class="xs12 sm12 pb-1 mb-1">
+                <span class="pr-2">Tên công dân, tổ chức, doanh nghiệp: </span>
+                <span class="pl-0 text-bold"> {{thongTinChuHoSo.applicantName}}</span>
+              </div>
+            </v-flex>
+            <v-flex xs12 sm7 class="mb-1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Số định danh: </span>
+                <span class="pl-0 text-bold"> {{thongTinChuHoSo.applicantIdNo}}</span>
+              </div>
+            </v-flex>
+            <v-flex xs12 sm5 class="pr-2 mb-1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Điện thoại: </span>
+                <span class="pl-0 text-bold"> {{thongTinChuHoSo.contactTelNo}} </span>
+              </div>
+            </v-flex>
+            <v-flex xs12 sm7 class="mb-1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pl-0">Thư điện tử: </span>
+                <span class="pl-0 text-bold"> {{thongTinChuHoSo.contactEmail}} </span>
+              </div>
+            </v-flex>
+          </v-layout>
+          <v-layout wrap class="mt-2" v-if="index && thongTinChuHoSo">
+            <v-flex xs12 md12 class="px-0">
+              <div class="mb-1">Thủ tục</div>
+              <v-autocomplete
+                :items="serviceInfoList"
+                v-model="serviceInfoSearch"
+                ref="autocomplete"
+                return-object
+                :loading="loading"
+                :search-input.sync="keywordSearchSelect"
+                item-text="serviceName"
+                item-value="serviceConfigId"
+                @change="changeService('search')"
+                clearable
+                solo flat
+              >
+                <template slot="selection" slot-scope="{ item }">
+                  <b class="labelCodeItemSelect">{{item.serviceCode}}</b>&nbsp;-&nbsp;{{item.serviceName}}
+                </template>
+                <template slot="item" slot-scope="{ item }">
+                  <b>{{item.serviceCode}}</b>&nbsp;-&nbsp;{{item.serviceName}}
+                </template>
+                <template v-slot:append-item>
+                  <div class="py-2" v-if="isShow"
+                    v-observe-visibility="{
+                      callback: visibilityChanged
+                    }"
+                  >
+                  </div>
+                </template>
+              </v-autocomplete>
+            </v-flex>
+            <v-flex xs12 md6 class="px-0 pr-2">
+              <div class="mb-1">Trường hợp</div>
+              <v-autocomplete
+                :items="optionListSearch"
+                v-model="optionSearch"
+                item-text="optionName"
+                item-value="templateNo"
+                return-object
+                :hide-selected="true"
+                solo flat
+                clearable
+                @change="changeOptionSearch"
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm6 class="px-0 pl-2">
+              <div class="mb-1">Loại giấy tờ</div>
+              <v-autocomplete
+                :items="fileTemplateListSearch"
+                v-model="fileTemplateNo"
+                item-text="partName"
+                item-value="fileTemplateNo"
+                :hide-selected="true"
+                clearable
+                solo flat
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex class="text-right">
+              <v-btn color="primary" small class="mx-0 white--text" @click.stop="changeFilterSearch">
+                  <v-icon size="20" style="color: #fff !important">
+                  search
+                  </v-icon> &nbsp;
+                  Tìm kiếm
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </div>
 
         <v-data-table
           :headers="documentListHeader"

@@ -1002,6 +1002,10 @@ export default {
             }
             if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
               vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
+              if (vm.itemsReports[vm.index]['filterConfig']['useGroupIdCurrentSite']) {
+                // Cấu hình báo cáo đánh giá cán bộ cấp xã
+                vm.filters[key]['groupId'] = window.themeDisplay.getScopeGroupId()
+              }
               if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
                 try {
                   vm.filters[key]['code'] = vm.govAgencyCodeCurrentSite
@@ -1204,6 +1208,10 @@ export default {
         }
         if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
           vm.filters[key]['groupId'] = vm.govAgency && !isNaN(Number(vm.govAgency)) ? vm.govAgency : window.themeDisplay.getScopeGroupId()
+          if (vm.itemsReports[vm.index]['filterConfig']['useGroupIdCurrentSite']) {
+            // Cấu hình báo cáo đánh giá cán bộ cấp xã
+            vm.filters[key]['groupId'] = window.themeDisplay.getScopeGroupId()
+          }
           if (!vm.filters[key]['source'] || vm.filters[key]['source'].length === 0) {
             try {
               vm.filters[key]['code'] = vm.govAgencyCodeCurrentSite
@@ -2398,10 +2406,12 @@ export default {
           } else {
             filter.data.listGov = vm.govAgencyCodeCurrentSite
           }
+          if (vm.itemsReports[vm.index]['filterConfig']['useGroupIdCurrentSite']) {
+            filter.data['listGroupId'] = window.themeDisplay.getScopeGroupId()
+          }
         }
       } catch (error) {
         filter.data.listGov = ""
-        console.log('error-listGroupId')
       }
       if (filter.api.indexOf('/o/rest/v2/votings/reportVE') >= 0 && vm.doExportExcel) {
         filter['fileName'] = vm.itemsReports[vm.index]['reportName'].replace(/ /g, "") + '.xlsx'
@@ -3328,6 +3338,10 @@ export default {
             }
             // 
             vm.filters[key]['groupId'] = vm.govAgency
+            if (vm.itemsReports[vm.index]['filterConfig']['useGroupIdCurrentSite']) {
+              // Cấu hình báo cáo đánh giá cán bộ cấp xã
+              vm.filters[key]['groupId'] = window.themeDisplay.getScopeGroupId()
+            }
             console.log('filterDataSource123', vm.filters[key])
             try {
               vm.filters[key]['code'] = vm.agencyLists.find(function(item) {

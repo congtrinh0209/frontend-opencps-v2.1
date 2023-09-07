@@ -855,6 +855,7 @@ export const store = new Vuex.Store({
         dataPost.append('fileType', filter.fileType ? filter.fileType : '')
         dataPost.append('fileEntryId', filter.fileEntryId ? filter.fileEntryId : '')
         dataPost.append('dossierNo', '')
+        dataPost.append('isTaiSuDung', 1)
 
         axios.post(state.initData.dossierApi + '/' + filter.dossierId + '/files/applicantdata', dataPost, param).then(function (response) {
           resolve(response)
@@ -1052,6 +1053,7 @@ export const store = new Vuex.Store({
         formData.append('url', filter.url)
         formData.append('viewType', 'internalViewDVCQG')
         formData.append('dossierPartNo', filter.partNo)
+        formData.append('isTaiSuDung', 2)
         axios.post('/o/rest/v2/dossiers/' + filter.dossierId + '/fileDVCQG', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -4344,6 +4346,27 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    updateDossierFile ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        let dataPutDossierFile = new FormData()
+        for (const key in data.payload) {
+          dataPutDossierFile.append(key,data.payload[key])
+        }
+        let url = '/o/rest/v2/dossiers/' + data.dossierId + '/isTaiSuDung/files/' + data.referenceUid
+        axios.post(url, dataPutDossierFile, options).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          reject(data)
+        })
+      })
+      
+    },
     loadingDossierCounting ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -6355,46 +6378,57 @@ export const store = new Vuex.Store({
     },
     getGiayToDvcqg ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          // let param = {
-          //   headers: {
-          //     groupId: state.initData.groupId,
-          //     'Accept': 'application/json',
-          //     'Content-Type': 'application/json',
-          //   }
-          // }
-          // let dataPost = new URLSearchParams()
-          // dataPost.append('MaThuTuc', filter.maThuTuc ? filter.maThuTuc : '')
-          // dataPost.append('DanhSachDanhMucKetQua', filter.danhSachDanhMucKetQua ? filter.danhSachDanhMucKetQua : [])
-          // dataPost.append('SoDinhDanhChuSoHuu', filter.cccd ? filter.cccd : '')
-          // dataPost.append('HoTenNguoiYeuCau', '')
-          // dataPost.append('KenhThucHien', '2')
-          // dataPost.append('SoDinhDanhNguoiYeuCau', '')
-          
-          let data = {
-            'MaThuTuc': filter.maThuTuc ? filter.maThuTuc : '',
-            'DanhSachDanhMucKetQua': filter.danhSachDanhMucKetQua ? filter.danhSachDanhMucKetQua : [],
-            'SoDinhDanhChuSoHuu': filter.cccd ? filter.cccd : '',
-            'HoTenNguoiYeuCau': '',
-            'KenhThucHien': '2',
-            'SoDinhDanhNguoiYeuCau': ''
+        let data = {
+          'MaThuTuc': filter.maThuTuc ? filter.maThuTuc : '',
+          'DanhSachDanhMucKetQua': filter.danhSachDanhMucKetQua ? filter.danhSachDanhMucKetQua : [],
+          'SoDinhDanhChuSoHuu': filter.cccd ? filter.cccd : '',
+          'HoTenNguoiYeuCau': '',
+          'KenhThucHien': '2',
+          'SoDinhDanhNguoiYeuCau': ''
+        }
+        let settings = {
+          method: 'post',
+          url: '/o/rest/v2/nps/getDanhMucGiayToCaNhan',
+          headers: { 
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          data: data,
+          params: filter.hasOwnProperty('params') ? filter.params : {}
+        }
+        axios(settings).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    getGiayToDvcqgProxy ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
           }
-          let settings = {
-            method: 'post',
-            url: '/o/rest/v2/nps/getDanhMucGiayToCaNhan',
-            headers: { 
-              'Accept': 'application/json', 
-              'Content-Type': 'application/json'
-            },
-            data: data,
-            params: filter.hasOwnProperty('params') ? filter.params : {}
-          }
-          axios(settings).then(function (response) {
-            resolve(response.data)
-          }).catch(function (error) {
-            reject(error)
-          })
-        }).catch(function (){})
+        }
+        let textPost = {
+          'MaThuTuc': filter.maThuTuc ? filter.maThuTuc : '',
+          'DanhSachDanhMucKetQua': filter.danhSachDanhMucKetQua ? filter.danhSachDanhMucKetQua : [],
+          'SoDinhDanhChuSoHuu': filter.cccd ? filter.cccd : '',
+          'HoTenNguoiYeuCau': '',
+          'KenhThucHien': '2',
+          'SoDinhDanhNguoiYeuCau': ''
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'POST')
+        dataPost.append('url', '/nps/getDanhMucGiayToCaNhan')
+        dataPost.append('data', JSON.stringify(textPost))
+        dataPost.append('serverCode', 'SERVER_DVC')
+        dataPost.append('body', 'raw')
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          resolve(result.data)
+        }).catch(xhr => {
+          reject(error)
+        })
       })
     },
     getChiTietGiayToCaNhan ({commit, state}, filter) {

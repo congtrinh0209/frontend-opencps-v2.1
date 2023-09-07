@@ -40,12 +40,12 @@ export const store = new Vuex.Store({
             code: 'opencps_serviceinfo',
             text: 'Thủ tục hành chính'
           },
-          {
-            icon: 'filter_2',
-            link: '/table/opencps_dossiertemplate',
-            code: 'opencps_dossiertemplate',
-            text: 'Mẫu hồ sơ'
-          },
+          // {
+          //   icon: 'filter_2',
+          //   link: '/table/opencps_dossiertemplate',
+          //   code: 'opencps_dossiertemplate',
+          //   text: 'Mẫu hồ sơ'
+          // },
           // {
           //   icon: 'filter_3',
           //   link: '/table/opencps_serviceprocess',

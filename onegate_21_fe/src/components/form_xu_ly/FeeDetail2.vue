@@ -120,12 +120,22 @@
                 </td>
               </template>
             </v-data-table>
-            <v-layout wrap class="my-2">
+            <!-- <v-layout wrap class="my-2">
               <v-flex style="max-width: 145px;" v-if="getDataSource('paymentMethod') && data_payment.requestPayment == 5 && (data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3)">
                 <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
               </v-flex>
               <v-flex style="max-width: 300px;" v-if="getDataSource('paymentMethod') && data_payment.requestPayment == 5 && (data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3)">
                 <v-autocomplete item-text="name" @change="changeMethod" v-model="data_payment.paymentMethod" :items="getDataSource('paymentMethod')"></v-autocomplete>
+              </v-flex>
+            </v-layout> -->
+            <v-layout wrap class="my-2" v-if="((paymentDetail && paymentDetail.paymentStatus == 5) || data_payment.requestPayment == 5) && 
+              (paymentDetail.paymentMethod !== 'PayPlatDVCQG' && paymentDetail.paymentMethod !== 'Keypay')
+            ">
+              <v-flex style="max-width: 145px;" >
+                <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
+              </v-flex>
+              <v-flex style="max-width: 300px;">
+                <v-autocomplete @change="changeMethod" v-model="data_payment.paymentMethod" :items="paymentMethodConfig"></v-autocomplete>
               </v-flex>
             </v-layout>
             <!--  -->
@@ -283,12 +293,24 @@ export default {
     paymentFile: '',
     dialogPDF: false,
     dialogPDFLoading: true,
-    totalFeeAll: 0
+    totalFeeAll: 0,
+    paymentMethodConfig: ["Chuyển khoản", "Tiền mặt"]
   }),
   directives: {money: VMoney},
   created () {
     var vm = this
+    try {
+      if (paymentMethodConfig) {
+        vm.paymentMethodConfig = paymentMethodConfig
+      }
+    } catch (error) {
+    }
     vm.data_payment = vm.payments
+    if (((vm.paymentDetail && vm.paymentDetail.paymentStatus == 5) || vm.data_payment.requestPayment == 5) && 
+      vm.paymentDetail.paymentMethod !== 'PayPlatDVCQG' && vm.paymentDetail.paymentMethod !== 'Keypay') 
+    {
+      vm.data_payment.paymentMethod = vm.paymentMethodConfig && vm.paymentMethodConfig[0] ? vm.paymentMethodConfig[0] : ''
+    }
     if (vm.payments.hasOwnProperty('groupPaymentFile') && vm.payments.groupPaymentFile) {
       vm.feeList = JSON.parse(vm.payments.groupPaymentFile)
     } else {

@@ -1,7 +1,7 @@
 <template>
     <div>
       <v-card>
-        <v-card-text class="px-0 pt-0 mt-4">
+        <v-card-text class="px-0 pt-0 mt-3">
           <v-layout wrap class="mt-0" v-if="thongTinChuHoSo">
             <v-flex xs12 sm5 class="pr-2">
               <div class="xs12 sm12 pb-1 mb-1">
@@ -27,72 +27,19 @@
                 <span class="pl-0 text-bold"> {{thongTinChuHoSo.contactEmail}} </span>
               </div>
             </v-flex>
-          </v-layout>
-          <v-layout wrap class="mt-2" id="form-search">
-            <v-flex xs12 md12 class="px-0">
-              <div class="mb-1">Thủ tục hành chính <span style="color: red"> (*)</span></div>
-              <v-autocomplete
-                :items="serviceInfoList"
-                v-model="serviceInfoSearch"
-                return-object
-                ref="autocomplete"
-                :loading="loading"
-                :search-input.sync="keywordSearchSelect"
-                item-text="serviceName"
-                item-value="serviceConfigId"
-                @change="changeService('search')"
-                clearable
-                solo flat
-              >
-                <template slot="selection" slot-scope="{ item }">
-                  <b class="labelCodeItemSelect">{{item.serviceCode}}</b>&nbsp;-&nbsp;{{item.serviceName}}
-                </template>
-                <template slot="item" slot-scope="{ item }">
-                  <b>{{item.serviceCode}}</b>&nbsp;-&nbsp;{{item.serviceName}}
-                </template>
-                <template v-slot:append-item>
-                  <div class="py-2" v-if="isShow"
-                    v-observe-visibility="{
-                      callback: visibilityChanged
-                    }"
-                  >
-                  </div>
-                </template>
-              </v-autocomplete>
+            <v-flex xs12 class="mb-1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pl-0">Thủ tục hành chính: </span>
+                <span class="pl-0 text-bold"> {{thanhPhanHoSo.serviceCodeKQ}} - {{serivceInfo.serviceName}} </span>
+              </div>
             </v-flex>
-            <v-flex xs12 md6 class="px-0 pr-2">
-              <div class="mb-1">Trường hợp <span style="color: red"> (*)</span></div>
-              <v-autocomplete
-                :items="optionListSearch"
-                v-model="optionSearch"
-                item-text="optionName"
-                item-value="templateNo"
-                return-object
-                :hide-selected="true"
-                solo flat
-                clearable
-                @change="changeOptionSearch"
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex xs12 sm6 class="px-0 pl-2">
-              <div class="mb-1">Loại giấy tờ <span style="color: red"> (*)</span></div>
-              <v-autocomplete
-                :items="fileTemplateListSearch"
-                v-model="fileTemplateNo"
-                item-text="partName"
-                item-value="fileTemplateNo"
-                :hide-selected="true"
-                clearable
-                solo flat
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex class="text-right">
-              <v-btn color="primary" small class="mx-0 white--text" @click.stop="changeFilterSearch">
-                  <v-icon size="20" style="color: #fff !important">
-                  search
-                  </v-icon> &nbsp;
-                  Tìm kiếm
-              </v-btn>
+            <v-flex xs12 class="mb-1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pl-0">Loại giấy tờ: </span>
+                <span class="pl-0 text-bold"> 
+                  {{thanhPhanHoSo.fileTemplateNoKQ}} - {{ thanhPhanHoSo.partName }}
+                </span>
+              </div>
             </v-flex>
           </v-layout>
           <v-data-table
@@ -209,18 +156,12 @@
   import TinyPagination from '../../components/pagging/opencps_pagination'
   Vue.use(toastr)
   export default {
-    props: ['index', 'status', 'thongTinChuHoSo', 'serverCode', 'thanhPhanHoSo', 'serivceCodeProps'],
+    props: ['index', 'status', 'thongTinChuHoSo', 'serivceInfo', 'thanhPhanHoSo'],
     components: {
       'tiny-pagination': TinyPagination
     },
     data: () => ({
-      loading: false,
-      keywordSearchSelect: "",
-      pageSelectBox: 1,
-      totalItemsSelectBox: 0,
-      timeOutSearch: "",
-      isShow: true,
-      
+      loading: false,      
       applicantInfos: '',
       nameTitle: '',
       creditTitle: '',
@@ -228,14 +169,10 @@
       totalDocument: 0,
       documentPage: 1,
       numberPerPage: 15,
-      fileTemplateNoCreate: '',
-      fileTemplateList: [],
       fileTemplateNo: '',
       fileNo: '',
       fileNoSearch: '',
       keySearch: '',
-      dialog_createDocument: false,
-      updateFile: false,
       loadingAction: false,
       loadingTable: false,
       dialogPDF: false,
@@ -270,16 +207,11 @@
       applicantIdNo: '',
       serviceInfoList: [],
       serviceInfoSearch: '',
-      serviceCodeDvcqg: '',
       optionListSearch: [],
       optionSearch: '',
       fileTemplateListSearch: [],
       fileTemplateNo: '',
-      dossierNoSearch: '',
-      ortherFileTemplate: {
-        fileTemplateNo: 'GIAY_TO_KHAC',
-        partName: 'Giấy tờ dùng chung'
-      },
+      dossierNoSearch: ''
     }),
     computed: {
       originality () {
@@ -296,49 +228,14 @@
       index (val) {
         this.applicantIdNo = val
         console.log('thongtinchuhoso', this.thongTinChuHoSo)
-      },
-      keywordSearchSelect(val) {
-        let vm = this
-        if (vm.serviceInfoList.length) {
-          if (val && val !== vm.serviceInfoSearch['serviceName']) {
-            if (vm.timeOutSearch) {
-              clearTimeout(vm.timeOutSearch);
-            }
-            vm.timeOutSearch = setTimeout(function () {
-              let exits = vm.serviceInfoList.find(function (item) {
-                return String(item.serviceName).toLowerCase().includes(String(val).toLowerCase())
-              })
-              if (!exits) {
-                vm.searchItems()
-              }
-            }, 1000)
-          }
-        } else {
-          if (vm.timeOutSearch) {
-            clearTimeout(vm.timeOutSearch);
-          }
-          vm.timeOutSearch = setTimeout(function () {
-            vm.searchItems()
-          }, 1000)
-        }     
-      },
+      }
     },
     created () {
       let vm = this
-      try {
-        if (ortherFileTemplateConfig) {
-          vm.ortherFileTemplate = ortherFileTemplateConfig
-        }
-      } catch (error) {
-      }
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let query = vm.$router.history.current.query
-        // vm.serviceCodeDvcqg = vm.serivceCodeProps
         vm.applicantIdNo = vm.index
-        // if (vm.thanhPhanHoSo) {
-        //   vm.fileTemplateNo = vm.thanhPhanHoSo.hasOwnProperty('fileTemplateNoDVCQG') ? vm.thanhPhanHoSo.fileTemplateNoDVCQG : vm.thanhPhanHoSo.fileTemplateNo
-        // }
       })
     },
     mounted () {
@@ -346,60 +243,25 @@
       vm.applicantIdNo = vm.index
     },
     methods: {
-      searchItems() {
-        this.serviceInfoList = [];
-        this.pageSelectBox = 1;
-        this.loadMoreItems();
-      },
-      visibilityChanged(e) {
-        e && this.loadMoreItems();
-      },
-      loadMoreItems() {
-        let vm = this
-        if (vm.serviceInfoList.length < vm.totalItemsSelectBox || vm.pageSelectBox == 1) {
-          // vm.loading = true;
-          vm.isShow = false
-          let filter1 = {
-            start: vm.pageSelectBox * 10 - 10,
-            end: vm.pageSelectBox * 10,
-            keyword: vm.keywordSearchSelect ? vm.keywordSearchSelect : ''
-          }
-          vm.$store.dispatch('getServiceConfigs', filter1).then(results => {
-            let resp1 = results.hasOwnProperty('data') ? results['data'] : []
-            vm.serviceInfoList = vm.serviceInfoList.concat(resp1);
-            vm.isShow = true
-            vm.pageSelectBox++;
-            let total1 = results.hasOwnProperty('total') ? results['total'] : 0
-            vm.totalItemsSelectBox = total1
-            vm.loading = false
-            if (vm.$refs.autocomplete) {
-              vm.$refs.autocomplete.onScroll()
-            }
-          }).catch(xhr => {
-            vm.loading = false
-          })
-        }
-      },
       initData () {
         let vm = this
-        // console.log('vm.thanhPhanHoSo', vm.thanhPhanHoSo)
-        if (vm.thanhPhanHoSo) {
-          vm.fileTemplateNo = vm.thanhPhanHoSo.hasOwnProperty('fileTemplateNoDVCQG') && vm.thanhPhanHoSo.fileTemplateNoDVCQG ? vm.thanhPhanHoSo.fileTemplateNoDVCQG : vm.thanhPhanHoSo.fileTemplateNo
-        }
-        vm.searchItems()
-        vm.fileTemplateListSearch = [vm.ortherFileTemplate]
-        // vm.getDanhSachGiayToDvcqg()
+        console.log('vm.thanhPhanHoSo', vm.thanhPhanHoSo)
+        vm.getDanhSachGiayToDvcqg()
       },
       getDanhSachGiayToDvcqg () {
         let vm = this
         let filter = {
-          danhSachDanhMucKetQua: vm.fileTemplateNo ? [{"MaKetQua": vm.fileTemplateNo, "SoKyHieu": ""}] : '',
+          danhSachDanhMucKetQua: [{"MaKetQua": vm.thanhPhanHoSo.fileTemplateNoKQ, "SoKyHieu": ""}],
           cccd: vm.applicantIdNo ? vm.applicantIdNo : '',
-          maThuTuc: vm.serviceCodeDvcqg ? vm.serviceCodeDvcqg : ''
+          maThuTuc: vm.thanhPhanHoSo.serviceCodeKQ
         }
   
         vm.loadingTable = true
-        vm.$store.dispatch('getGiayToDvcqg', filter).then(function (result) {
+        let endPoint = 'getGiayToDvcqg'
+        if (vm.originality == 3) {
+          endPoint = 'getGiayToDvcqgProxy'
+        }
+        vm.$store.dispatch(endPoint, filter).then(function (result) {
           // console.log('result', result)
           vm.documentApplicantList = result.result['DanhSachGiayToKetQua']
           vm.totalDocument = result.result['DanhSachGiayToKetQua'].length
@@ -410,170 +272,6 @@
           vm.totalDocument = 0
         })
       },
-      getApplicantInfos () {
-        let vm = this
-        let filter = {
-          applicantId: vm.index
-        }
-        vm.$store.dispatch('getApplicantInfos', filter).then(function (result) {
-          vm.applicantInfos = result
-          vm.getApplicantType(vm.applicantInfos)
-        }).catch(function () {
-        })
-      },
-      getApplicantDocument () {
-        let vm = this
-        let filter = {
-          start: vm.documentPage * vm.numberPerPage - vm.numberPerPage,
-          end: vm.documentPage * vm.numberPerPage,
-          applicantIdNo: vm.applicantIdNo,
-          fileTemplateNo: vm.fileTemplateNo,
-          status: vm.originality === 1 ? 1 : vm.status,
-          keywordSearch: vm.keySearch,
-          fileNoSearch: vm.fileNoSearch,
-          dossierNoSearch: vm.dossierNoSearch,
-          applicantDataType: '',
-          serverCode: vm.serverCode
-        }
-        vm.loadingTable = true
-        if (vm.originality === 1) {
-          vm.$store.dispatch('getApplicantDocumentProxy', filter).then(function (result) {
-            if (result.hasOwnProperty('data')) {
-              vm.documentApplicantList = result.data
-            } else {
-              vm.documentApplicantList = []
-            }
-            vm.totalDocument = result['total']
-            vm.loadingTable = false
-          }).catch(function () {
-            vm.loadingTable = false
-            vm.documentApplicantList = []
-            vm.totalDocument = 0
-          })
-        } else {
-          vm.$store.dispatch('getApplicantDocument', filter).then(function (result) {
-            if (result.hasOwnProperty('data')) {
-              vm.documentApplicantList = result.data
-            } else {
-              vm.documentApplicantList = []
-            }
-            vm.totalDocument = result['total']
-            vm.loadingTable = false
-          }).catch(function () {
-            vm.loadingTable = false
-            vm.documentApplicantList = []
-            vm.totalDocument = 0
-          })
-        }
-        
-      },
-      getFileItems () {
-        let vm = this
-        let filter = {
-          status: 1
-        }
-        if (vm.originality === 1) {
-          vm.$store.dispatch('getFileItemsProxy', filter).then(function (result) {
-            if (result.hasOwnProperty('data')) {
-              vm.fileTemplateList = result.data
-            } else {
-              vm.fileTemplateList = []
-            }
-          }).catch(function () {
-          })
-        } else {
-          vm.$store.dispatch('getFileItems', filter).then(function (result) {
-            if (result.hasOwnProperty('data')) {
-              vm.fileTemplateList = result.data
-            } else {
-              vm.fileTemplateList = []
-            }
-          }).catch(function () {
-          })
-        }
-        
-      },
-      getServiceInfoItems () {
-        let vm = this
-        let filter = {
-        }
-        vm.$store.dispatch('getServiceInfoItems', filter).then(function (result) {
-          if (result.hasOwnProperty('data')) {
-            vm.serviceInfoList = result.data
-          } else {
-            vm.serviceInfoList = []
-          }
-          vm.optionList = []
-          vm.optionCreate = ''
-          vm.fileTemplateListSearch = [vm.ortherFileTemplate]
-          vm.fileTemplateNoCreate = ''
-        }).catch(function () {
-        })
-      },
-      changeService () {
-        let vm = this
-        setTimeout(function () {
-          if (vm.serviceInfoSearch) {
-            console.log('vm.serviceInfoSearch', vm.serviceInfoSearch)
-            let exits = vm.serviceInfoList.find(function (item) {
-              return item.serviceCode === vm.serviceInfoSearch['serviceCode']
-            })
-            let filter = {
-              serviceConfigId: exits ? exits.serviceConfigId : ''
-            }
-            vm.$store.dispatch('getServiceOpionByProcess', filter).then(function (result) {
-              if (result) {
-                vm.optionListSearch = result
-                vm.optionSearch = ''
-              } else {
-                vm.optionListSearch = []
-              }
-            }).catch(function () {
-              vm.optionListSearch = []
-            })
-            // 
-            let filer2 = {
-              keyword: vm.serviceInfoSearch['serviceName']
-            }
-            vm.$store.dispatch('getServiceInfos', filer2).then(function (result) {
-              let serviceList = result.data
-              let service = serviceList.find(function (item) {
-                return item.serviceCode == vm.serviceInfoSearch['serviceCode']
-              })
-              vm.serviceCodeDvcqg = service['serviceCodeDVCQG'] ? service['serviceCodeDVCQG'] : vm.serviceInfoSearch['serviceCode']
-            }).catch(function () {
-            })
-            // 
-          } else {
-            vm.optionListSearch = []
-            vm.optionSearch = ''
-          }
-        }, 200)
-      },
-      changeOptionSearch () {
-        let vm = this
-        setTimeout (function () {
-          if (vm.optionSearch) {
-            let filter = {
-              dossierTemplateNo: vm.optionSearch.templateNo
-            }
-            vm.$store.dispatch('getDossierPart', filter).then(function (result) {
-              if (result.hasOwnProperty('dossierParts')) {
-                vm.fileTemplateListSearch = result.dossierParts
-                vm.fileTemplateNo = null
-              } else {
-                vm.fileTemplateListSearch = []
-              }
-              vm.fileTemplateListSearch.push(vm.ortherFileTemplate)
-            }).catch(function () {
-            })
-          } else {
-            vm.fileTemplateList = []
-            vm.fileTemplateListSearch = [vm.ortherFileTemplate]
-            vm.fileTemplateNoCreate = ''
-          }
-        }, 200)
-      },  
       getDocumentTypeIcon (type) {
         let vm = this
         let typeDoc = 'doc,docx'
