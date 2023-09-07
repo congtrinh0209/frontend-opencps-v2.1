@@ -95,6 +95,7 @@ export default {
   },
   created () {
     this.currentPage = this.page
+    console.log("pagination")
   },
   watch: {
     page (val) {
