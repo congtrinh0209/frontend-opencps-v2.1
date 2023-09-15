@@ -24,6 +24,15 @@
                 :min-date="minDate"
                 locale="vi"
               ></vue-ctk-date-time-picker> -->
+              <v-text-field
+                v-model="dueDateInput"
+                label=""
+                placeholder="dd/mm/yyyy"
+                @blur="formatDate()"
+                box
+                clearable
+                prepend-inner-icon="event"
+              ></v-text-field>
             </v-layout>
           </v-card-text>
         </v-card>
@@ -57,8 +66,11 @@ export default {
     getDateInput () {
       var vm = this
       console.log('vm.dueDateInput', vm.dueDateInput)
-      let date = vm.dueDateInput ? (new Date(vm.dueDateInput)).getTime() : ''
-      return date
+      // let date = vm.dueDateInput ? (new Date(vm.dueDateInput)).getTime() : ''
+      let [day, month, year] = vm.dueDateInput.split('/')
+      let d = vm.dueDateInput ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : ''
+      let valueEdit = d && (new Date(d)).getTime() ? (new Date(d)).getTime() : ''
+      return valueEdit
     },
     getCurentDateTime (type) {
       let date = new Date()
@@ -69,11 +81,34 @@ export default {
       }
     },
     formatDateInput (date) {
-      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
     },
     showDatePicker () {
       this.$refs.datepicker.showDatePicker()
-    }
+    },
+    formatDate() {
+      let vm = this;
+      let lengthDate = String(vm.dueDateInput).trim().length;
+      let splitDate = String(vm.dueDateInput).split("/");
+      if (
+        lengthDate &&
+        lengthDate > 4 &&
+        splitDate.length === 3 &&
+        splitDate[2]
+      ) {
+        vm.dueDateInput = vm.translateDate(vm.dueDateInput);
+      } else if (lengthDate && lengthDate === 8) {
+        let date = String(vm.dueDateInput);
+        vm.dueDateInput = date.slice(0, 2) + "/" + date.slice(2, 4) + "/" + date.slice(4, 8);
+      } else {
+        vm.dueDateInput = "";
+      }
+    },
+    translateDate(date) {
+      if (!date) return null;
+      const [day, month, year] = date.split("/");
+      return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+    },
   }
 }
 </script>

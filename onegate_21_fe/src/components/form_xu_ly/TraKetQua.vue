@@ -26,7 +26,7 @@
                         </span>
                         <!--  -->
                         <v-btn class="my-0 ml-2" small color="primary" style="height: 24px;"
-                          v-if="(khoTaiLieuTapTrung || khoTaiLieuCongDan) && 
+                          v-if="(khoTaiLieuTapTrung || (khoTaiLieuCongDan && originality == '3')) && 
                           (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                           @click.stop="showAddStorage(item, itemFileView)"
                         >

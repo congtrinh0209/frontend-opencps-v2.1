@@ -55,6 +55,15 @@
                 :min-date="minDate"
                 locale="vi"
               ></vue-ctk-date-time-picker> -->
+              <v-text-field
+                v-model="extendDateInput"
+                label=""
+                placeholder="dd/mm/yyyy"
+                @blur="formatDate()"
+                box
+                clearable
+                prepend-inner-icon="event"
+              ></v-text-field>
             </v-layout>
           </v-card-text>
         </v-card>
@@ -77,13 +86,9 @@ export default {
   }),
   created () {
     var vm = this
-    // vm.extendDateInput = vm.extendDateEdit ? vm.formatDateInput(vm.extendDateEdit) : vm.formatDateInput(new Date())
-    // vm.extendDateInput = vm.extendDateEdit ? (vm.parseCurrentDate(vm.extendDateEdit) + ' ' + vm.parseCurrentTime(vm.extendDateEdit)) : vm.formatDateInput(new Date())
-    // console.log('extendDateInput', vm.extendDateInput)
   },
   watch: {},
   mounted () {
-    // this.extendDateInput = this.extendDateEdit ? this.formatDateInput(this.extendDateEdit) : this.formatDateInput(new Date())
     this.extendDateInput = this.extendDateEdit ? this.parseCurrentDate(this.extendDateEdit) : this.formatDateInput(new Date())
     console.log('extendDateInput', this.extendDateInput)
     this.minDate = this.getCurentDateTime('date')
@@ -91,7 +96,9 @@ export default {
   methods: {
     doExport () {
       let vm = this
-      let date = vm.extendDateInput ? (new Date(vm.extendDateInput)).getTime() : ''
+      let [day, month, year] = vm.extendDateInput.split('/')
+      let d = vm.extendDateInput ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : ''
+      let date = d && (new Date(d)).getTime() ? (new Date(d)).getTime() : ''
       var exportData
       if (vm.type === 'overdue' || vm.type === 'preoverdue') {
         exportData = {
@@ -108,12 +115,6 @@ export default {
       }
       return exportData
     },
-    // getDateInput () {
-    //   var vm = this
-    //   console.log('vm.extendDateInput', vm.extendDateInput)
-    //   let date = vm.extendDateInput ? (new Date(vm.extendDateInput)).getTime() : ''
-    //   return date
-    // },
     getCurentDateTime (type) {
       let date = new Date()
       if (type === 'datetime') {
@@ -123,7 +124,7 @@ export default {
       }
     },
     formatDateInput (date) {
-      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
     },
     showDatePicker () {
       this.$refs.datepicker.showDatePicker()
@@ -135,8 +136,31 @@ export default {
       let [day1, time] = date.split(' ')
       let [day2, month, year] = `${day1}`.split('/')
       let [hh, mm, ss] = `${time}`.split(':')
-      return `${year}-${month.padStart(2, '0')}-${day2.padStart(2, '0')} ${hh}:${mm}`
-    }
+      return `${day2.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
+    },
+    formatDate() {
+      let vm = this;
+      let lengthDate = String(vm.dueDateInput).trim().length;
+      let splitDate = String(vm.dueDateInput).split("/");
+      if (
+        lengthDate &&
+        lengthDate > 4 &&
+        splitDate.length === 3 &&
+        splitDate[2]
+      ) {
+        vm.dueDateInput = vm.translateDate(vm.dueDateInput);
+      } else if (lengthDate && lengthDate === 8) {
+        let date = String(vm.dueDateInput);
+        vm.dueDateInput = date.slice(0, 2) + "/" + date.slice(2, 4) + "/" + date.slice(4, 8);
+      } else {
+        vm.dueDateInput = "";
+      }
+    },
+    translateDate(date) {
+      if (!date) return null;
+      const [day, month, year] = date.split("/");
+      return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+    },
   }
 }
 </script>

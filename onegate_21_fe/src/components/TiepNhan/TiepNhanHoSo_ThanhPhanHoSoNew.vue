@@ -176,7 +176,7 @@
                     </v-menu>
                     <!--  -->
                     <v-btn class="my-0" small color="primary" style="height: 24px;"
-                      v-if="khoTaiLieuCongDan && !khoTaiLieuTapTrung && 
+                      v-if="khoTaiLieuCongDan && !khoTaiLieuTapTrung && originality == '3' &&
                       (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)" 
                       @click.stop="showAddStorage(item, itemFileView)"
                     >
@@ -290,7 +290,7 @@
                     </v-menu>
                     <!--  -->
                     <v-btn class="my-0" small color="primary" style="height: 24px;"
-                      v-if="khoTaiLieuCongDan && !khoTaiLieuTapTrung && 
+                      v-if="khoTaiLieuCongDan && !khoTaiLieuTapTrung && originality == '3' &&
                       (!itemFileView.hasOwnProperty('isTaiSuDung') || itemFileView.isTaiSuDung == 0)"
                       @click.stop="showAddStorage(item, itemFileView)"
                     >

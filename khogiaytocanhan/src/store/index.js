@@ -922,8 +922,64 @@ export const store = new Vuex.Store({
           })
         }).catch(function () {})
       })
-    }
+    },
 
+    getCertMySign ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/signature/NEAC/get_certificate',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json', 
+            'groupId': window.themeDisplay.getScopeGroupId(),
+          },
+          data : JSON.stringify(filter)
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          let serializable = response.data
+          resolve(serializable)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+      })
+    },
+    signatureMySign ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let data = new FormData();
+        data.append('user_id', filter.user_id)
+        data.append('ca_name', filter.ca_name)
+        data.append('serial_number', filter.serial_number)
+        data.append('cert_data', filter.cert_data)
+        data.append('file', filter.file)
+        data.append('x', filter.x)
+        data.append('y', filter.y)
+        data.append('width', filter.width)
+        data.append('height', filter.height)
+        data.append('page', filter.page)
+        let config = {
+          method: 'post',
+          url: '/o/rest/v2/signature/NEAC/sign/warehouse',
+          headers: { 
+            'Content-Type': 'multipart/form-data',
+            'groupId': window.themeDisplay.getScopeGroupId(),
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          let serializable = response.data
+          resolve(serializable)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+      })
+    },
   },
   mutations: {
     setLoading(state, payload) {

@@ -217,7 +217,7 @@
           style="width: 100%; background: #ffffff"
         >
           <v-layout wrap>
-            <v-flex>
+            <v-flex style="max-width: fit-content;">
               <div
                 class="headline mb-3 pr-2"
                 style="
@@ -234,13 +234,7 @@
               </div>
             </v-flex>
 
-            <v-flex
-              :style="
-                menuActive !== 1 && menuActive !== 2
-                  ? 'width: 340px'
-                  : 'width: 500px'
-              "
-            >
+            <v-flex style="padding-left: 10px;">
               <v-text-field
                 solo
                 v-model="keywordSearch"
@@ -250,7 +244,7 @@
                 @click:append="searchKeyword"
               ></v-text-field>
             </v-flex>
-            <v-flex style="text-align: right; padding-top: 2px">
+            <v-flex style="text-align: right; padding-top: 2px; padding-left: 10px; max-width: fit-content">
               <v-btn
                 color="#0072bc"
                 small
@@ -258,12 +252,11 @@
                 @click.stop="showTimKiem"
                 style=""
               >
-                <v-icon size="20"> filter_list </v-icon> &nbsp; Tìm kiếm nâng
-                cao
+                <v-icon size="20"> filter_list </v-icon> &nbsp; Tìm kiếm nâng cao
               </v-btn>
             </v-flex>
             <v-flex
-              style="text-align: right; padding-top: 2px"
+              style="text-align: right; padding-top: 2px; padding-left: 10px; max-width: fit-content;"
               v-if="menuActive !== 1 && menuActive !== 2"
             >
               <v-btn
@@ -1148,35 +1141,33 @@
                           "
                         >
                           <span
+                            @click.stop="viewTepUpload(itemFileView)"
                             class="ml-1"
                             style="cursor: pointer; text-decoration: underline"
                           >
-                            <v-icon
-                              class="mr-2"
-                              :color="
-                                getDocumentTypeIcon(itemFileView.Ext)['color']
-                              "
-                              :size="16"
-                            >
-                              {{
-                                getDocumentTypeIcon(itemFileView.Ext)["icon"]
-                              }}
+                            <v-icon class="mr-2" :color="getDocumentTypeIcon(itemFileView.Ext)['color']" :size="16">
+                              {{ getDocumentTypeIcon(itemFileView.Ext)["icon"]}}
                             </v-icon>
                             <span style="font-size: 16px">{{
                               itemFileView.TenTep
                             }}</span>
                           </span>
-                          <v-btn
-                            title="Xóa"
-                            color="red"
-                            flat
-                            icon
-                            v-on:click.stop="
-                              deleteTepUpload(itemFileView, indexFile)
-                            "
-                            class="mx-0 my-0"
+                          <v-btn title="Xóa" color="red" flat icon class="mx-0 my-0 ml-2"
+                            v-on:click.stop="deleteTepUpload(itemFileView, indexFile)"
                           >
                             <v-icon size="20" color="red">close</v-icon>
+                          </v-btn>
+
+                          <v-btn title="Ký số giấy tờ" class="my-0 ml-2" flat icon color="indigo"
+                            v-if="String(itemFileView.Ext).toLowerCase() === 'pdf' && !itemFileView.Signed"
+                            @click.stop="showKySo(itemFileView, indexFile)"
+                          >
+                            <v-icon size="20">fa fa-pencil-square-o</v-icon>
+                          </v-btn>
+                          <v-btn title="Giấy tờ đã được ký số" class="my-0 ml-2" flat icon color="green"
+                            v-if="String(itemFileView.Ext).toLowerCase() === 'pdf' && itemFileView.Signed" 
+                          >
+                            <v-icon style="color: green !important" size="18">check_circle</v-icon>
                           </v-btn>
                         </div>
                       </div>
@@ -1351,7 +1342,7 @@
         >
           <v-card>
             <v-toolbar flat dark color="primary">
-              <v-toolbar-title></v-toolbar-title>
+              <v-toolbar-title>Giấy tờ đính kèm</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon dark @click.native="dialogViewFileSign = false">
                 <v-icon>close</v-icon>
@@ -1405,6 +1396,115 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <!-- ký số điện tử -->
+    <v-dialog
+      v-model="dialogInputMobile"
+      max-width="550"
+      persistent
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title style="font-size: 14px">THÔNG TIN TÀI KHOẢN CHỮ KÝ SỐ CÔNG CỘNG</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogInputMobile = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="px-0 pb-0">
+          <v-layout wrap>
+            <v-flex xs12 class="px-3" style="cursor: pointer">
+              <div>Chọn nhà cung cấp chữ ký số: <span style="color: red"> (*)</span></div>
+              <v-autocomplete
+                :items="dsCungCapCA"
+                hide-no-data
+                v-model="donViCapCA"
+                item-text="name"
+                item-value="value"
+                box
+                class="my-2"
+              ></v-autocomplete>
+              <div>Mã số thuế / Số CMND/CCCD, hộ chiếu<span style="color: red"> (*)</span>:</div>
+              <v-text-field class="mt-2"
+                v-model="userIdMySign"
+                box
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 class="text-xs-center mb-3">
+              <v-btn :loading="loadingAction" :disabled="loadingAction" class="mr-0" style="width: 100px" color="primary" @click="getCertMySign()" >
+                <v-icon>save</v-icon> &nbsp;
+                Xác nhận
+              </v-btn>
+            </v-flex>
+            <v-flex xs12 class="px-3 mb-4" v-if="listCertMySign.length">
+              <div style="display: flex;align-items: center;">
+                <v-icon size="20" color="#5a770d" class="mr-2">double_arrow</v-icon>
+                <span style="text-transform: uppercase; color: #5a770d;font-weight: 500; font-size: 14px;">Chọn chứng thư số:</span>
+              </div>
+              <v-flex class="py-2 mt-2" v-for="(item, index) in listCertMySign" :key="index" xs12 
+                style="border: 1px dotted #5a770d; background: #5a770d24;"
+                @click="!chonViTriKySo ? submitMySign(item) : showPdfCoordinate(item)"
+              >
+                <div style="cursor: pointer !important;text-decoration: underline;padding-left: 15px;margin-bottom: 0px;">
+                  <v-icon class="mr-2" size="18">edit</v-icon>
+                  <span style="font-size: 14px;">{{item.cert_id}}</span>
+                  <p style="font-size: 14px;">{{strToJson(item.cert_subject)['CN']}} - {{strToJson(item.cert_subject)['L']}} - {{strToJson(item.cert_subject)['ST']}} - {{strToJson(item.cert_subject)['C']}}</p>
+                </div>
+              </v-flex>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog
+      v-model="dialogChoKySoBatDongBo"
+      max-width="550"
+      persistent
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title style="font-size: 14px"> CHỜ KÝ SỐ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="cancelProcessKySo">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="px-0 pb-0">
+          <v-layout wrap>
+            <v-flex xs12 class="mt-2" style="font-size: 16px;">
+              <div class="mb-2 mx-3">
+                <v-progress-linear :indeterminate="true"></v-progress-linear>
+              </div>
+              <p class="mx-3">
+                Yêu cầu ký số tài liệu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.
+              </p>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions class="py-3 px-3" style="justify-content: center;">
+          <v-btn class="mr-2 white--text" style="width: 125px" color="primary" @click="cancelProcessKySo">
+            <v-icon>clear</v-icon> &nbsp;
+            HỦY BỎ
+            <span slot="loader">Đang kiểm tra</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogPdfCoordinate" fullscreen transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn vị trí đặt chữ ký số</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPdfCoordinate = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <pdf-coordinate ref="pdfCoordinate" :urlPdf="urlPdf" :bas64Pdf="base64Pdf" @submitCoordinate="submitCoordinatePdf"></pdf-coordinate>
+      </v-card>
+    </v-dialog>
+    <!--  -->
     <DialogConfirm :fnCancel="handleCancelClick"/>
   </div>
 </template>
@@ -1416,6 +1516,7 @@ import toastr from "toastr";
 import Pagination from "./Pagination.vue";
 import Search from "./FormTimKiem.vue";
 import DialogConfirm from "../DialogConfirm.vue";
+import PdfCoordinate from "./PdfCoordinate.vue";
 
 Vue.use(toastr);
 
@@ -1425,6 +1526,7 @@ toastr.options = {
 };
 export default {
   components: {
+    "pdf-coordinate": PdfCoordinate,
     "tim-kiem": Search,
     pagination: Pagination,
     DialogConfirm,
@@ -1432,6 +1534,10 @@ export default {
   data: () => ({
     percent: 0,
     dialog: false,
+    dialogPdfCoordinate: false,
+    base64Pdf: '',
+    urlPdf: '',
+    chonViTriKySo: false,
     dragging: false,
     valid: false,
     donViList: [],
@@ -1554,6 +1660,24 @@ export default {
     dataCapacity: null,
     checkbox: true,
     numberData: "",
+
+    dialogInputMobile: false,
+    dialogChoKySoBatDongBo: false,
+    userIdMySign: '',
+    dsCungCapCA: [
+      {name: 'Viettel CA', value: 'Viettel-CA'},
+      {name: 'VNPT CA', value: 'VNPT-CA'},
+      {name: 'FPT CA', value: 'FPT-CA'},
+      {name: 'BKAV CA', value: 'BkavCA'},
+      {name: 'Nacencom', value: 'CA2'},
+      {name: 'MISA CA', value: 'MISA-CA'}
+    ],
+    donViCapCA: '',
+    listCertMySign: [],
+    transactionInfo: '',
+    certSelected: '',
+    tepKySo: null,
+    indexTepUpload: null
   }),
   computed: {
     documentListHeaderSelectedOption() {
@@ -1596,7 +1720,7 @@ export default {
         case 3:
           return "Lấy giấy tờ về kho";
         case 4:
-          return "Khôi phục những giấy tờ đã chọn";
+          return "Khôi phục giấy tờ";
 
         default:
           return "Xóa giấy tờ";
@@ -1606,13 +1730,13 @@ export default {
       const vm = this;
       switch (vm.menuActive) {
         case 3:
-          return "Bạn có muốn lấy những giấy tờ đã chọn về kho của mình ?";
+          return "Bạn có chắc chắn lấy những giấy tờ đã chọn về kho của mình?";
         case 4:
-          return "Bạn có muốn khôi phục những giấy tờ đã chọn ?";
+          return "Bạn có chắc chắn khôi phục những giấy tờ đã chọn?";
 
         default:
-          return "Bạn có muốn xóa những giấy tờ đã chọn ?";
-      }andleCan
+          return "Bạn có chắc chắn xóa những giấy tờ đã chọn?";
+      }
     },
     genCss() {
       const vm = this;
@@ -1631,6 +1755,18 @@ export default {
   beforeCreate() {},
   created() {
     let vm = this;
+    try {
+      if (dsCungCapCA) {
+        vm.dsCungCapCA = dsCungCapCA
+      }
+    } catch (error) {
+    }
+    try {
+      if (chonViTriKySo) {
+        vm.chonViTriKySo = chonViTriKySo
+      }
+    } catch (error) {
+    }
     let param = {
       headers: {
         groupId: window.themeDisplay
@@ -1727,8 +1863,186 @@ export default {
       if (getInputDom) getInputDom.checked = false;
       if (val === 5) vm.getCapacity();
     },
+    dialogInputMobile (val) {
+      setTimeout(function () {
+        if (val) {
+          let myElements = document.querySelectorAll(".v-menu__content");
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'fixed';
+          }
+        } else {
+          let myElements = document.querySelectorAll(".v-menu__content")
+          for (let i = 0; i < myElements.length; i++) {
+            myElements[i].style.position = 'absolute';
+          }
+        }
+      }, 300)
+    },
   },
   methods: {
+    showKySo (file, index) {
+      let vm = this
+      console.log('fileKySo', file)
+      vm.dialogInputMobile = true
+      vm.tepKySo = file
+      vm.indexTepUpload = index
+    },
+    base64ToPdfBlob (base64String) {
+      let byteArray = atob(base64String)
+      let arrayBuffer = new ArrayBuffer(byteArray.length)
+      let uint8Array = new Uint8Array(arrayBuffer)
+      for (let i = 0; i < byteArray.length; i++) {
+        uint8Array[i] = byteArray.charCodeAt(i)
+      }
+      let blob = new Blob([uint8Array], { type: 'application/pdf' })
+      return blob
+    },
+    convertFileToBase64 (file) {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+
+        fileReader.onload = () => {
+          resolve(fileReader.result)
+        }
+
+        fileReader.onerror = (error) => {
+          reject(error)
+        }
+      })
+    },
+    viewTepUpload (file) {
+      let vm = this
+      let pdfUrl = ''
+      if (file.Signed) {
+        let blob = vm.base64ToPdfBlob(file.FileSigned)
+        pdfUrl = URL.createObjectURL(blob);
+        console.log('pdfUrl', pdfUrl)
+        vm.pathNameFileESign = pdfUrl
+        vm.dialogViewFileSign = true
+      } else {
+        var selectedFile = file['File'];
+        if (selectedFile) {
+          let base64 = ''
+          let getBase64 = async () => {
+            base64 = await vm.convertFileToBase64(selectedFile)
+            let blob = vm.base64ToPdfBlob(base64.split(',')[1])
+            pdfUrl = URL.createObjectURL(blob)
+            console.log('pdfUrl', pdfUrl)
+            vm.pathNameFileESign = pdfUrl
+            vm.dialogViewFileSign = true
+          }
+          getBase64()
+        }
+      }
+    },
+    getCertMySign () {
+      let vm = this
+      if (String(vm.userIdMySign).trim()) {
+        let user = {
+          user_id: String(vm.userIdMySign).trim(),
+          ca_name: vm.donViCapCA,
+          serial_number: ''
+        }
+        vm.loadingAction = true
+        vm.$store.dispatch('getCertMySign', user).then(res => {
+          vm.loadingAction = false
+          vm.listCertMySign = []
+          try {
+            vm.listCertMySign = res.data.user_certificates
+          } catch (error) {
+          }
+          if (!vm.listCertMySign.length) {
+            toastr.error('Không có thông tin chứng thư số')
+          }
+        }).catch(function () {
+          vm.loadingAction = false
+          toastr.error('Không có thông tin chứng thư số')
+        })
+      }  
+    },
+    showPdfCoordinate (cert) {
+      let vm = this
+      vm.certSelected = cert
+      let getBase64 = async () => {
+        let base64 = await vm.convertFileToBase64(vm.tepKySo.File)
+        vm.base64Pdf = base64.split(',')[1]
+        vm.dialogPdfCoordinate = true
+        setTimeout(function () {
+          vm.$refs.pdfCoordinate.init()
+        }, 200)
+      }
+      getBase64()
+    },
+    submitCoordinatePdf (position) {
+      let vm = this
+      vm.dialogPdfCoordinate = false
+      console.log('coordSubmit', position)
+      vm.submitMySign(vm.certSelected, position)
+    },
+    base64ToFileObject (base64String, fileName) {
+      var sliceSize = 1024;
+      var byteCharacters = atob(base64String);
+      var byteArrays = [];
+
+      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+          var slice = byteCharacters.slice(offset, offset + sliceSize);
+          var byteNumbers = new Array(slice.length);
+          for (var i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i);
+          }
+          var byteArray = new Uint8Array(byteNumbers);
+          byteArrays.push(byteArray);
+      }
+
+      let blob = new Blob(byteArrays, { type: "application/pdf" });
+      return new File([blob], fileName, { type: "application/pdf" });
+    },
+    submitMySign (item, position) {
+      let vm = this
+      vm.certSelected = item
+      if (vm.loadingAction) {
+        return;
+      }
+      let dataInsertSignature = {
+        "user_id": String(vm.userIdMySign).trim(),
+        "ca_name": vm.donViCapCA,
+        "serial_number": item.serial_number,
+        "cert_data": item.cert_data,
+        "file": vm.tepKySo.File,
+        "x": position ? position['coordinate'][0] : 0,
+        "y": position ? position['coordinate'][1] : 0,
+        "width": position ? position['coordinate'][2] : 0,
+        "height": position ? position['coordinate'][3] : 0,
+        "page": position ? position['page'] : 1
+      }
+      vm.loadingAction = true
+      toastr.success('Yêu cầu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.')
+      vm.dialogChoKySoBatDongBo = true
+      vm.dialogInputMobile = false
+      vm.$store.dispatch('signatureMySign', dataInsertSignature).then(res => {
+        vm.loadingAction = false
+        toastr.clear()
+        toastr.success('Thực hiện ký số thành công')
+        vm.dialogChoKySoBatDongBo = false
+        vm.tepUpload[vm.indexTepUpload].FileSigned = res.file
+        vm.tepUpload[vm.indexTepUpload].Signed = true
+        vm.tepUpload[vm.indexTepUpload].File = vm.base64ToFileObject(res.file, vm.tepUpload[vm.indexTepUpload]['TenTep'] + "_Signed.pdf")
+        console.log('tepDaKySo', vm.tepUpload[vm.indexTepUpload])
+      }).catch(function () {
+        vm.loadingAction = false
+        vm.dialogChoKySoBatDongBo = false
+        setTimeout(function () {
+          toastr.error('Gửi yêu cầu ký số thất bại')
+        }, 300)
+      })
+      
+    },
+    cancelProcessKySo () {
+      let vm = this
+      vm.dialogChoKySoBatDongBo = false
+      vm.loadingAction = false
+    },
     handleCancelClick() {
       const vm = this
       vm.loadingAction = false
@@ -1767,16 +2081,14 @@ export default {
             vm.numberData = Math.ceil(
               vm.convertToByte(data.DungLuongToiDaFileTaiLen)
             );
-          console.log("dtaa: ", vm.numberData);
           vm.percent = Math.ceil(number);
           if (vm.percent >= 80) toastr.error("Bạn sắp sử dụng hết dung lượng");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => vm.numberData = '');
     },
     handleClickSelected() {
       const vm = this;
       vm.dialog = false;
-      console.log("click: ", vm.selected, vm.menuActive);
       try {
         if (vm.selected.length > 1) {
           for (let i = 0; i < vm.selected.length; i++) {
@@ -1915,17 +2227,21 @@ export default {
     },
     cancelShareDocument() {
       const vm = this;
-      console.log("cancel share");
     },
     handleDrop(event) {
       const vm = this;
       event.preventDefault();
       vm.dragging = false;
       const files = event.dataTransfer.files;
-      if (files[0].size < vm.numberData) {
-        vm.handleDragFiles(files);
+      console.log('vm.numberData', vm.numberData)
+      if (vm.numberData) {
+        if (files[0].size <= vm.numberData) {
+          vm.handleDragFiles(files);
+        } else {
+          toastr.error("Kích thước tệp không được vượt quá " + vm.numberData);
+        }
       } else {
-        toastr.error("Kích thước tệp không được vượt quá 20Mb");
+        vm.handleDragFiles(files);
       }
     },
     getDanhMuc() {
@@ -1943,7 +2259,6 @@ export default {
     },
     getDanhSachDonVi() {
       let vm = this;
-      console.log("run");
       let filter = {
         page: 0,
         size: 100,
@@ -2024,7 +2339,6 @@ export default {
     },
     changeMenu(index) {
       let vm = this;
-      console.log("heree: ", vm.selected);
       vm.selected = [];
       vm.menuActive = index;
       vm.showDetail = false;
@@ -2073,7 +2387,6 @@ export default {
     getDanhSachGiayToSoHoa(dataSearch) {
       let vm = this;
       let share = "";
-      console.log("run here", vm.applicantIdNo, vm.menuActive, dataSearch);
       switch (vm.menuActive) {
         case 0:
           share = "0,1";
@@ -2127,12 +2440,10 @@ export default {
       vm.$store
         .dispatch("getGiayToKhoCaNhan", filter)
         .then(function (result) {
-          console.log("data: ", result);
           // vm.$store.dispatch('getGiayToKhoCaNhan_HeThongKhoGT', filter).then(function (result) {
           vm.documentApplicantList = result.content;
           vm.totalDocument = result["totalElements"];
           vm.loadingTable = false;
-          console.log("get selected: ", vm.selected);
         })
         .catch(function () {
           vm.loadingTable = false;
@@ -2390,7 +2701,7 @@ export default {
               toastr.error("Yêu cầu thực hiện thất bại");
             });
         },
-        title: "Bạn có muốn khôi phục giấy tờ này không ?",
+        title: "Bạn có chắc chắn khôi phục giấy tờ này?",
       };
       vm.$store.commit("SET_STATE_DIALOG", payload);
     },
@@ -2407,6 +2718,8 @@ export default {
           KichThuocTep: file["size"],
           TenTep: file["name"],
           FileInput: true,
+          Signed: false,
+          FileSigned: null
         });
       }
       vm.tepUpload = arrTep;
@@ -2414,9 +2727,8 @@ export default {
     uploadDocumentFile(e) {
       let vm = this;
       let files = $("#documentFile")[0].files;
-      if (files[0].size < vm.numberData) {
+      let upload = function () {
         let arrTep = [];
-
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
           let ext = file["name"].split(".");
@@ -2428,9 +2740,17 @@ export default {
             FileInput: true,
           });
         }
-
         vm.tepUpload = arrTep;
-      } else toastr.error("Kích thước tệp không được vượt quá 20Mb");
+      }
+      if (vm.numberData) {
+        if (files[0].size < vm.numberData) {
+          upload()
+        } else {
+          toastr.error("Kích thước tệp không được vượt quá " + vm.numberData)
+        }
+      } else {
+        upload()
+      }
     },
     showCreatedocument() {
       let vm = this;
@@ -2568,7 +2888,7 @@ export default {
               toastr.error("Vui lòng đính kèm tài liệu");
             }
           },
-          title: "Bạn có muốn tải tài liệu này lên kho của mình không ?",
+          title: "Bạn có chắc chắn tải tài liệu này lên kho của mình không?",
         };
         vm.$store.commit("SET_STATE_DIALOG", payload);
       }
@@ -2654,46 +2974,6 @@ export default {
           toastr.error("Vui lòng đính kèm tệp");
         }
       }
-    },
-    vgca_sign_approved() {
-      let vm = this;
-      let prms = {};
-      prms["FileUploadHandler"] =
-        window.themeDisplay.getPortalURL() + "/o/rest/v2/vgca/fileupload";
-      prms["SessionId"] = "";
-      prms["FileName"] = "";
-      let signFileCallBack = function (rv) {
-        let received_msg = JSON.parse(rv);
-        console.log("received_msg", received_msg);
-        if (received_msg.Status === 0) {
-          let dataSigned;
-          try {
-            dataSigned = JSON.parse(received_msg.FileServer);
-            vm.fileEntryESign = dataSigned.fileEntryId;
-            let urlPdf = dataSigned.url;
-            if (window.top.location.protocol === "https:") {
-              urlPdf = urlPdf.replace("http:", "https:");
-            }
-            urlPdf = urlPdf.replace(":80/", "/");
-            vm.pathNameFileESign = urlPdf;
-            vm.fileNameView = urlPdf;
-          } catch (error) {}
-          console.log("dataSigned", dataSigned);
-          toastr.clear();
-          toastr.success("Giấy tờ đã được ký duyệt");
-          vm.dialogViewFileSign = true;
-        } else {
-          if (received_msg.Message) {
-            toastr.clear();
-            toastr.error(received_msg.Message);
-          } else {
-            toastr.clear();
-            toastr.error("Ký duyệt không thành công");
-          }
-        }
-      };
-      let json_prms = JSON.stringify(prms);
-      vgca_sign_approved(json_prms, signFileCallBack);
     },
     formatDate() {
       let vm = this;
@@ -2909,7 +3189,21 @@ export default {
           });
       }
     },
-    // ------
+    strToJson (inputString) {
+      var keyValuePairs = inputString.split(',');
+      var result = {};
+
+      keyValuePairs.forEach(function(keyValuePair) {
+          var parts = keyValuePair.split('=');
+          var key = parts[0].trim();
+          var value = parts[1].trim();
+          if (value.startsWith("U+")) {
+            value = String.fromCharCode(parseInt(value.substring(2), 16));
+          }
+          result[key] = value;
+      });
+      return result;
+    }
   },
 };
 </script>

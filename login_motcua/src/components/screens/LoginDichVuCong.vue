@@ -126,6 +126,16 @@
               <v-icon>admin_panel_settings</v-icon>&nbsp;
               Đăng nhập Hệ thống xác thực tập trung
             </v-btn>
+            <v-btn v-if="showXacThucSso" class="btn-sso px-2 my-0" color="#913938"
+              :loading="loading"
+              :disabled="loading"
+              @click="redirectXacThucSso"
+              style="width: 300px !important; margin-top: 10px !important;"
+            >
+              <v-icon>done_all</v-icon>&nbsp;
+              Đăng nhập Hệ thống xác thực tập trung
+            </v-btn>
+            
           </v-flex>
         </v-form>
       </v-flex>
@@ -207,13 +217,18 @@ export default {
       }
     },
     dialog_loginDVCQG: false,
-    tempDVCQG: ''
+    tempDVCQG: '',
+    showXacThucSso: false
   }),
   computed: {
   },
   created () {
     var vm = this
     vm.$nextTick(function () {
+      try {
+        vm.showXacThucSso = urlRedirectConfig
+      } catch (error) {
+      }
       try {
         if (configSsoBtt) {
           vm.hasSSO = true
@@ -295,6 +310,10 @@ export default {
         vm.loading = false
         alert('Chức năng đang cập nhật')
       })
+    },
+    redirectXacThucSso () {
+      let vm = this
+      window.location.href = vm.showXacThucSso
     },
     makeImageCap () {
       var vm = this

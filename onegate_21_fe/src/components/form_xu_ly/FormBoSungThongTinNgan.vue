@@ -10,16 +10,15 @@
             <v-form ref="form1" v-model="valid1" lazy-validation :id="'form_' + item.fieldName">
               <v-layout wrap>
                 <v-flex xs12 class="mx-3">
-                  <v-text-field v-if="item.fieldType === 'textarea'"
+                  <v-textarea v-if="item.fieldType === 'textarea'"
                     box
                     :id="item.fieldName"
                     :value="item.value"
                     :placeholder="item.placeholder"
-                    multi-line
                     @input="inputChangeValue(item)"
                     :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
                     :required="(item.required === true || item.required === 'true') ? true : false"
-                  ></v-text-field>
+                  ></v-textarea>
                   <v-text-field v-if="item.fieldType === 'string'"
                     box
                     :id="item.fieldName"
@@ -74,7 +73,6 @@
                     box
                   ></v-autocomplete>
                   <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
-                    <v-icon color="blue" class="">event</v-icon>
                     <!-- <vue-ctk-date-time-picker 
                       ref="datepicker"
                       :label="item.value ? '' : 'Chọn ngày'"
@@ -89,6 +87,16 @@
                       :without-header="true"
                       locale="vi"
                     /> -->
+                    <v-text-field
+                      :id="item.fieldName"
+                      v-model="item.value"
+                      label=""
+                      placeholder="dd/mm/yyyy, ddmmyyyy"
+                      @blur="formatDate(index)"
+                      box
+                      clearable
+                      prepend-inner-icon="event"
+                    ></v-text-field>
                   </v-layout>
                   <v-layout wrap v-if="item.fieldType.indexOf('options_group') >= 0" class="mt-2">
                     <v-flex xs4 v-for="(item1, index1) in optionsGroup" v-bind:key="index1" class="pr-3">
@@ -137,16 +145,15 @@
         <v-form ref="form" v-model="valid2" lazy-validation>
           <v-layout wrap>
             <v-flex xs12 class="px-3 mt-2">
-              <v-text-field v-if="item.fieldType === 'textarea'"
+              <v-textarea v-if="item.fieldType === 'textarea'"
                 box
                 :id="item.fieldName"
                 :value="item.value"
                 :placeholder="item.placeholder"
-                multi-line
                 @input="inputChangeValue(item)"
                 :rules="(item.required === true || item.required === 'true') ? [rules.required, rules.varchar5000] : [rules.varchar5000]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
-              ></v-text-field>
+              ></v-textarea>
             </v-flex>
             <v-flex xs12 class="px-3">
               <v-text-field v-if="item.fieldType === 'string'"
@@ -188,7 +195,6 @@
             </v-flex>
             <v-flex xs12 class="px-3">
               <v-layout wrap class="mt-2" v-if="item.fieldType === 'date'">
-                <v-icon color="blue" class="">event</v-icon>
                 <!-- <vue-ctk-date-time-picker 
                   ref="datepicker"
                   :label="item.value ? '' : 'Chọn ngày'"
@@ -202,6 +208,16 @@
                   :without-header="true"
                   locale="vi"
                 /> -->
+                <v-text-field
+                 :id="item.fieldName"
+                  v-model="item.value"
+                  label=""
+                  placeholder="dd/mm/yyyy, ddmmyyyy"
+                  @blur="formatDate(index)"
+                  box
+                  clearable
+                  prepend-inner-icon="event"
+                ></v-text-field>
               </v-layout>
             </v-flex>
             <v-flex xs12 class="px-3">
@@ -339,7 +355,9 @@
               if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                 vm.formBuilder[key]['value'] = ''
               } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
-                vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
+                // vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
+                let d = new Date(vm.formBuilder[key]['value'])
+                vm.formBuilder[key]['value'] =  `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
               }
             }
           }
@@ -368,7 +386,9 @@
                 if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                   vm.formBuilder[key]['value'] = ''
                 } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
-                  vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
+                  // vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
+                  let d = new Date(vm.formBuilder[key]['value'])
+                  vm.formBuilder[key]['value'] = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
                 } else if (vm.formBuilder[key]['fieldType'].indexOf('select') >= 0 && JSON.parse(vm.formBuilder[key]['fieldType'])['select'] && JSON.parse(vm.formBuilder[key]['fieldType'])['api']) {
                   let api = JSON.parse(vm.formBuilder[key]['fieldType'])['api']
                   let dataSourceSelect = []
@@ -408,6 +428,29 @@
       })
     },
     methods: {
+      formatDate(index) {
+        let vm = this;
+        let lengthDate = String(vm.formBuilder[index]['value']).trim().length;
+        let splitDate = String(vm.formBuilder[index]['value']).split("/");
+        if (
+          lengthDate &&
+          lengthDate > 4 &&
+          splitDate.length === 3 &&
+          splitDate[2]
+        ) {
+          vm.formBuilder[index]['value'] = vm.translateDate(vm.formBuilder[index]['value']);
+        } else if (lengthDate && lengthDate === 8) {
+          let date = String(vm.formBuilder[index]['value']);
+          vm.formBuilder[index]['value'] = date.slice(0, 2) + "/" + date.slice(2, 4) + "/" + date.slice(4, 8);
+        } else {
+          vm.formBuilder[index]['value'] = "";
+        }
+      },
+      translateDate(date) {
+        if (!date) return null;
+        const [day, month, year] = date.split("/");
+        return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+      },
       allExpand (arr) {
         let vm = this
         vm.panel = [...Array(arr.length).keys()].map(_ => true)
@@ -542,7 +585,10 @@
             if (vm.formBuilder[key].fieldName) {
               let valueEdit = vm.formBuilder[key].value
               if (vm.formBuilder[key].fieldType === 'date') {
-                valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
+                // valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
+                let [day, month, year] = vm.formBuilder[key].value.split('/')
+                let d = vm.formBuilder[key].value ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : ''
+                valueEdit = d && (new Date(d)).getTime() ? (new Date(d)).getTime() : ''
               }
               if (vm.formBuilder[key].fieldType === 'number') {
                 try {

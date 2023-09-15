@@ -426,7 +426,7 @@
                       </content-placeholders>
                       <v-subheader v-else class="pl-0"> {{ thongTinChuHoSo.userType && labelSwitch[thongTinChuHoSo.userType] ? labelSwitch[thongTinChuHoSo.userType].nguoi_nop : 'Họ và tên' }}<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
-                    <v-flex xs12 sm6>
+                    <v-flex :class="showNgaySinhApplicant ? 'xs12 sm2' : 'xs12 sm6'">
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
@@ -438,6 +438,26 @@
                         :disabled="loadingVerify"
                         :rules="requiredOptions['applicantName'] ? [rules.required,rules.varchar500] : ''"
                         :required="requiredOptions['applicantName']"
+                      ></v-text-field>
+                      <p class="pl-0 pt-2" v-if="originality == 1 && disableEditApplicant"> {{thongTinChuHoSo.applicantName}}</p>
+                    </v-flex>
+                    <v-flex xs12 sm2 v-if="showNgaySinhApplicant">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-subheader v-else class="pl-0">Ngày sinh<span style="color:red"> &nbsp;*</span>: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm2 v-if="showNgaySinhApplicant">
+                      <content-placeholders class="mt-1" v-if="loading">
+                        <content-placeholders-text :lines="1" />
+                      </content-placeholders>
+                      <v-text-field
+                        v-if="!loading && originality == 1"
+                        v-model="applicantDateCreated"
+                        @input="changeApplicantInfos"
+                        @change="thongTinChuHoSo.applicantName=String(thongTinChuHoSo.applicantName).trim()"
+                        :rules="[rules.required]"
+                        required
                       ></v-text-field>
                       <p class="pl-0 pt-2" v-if="originality == 1 && disableEditApplicant"> {{thongTinChuHoSo.applicantName}}</p>
                     </v-flex>
@@ -1766,6 +1786,7 @@ export default {
     quyenTraCuuLgsp: false,
     serviceCheckCsdldc: '',
     disableEditApplicant: false,
+    showNgaySinhApplicant: false,
     SCAN_QR_CCCD: false
   }),
   computed: {
@@ -1804,6 +1825,10 @@ export default {
     let vm = this
     try {
       vm.disableEditApplicant = disableEditApplicant
+    } catch (error) {
+    }
+    try {
+      vm.showNgaySinhApplicant = showNgaySinhApplicant
     } catch (error) {
     }
     try {
@@ -3356,7 +3381,7 @@ export default {
     },
     getTenDanhMuc (code, danhmuc) {
       let vm = this
-      if (code) {
+      if (code !== null && code !== '') {
         if (danhmuc === 'tongiao') {
           let dm = vm.danhmuctongiao.find(function (item) {
             return Number(item.TONGIAO) == Number(code)

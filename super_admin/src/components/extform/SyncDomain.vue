@@ -51,6 +51,7 @@
               class="table-landing table-bordered"
               :rows-per-page-items="rowsPerPageItems"
               :pagination.sync="pagination"
+              style="border: 1px solid #dedede"
             >
               <template slot="items" slot-scope="props">
                 <tr v-bind:class="{'active': props.index%2==1}">
@@ -109,7 +110,7 @@
       </div>
     </v-card>
     <!-- Popup danh sách mapping thêm -->
-    <v-dialog v-model="dialogMapping" persistent max-width="600px">
+    <v-dialog v-model="dialogMapping" persistent max-width="900px">
         <v-card style="background: #fff;">
           <v-card-title pa-1>
             <v-layout wrap align-center>
@@ -139,9 +140,10 @@
                 <content-placeholders v-if="loadingMapping">
                       <content-placeholders-text :lines="5" />
                 </content-placeholders>
-                <v-layout v-else align-center style="border-bottom: 0.5px dashed" wrap v-for="(item, index) in listMappingView" :key="index">
+                <v-layout v-else align-center style="border-bottom: 1px dashed #dedede" wrap v-for="(item, index) in listMappingView" :key="index">
                   <v-flex xs9 class="pa-0">
-                    <span style="font-weight: bold">{{item.itemCodeDVCQG}}-{{item.itemNameDVCQG}}</span>
+                    <span style="font-weight: bold">{{item.itemCodeDVCQG}}</span>
+                    <span style="font-weight: bold" v-if="item.itemNameDVCQG"> - {{item.itemNameDVCQG}}</span>
                   </v-flex>
                   <v-flex xs3  class="text-right pa-0">
                     <v-btn style="color:#fff;" small color="#115ebe" @click="mappingDomainDVCQG(item)">Chọn</v-btn>
@@ -149,9 +151,18 @@
                 </v-layout>
               </div>
               <div v-else style="height: 437px;">
-                <v-layout>
+                <div>
                   <v-flex xs12><span>Không tìm thấy dữ liệu</span></v-flex>
-                </v-layout>
+                  <v-flex xs12 class="mt-2">
+                    <v-text-field
+                      label="Nhập mã để mapping"
+                      v-model="itemCodeDvcqgCreate"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 class="text-center mt-2">
+                    <v-btn style="color:#fff;" small color="#115ebe" @click="mappingDomainDVCQG(null)">Xác nhận</v-btn>
+                  </v-flex>
+                </div>
               </div>
               <v-layout>
                 <v-flex xs12>
@@ -296,7 +307,8 @@ export default {
     pagination: {
         rowsPerPage: 20
     },
-    linhVucSelect: {}
+    linhVucSelect: {},
+    itemCodeDvcqgCreate: ''
   }),
   computed: {
 
@@ -664,14 +676,18 @@ export default {
       let vm = this
       vm.linhVucSelect = item
       vm.nameDVCQGModel = item.itemName
+      vm.itemCodeDvcqgCreate = ''
       vm.pageMapping = 1
       vm.dialogMapping = true
     },
     mappingDomainDVCQG (item) {
       let vm = this
+      if (!item && !String(vm.itemCodeDvcqgCreate).trim()) {
+        return
+      }
       let filter = {
         itemCode: vm.linhVucSelect.itemCode,
-        itemCodeDVCQG: item.itemCodeDVCQG
+        itemCodeDVCQG: item ? item.itemCodeDVCQG : String(vm.itemCodeDvcqgCreate).trim()
       }
       vm.$store.dispatch('mappingServiceDomain', filter).then(function (result) {
         if(result){
@@ -684,7 +700,7 @@ export default {
               //   vm.listLinhVuc[i]['similarity'][j].mapped =  false
               // }
               vm.listLinhVuc[i]['similarity'] = []
-              vm.listLinhVuc[i]['similarity'].push({itemCodeDVCQG: item.itemCodeDVCQG, itemNameDVCQG: item.itemNameDVCQG, mapped: true})
+              vm.listLinhVuc[i]['similarity'].push({itemCodeDVCQG: item ? item.itemCodeDVCQG : vm.itemCodeDvcqgCreate, itemNameDVCQG: item ? item.itemNameDVCQG : '', mapped: true})
               break
             }
           }

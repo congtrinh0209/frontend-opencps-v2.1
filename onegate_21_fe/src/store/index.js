@@ -153,7 +153,9 @@ export const store = new Vuex.Store({
     formActionGroup: '',
     keywordSearch: '',
     base64Document: '',
-    formDataTphs: ''
+    formDataTphs: '',
+    applicantInfomationLgsp: '',
+    activeBindApplicantLgsp: false
   },
   actions: {
     clearError ({commit}) {
@@ -6827,6 +6829,12 @@ export const store = new Vuex.Store({
     setBase64Document (state, payload) {
       state.base64Document = payload
     },
+    setApplicantInfomationLgsp (state, payload) {
+      state.applicantInfomationLgsp = payload
+    },
+    setActiveBindApplicantLgsp (state, payload) {
+      state.activeBindApplicantLgsp = payload
+    },
   },
   getters: {
     getFormData (state) {
@@ -7063,6 +7071,12 @@ export const store = new Vuex.Store({
     },
     getBase64Document (state) {
       return state.base64Document
+    },
+    getApplicantInfomationLgsp (state) {
+      return state.applicantInfomationLgsp
+    },
+    getActiveBindApplicantLgsp (state) {
+      return state.activeBindApplicantLgsp
     }
   }
 })

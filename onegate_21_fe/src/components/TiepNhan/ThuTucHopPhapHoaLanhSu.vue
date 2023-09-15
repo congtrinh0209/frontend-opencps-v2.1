@@ -21,7 +21,7 @@
                 <strong>Thông tin người nộp</strong>
                 <v-btn class="mx-0 ml-3" color="primary" v-if="quyenTraCuuLgsp"
                     @click.stop="showDialogSearchLgspCongDan()">
-                    <v-icon>fas fa fa-search-plus</v-icon>
+                    <v-icon>fas fa fa-search-plus</v-icon>&nbsp;
                     <span>Kiểm tra thông tin công dân</span>
                 </v-btn>
             </v-flex>
@@ -1070,6 +1070,14 @@ export default {
             vm.getTenGiayTo()
         })
     },
+    computed: {
+        applicantInfomationLgsp () {
+            return this.$store.getters.getApplicantInfomationLgsp
+        },
+        activeBindApplicantLgsp () {
+            return this.$store.getters.getActiveBindApplicantLgsp
+        },
+    },
     watch: {
         payment: {
             deep: true,
@@ -1244,6 +1252,9 @@ export default {
             this.dossiers.dueDate = date.getTime()
             //this.dossiers.dueDate = this.dateDueDateFormated
         },
+        activeBindApplicantLgsp () {
+            this.bindDataCsdlDanCu()
+        }
         // tongSoBan (val) {
         //     if(parseInt(val) >= 10){
         //         let date = new Date(this.dateDueDate + this.crurentHours)
@@ -1271,8 +1282,17 @@ export default {
             }
           )
         },
-        bindDataCsdlDanCu (data) {
+        bindDataCsdlDanCu () {
           let vm = this
+          let data = {
+                applicantIdNo: vm.applicantInfomationLgsp.SoDinhDanh ? vm.applicantInfomationLgsp.SoDinhDanh : vm.applicantInfomationLgsp.SoCMND,
+                applicantName: vm.applicantInfomationLgsp.HoVaTen.Ten,
+                address: vm.applicantInfomationLgsp.ThuongTru.ChiTiet,
+                cityCode: Number(vm.applicantInfomationLgsp.ThuongTru.MaTinhThanh),
+                districtCode: Number(vm.applicantInfomationLgsp.ThuongTru.MaQuanHuyen),
+                wardCode: Number(vm.applicantInfomationLgsp.ThuongTru.MaPhuongXa)
+            }
+          console.log('dataaddApplicantLgsp', data)
           vm.dossiers.delegateIdNo = data.applicantIdNo
           vm.dossiers.delegateName = data.applicantName
           vm.dossiers.delegateAddress = data.address
