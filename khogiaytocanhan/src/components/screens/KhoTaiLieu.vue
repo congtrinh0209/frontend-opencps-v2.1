@@ -217,7 +217,7 @@
           style="width: 100%; background: #ffffff"
         >
           <v-layout wrap>
-            <v-flex style="max-width: fit-content;">
+            <v-flex style="max-width: fit-content">
               <div
                 class="headline mb-3 pr-2"
                 style="
@@ -234,7 +234,7 @@
               </div>
             </v-flex>
 
-            <v-flex style="padding-left: 10px;">
+            <v-flex style="padding-left: 10px">
               <v-text-field
                 solo
                 v-model="keywordSearch"
@@ -244,7 +244,14 @@
                 @click:append="searchKeyword"
               ></v-text-field>
             </v-flex>
-            <v-flex style="text-align: right; padding-top: 2px; padding-left: 10px; max-width: fit-content">
+            <v-flex
+              style="
+                text-align: right;
+                padding-top: 2px;
+                padding-left: 10px;
+                max-width: fit-content;
+              "
+            >
               <v-btn
                 color="#0072bc"
                 small
@@ -252,11 +259,17 @@
                 @click.stop="showTimKiem"
                 style=""
               >
-                <v-icon size="20"> filter_list </v-icon> &nbsp; Tìm kiếm nâng cao
+                <v-icon size="20"> filter_list </v-icon> &nbsp; Tìm kiếm nâng
+                cao
               </v-btn>
             </v-flex>
             <v-flex
-              style="text-align: right; padding-top: 2px; padding-left: 10px; max-width: fit-content;"
+              style="
+                text-align: right;
+                padding-top: 2px;
+                padding-left: 10px;
+                max-width: fit-content;
+              "
               v-if="menuActive !== 1 && menuActive !== 2"
             >
               <v-btn
@@ -559,7 +572,7 @@
               flat
               icon
               :disabled="loadingAction"
-              @click.native="showDetail = false"
+              @click.native="handleCancelModalCreate"
               style="position: absolute; right: 10px; top: 10px"
             >
               <v-icon size="28" color="#0072bc">reply</v-icon>
@@ -1145,29 +1158,62 @@
                             class="ml-1"
                             style="cursor: pointer; text-decoration: underline"
                           >
-                            <v-icon class="mr-2" :color="getDocumentTypeIcon(itemFileView.Ext)['color']" :size="16">
-                              {{ getDocumentTypeIcon(itemFileView.Ext)["icon"]}}
+                            <v-icon
+                              class="mr-2"
+                              :color="
+                                getDocumentTypeIcon(itemFileView.Ext)['color']
+                              "
+                              :size="16"
+                            >
+                              {{
+                                getDocumentTypeIcon(itemFileView.Ext)["icon"]
+                              }}
                             </v-icon>
                             <span style="font-size: 16px">{{
                               itemFileView.TenTep
                             }}</span>
                           </span>
-                          <v-btn title="Xóa" color="red" flat icon class="mx-0 my-0 ml-2"
-                            v-on:click.stop="deleteTepUpload(itemFileView, indexFile)"
+                          <v-btn
+                            title="Xóa"
+                            color="red"
+                            flat
+                            icon
+                            class="mx-0 my-0 ml-2"
+                            v-on:click.stop="
+                              deleteTepUpload(itemFileView, indexFile)
+                            "
                           >
                             <v-icon size="20" color="red">close</v-icon>
                           </v-btn>
 
-                          <v-btn title="Ký số giấy tờ" class="my-0 ml-2" flat icon color="indigo"
-                            v-if="String(itemFileView.Ext).toLowerCase() === 'pdf' && !itemFileView.Signed"
+                          <v-btn
+                            title="Ký số giấy tờ"
+                            class="my-0 ml-2"
+                            flat
+                            icon
+                            color="indigo"
+                            v-if="
+                              String(itemFileView.Ext).toLowerCase() ===
+                                'pdf' && !itemFileView.Signed
+                            "
                             @click.stop="showKySo(itemFileView, indexFile)"
                           >
                             <v-icon size="20">fa fa-pencil-square-o</v-icon>
                           </v-btn>
-                          <v-btn title="Giấy tờ đã được ký số" class="my-0 ml-2" flat icon color="green"
-                            v-if="String(itemFileView.Ext).toLowerCase() === 'pdf' && itemFileView.Signed" 
+                          <v-btn
+                            title="Giấy tờ đã được ký số"
+                            class="my-0 ml-2"
+                            flat
+                            icon
+                            color="green"
+                            v-if="
+                              String(itemFileView.Ext).toLowerCase() ===
+                                'pdf' && itemFileView.Signed
+                            "
                           >
-                            <v-icon style="color: green !important" size="18">check_circle</v-icon>
+                            <v-icon style="color: green !important" size="18"
+                              >check_circle</v-icon
+                            >
                           </v-btn>
                         </div>
                       </div>
@@ -1180,7 +1226,9 @@
                             </v-icon>
                           </div>
                           <span style="font-size: 14px; color: #0072bc"
-                            >Kéo và thả tệp vào đây hoặc nhấp để chọn tệp</span
+                            >Kéo và thả tệp vào đây hoặc nhấp để chọn tệp (dung
+                            lượng tệp tối đa tải lên là :
+                            {{ numberData }})</span
                           >
                         </div>
                       </div>
@@ -1206,7 +1254,7 @@
                 class="mr-2 white--text"
                 color="red"
                 :disabled="loadingAction"
-                @click.native="showDetail = false"
+                @click.native="handleCancelModalCreate"
               >
                 <v-icon>reply</v-icon> &nbsp; Quay lại
               </v-btn>
@@ -1268,8 +1316,7 @@
                   style="color: #246; font-weight: 500; font-size: 14px"
                   class="ml-2"
                 >
-                  {{ dataCapacity ? dataCapacity.TongDungLuongDaSuDung : "" }}
-                  bytes
+                  {{ showCapacity }}
                 </p>
               </div>
               <div class="body-content-item__text d-flex align-center">
@@ -1308,7 +1355,7 @@
                     color: rgba(255, 255, 255, 0.75);
                   "
                 >
-                  {{ percent }}%
+                  {{ percent >= 100 ? 100 : percent }}%
                 </div>
               </div>
             </div>
@@ -1380,7 +1427,7 @@
             small
             class="white--text"
             variant="text"
-            @click="dialog=false"
+            @click="dialog = false"
           >
             Hủy
           </v-btn>
@@ -1398,14 +1445,12 @@
     </v-dialog>
     <!--  -->
     <!-- ký số điện tử -->
-    <v-dialog
-      v-model="dialogInputMobile"
-      max-width="550"
-      persistent
-    >
+    <v-dialog v-model="dialogInputMobile" max-width="550" persistent>
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title style="font-size: 14px">THÔNG TIN TÀI KHOẢN CHỮ KÝ SỐ CÔNG CỘNG</v-toolbar-title>
+          <v-toolbar-title style="font-size: 14px"
+            >THÔNG TIN TÀI KHOẢN CHỮ KÝ SỐ CÔNG CỘNG</v-toolbar-title
+          >
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogInputMobile = false">
             <v-icon>close</v-icon>
@@ -1414,7 +1459,10 @@
         <v-card-text class="px-0 pb-0">
           <v-layout wrap>
             <v-flex xs12 class="px-3" style="cursor: pointer">
-              <div>Chọn nhà cung cấp chữ ký số: <span style="color: red"> (*)</span></div>
+              <div>
+                Chọn nhà cung cấp chữ ký số:
+                <span style="color: red"> (*)</span>
+              </div>
               <v-autocomplete
                 :items="dsCungCapCA"
                 hide-no-data
@@ -1424,31 +1472,70 @@
                 box
                 class="my-2"
               ></v-autocomplete>
-              <div>Mã số thuế / Số CMND/CCCD, hộ chiếu<span style="color: red"> (*)</span>:</div>
-              <v-text-field class="mt-2"
+              <div>
+                Mã số thuế / Số CMND/CCCD, hộ chiếu<span style="color: red">
+                  (*)</span
+                >:
+              </div>
+              <v-text-field
+                class="mt-2"
                 v-model="userIdMySign"
                 box
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="text-xs-center mb-3">
-              <v-btn :loading="loadingAction" :disabled="loadingAction" class="mr-0" style="width: 100px" color="primary" @click="getCertMySign()" >
-                <v-icon>save</v-icon> &nbsp;
-                Xác nhận
+              <v-btn
+                :loading="loadingAction"
+                :disabled="loadingAction"
+                class="mr-0"
+                style="width: 100px"
+                color="primary"
+                @click="getCertMySign()"
+              >
+                <v-icon>save</v-icon> &nbsp; Xác nhận
               </v-btn>
             </v-flex>
             <v-flex xs12 class="px-3 mb-4" v-if="listCertMySign.length">
-              <div style="display: flex;align-items: center;">
-                <v-icon size="20" color="#5a770d" class="mr-2">double_arrow</v-icon>
-                <span style="text-transform: uppercase; color: #5a770d;font-weight: 500; font-size: 14px;">Chọn chứng thư số:</span>
+              <div style="display: flex; align-items: center">
+                <v-icon size="20" color="#5a770d" class="mr-2"
+                  >double_arrow</v-icon
+                >
+                <span
+                  style="
+                    text-transform: uppercase;
+                    color: #5a770d;
+                    font-weight: 500;
+                    font-size: 14px;
+                  "
+                  >Chọn chứng thư số:</span
+                >
               </div>
-              <v-flex class="py-2 mt-2" v-for="(item, index) in listCertMySign" :key="index" xs12 
-                style="border: 1px dotted #5a770d; background: #5a770d24;"
-                @click="!chonViTriKySo ? submitMySign(item) : showPdfCoordinate(item)"
+              <v-flex
+                class="py-2 mt-2"
+                v-for="(item, index) in listCertMySign"
+                :key="index"
+                xs12
+                style="border: 1px dotted #5a770d; background: #5a770d24"
+                @click="
+                  !chonViTriKySo ? submitMySign(item) : showPdfCoordinate(item)
+                "
               >
-                <div style="cursor: pointer !important;text-decoration: underline;padding-left: 15px;margin-bottom: 0px;">
+                <div
+                  style="
+                    cursor: pointer !important;
+                    text-decoration: underline;
+                    padding-left: 15px;
+                    margin-bottom: 0px;
+                  "
+                >
                   <v-icon class="mr-2" size="18">edit</v-icon>
-                  <span style="font-size: 14px;">{{item.cert_id}}</span>
-                  <p style="font-size: 14px;">{{strToJson(item.cert_subject)['CN']}} - {{strToJson(item.cert_subject)['L']}} - {{strToJson(item.cert_subject)['ST']}} - {{strToJson(item.cert_subject)['C']}}</p>
+                  <span style="font-size: 14px">{{ item.cert_id }}</span>
+                  <p style="font-size: 14px">
+                    {{ strToJson(item.cert_subject)["CN"] }} -
+                    {{ strToJson(item.cert_subject)["L"] }} -
+                    {{ strToJson(item.cert_subject)["ST"] }} -
+                    {{ strToJson(item.cert_subject)["C"] }}
+                  </p>
                 </div>
               </v-flex>
             </v-flex>
@@ -1457,11 +1544,7 @@
       </v-card>
     </v-dialog>
     <!--  -->
-    <v-dialog
-      v-model="dialogChoKySoBatDongBo"
-      max-width="550"
-      persistent
-    >
+    <v-dialog v-model="dialogChoKySoBatDongBo" max-width="550" persistent>
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title style="font-size: 14px"> CHỜ KÝ SỐ</v-toolbar-title>
@@ -1472,27 +1555,36 @@
         </v-toolbar>
         <v-card-text class="px-0 pb-0">
           <v-layout wrap>
-            <v-flex xs12 class="mt-2" style="font-size: 16px;">
+            <v-flex xs12 class="mt-2" style="font-size: 16px">
               <div class="mb-2 mx-3">
                 <v-progress-linear :indeterminate="true"></v-progress-linear>
               </div>
               <p class="mx-3">
-                Yêu cầu ký số tài liệu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.
+                Yêu cầu ký số tài liệu đã được gửi. Vui lòng thực hiện ký số
+                trên thiết bị.
               </p>
             </v-flex>
           </v-layout>
         </v-card-text>
-        <v-card-actions class="py-3 px-3" style="justify-content: center;">
-          <v-btn class="mr-2 white--text" style="width: 125px" color="primary" @click="cancelProcessKySo">
-            <v-icon>clear</v-icon> &nbsp;
-            HỦY BỎ
+        <v-card-actions class="py-3 px-3" style="justify-content: center">
+          <v-btn
+            class="mr-2 white--text"
+            style="width: 125px"
+            color="primary"
+            @click="cancelProcessKySo"
+          >
+            <v-icon>clear</v-icon> &nbsp; HỦY BỎ
             <span slot="loader">Đang kiểm tra</span>
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!--  -->
-    <v-dialog v-model="dialogPdfCoordinate" fullscreen transition="fade-transition">
+    <v-dialog
+      v-model="dialogPdfCoordinate"
+      fullscreen
+      transition="fade-transition"
+    >
       <v-card>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>Chọn vị trí đặt chữ ký số</v-toolbar-title>
@@ -1501,11 +1593,16 @@
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <pdf-coordinate ref="pdfCoordinate" :urlPdf="urlPdf" :bas64Pdf="base64Pdf" @submitCoordinate="submitCoordinatePdf"></pdf-coordinate>
+        <pdf-coordinate
+          ref="pdfCoordinate"
+          :urlPdf="urlPdf"
+          :bas64Pdf="base64Pdf"
+          @submitCoordinate="submitCoordinatePdf"
+        ></pdf-coordinate>
       </v-card>
     </v-dialog>
     <!--  -->
-    <DialogConfirm :fnCancel="handleCancelClick"/>
+    <DialogConfirm :fnCancel="handleCancelClick" />
   </div>
 </template>
 
@@ -1535,8 +1632,8 @@ export default {
     percent: 0,
     dialog: false,
     dialogPdfCoordinate: false,
-    base64Pdf: '',
-    urlPdf: '',
+    base64Pdf: "",
+    urlPdf: "",
     chonViTriKySo: false,
     dragging: false,
     valid: false,
@@ -1663,23 +1760,30 @@ export default {
 
     dialogInputMobile: false,
     dialogChoKySoBatDongBo: false,
-    userIdMySign: '',
+    userIdMySign: "",
     dsCungCapCA: [
-      {name: 'Viettel CA', value: 'Viettel-CA'},
-      {name: 'VNPT CA', value: 'VNPT-CA'},
-      {name: 'FPT CA', value: 'FPT-CA'},
-      {name: 'BKAV CA', value: 'BkavCA'},
-      {name: 'Nacencom', value: 'CA2'},
-      {name: 'MISA CA', value: 'MISA-CA'}
+      { name: "Viettel CA", value: "Viettel-CA" },
+      { name: "VNPT CA", value: "VNPT-CA" },
+      { name: "FPT CA", value: "FPT-CA" },
+      { name: "BKAV CA", value: "BkavCA" },
+      { name: "Nacencom", value: "CA2" },
+      { name: "MISA CA", value: "MISA-CA" },
     ],
-    donViCapCA: '',
+    donViCapCA: "",
     listCertMySign: [],
-    transactionInfo: '',
-    certSelected: '',
+    transactionInfo: "",
+    certSelected: "",
     tepKySo: null,
-    indexTepUpload: null
+    indexTepUpload: null,
   }),
   computed: {
+    showCapacity() {
+      const vm = this;
+
+      if (vm.dataCapacity) {
+        return `${vm.dataCapacity.TongDungLuongDaSuDung} bytes`;
+      } else return "";
+    },
     documentListHeaderSelectedOption() {
       const vm = this;
       return [
@@ -1757,16 +1861,14 @@ export default {
     let vm = this;
     try {
       if (dsCungCapCA) {
-        vm.dsCungCapCA = dsCungCapCA
+        vm.dsCungCapCA = dsCungCapCA;
       }
-    } catch (error) {
-    }
+    } catch (error) {}
     try {
       if (chonViTriKySo) {
-        vm.chonViTriKySo = chonViTriKySo
+        vm.chonViTriKySo = chonViTriKySo;
       }
-    } catch (error) {
-    }
+    } catch (error) {}
     let param = {
       headers: {
         groupId: window.themeDisplay
@@ -1863,189 +1965,207 @@ export default {
       if (getInputDom) getInputDom.checked = false;
       if (val === 5) vm.getCapacity();
     },
-    dialogInputMobile (val) {
+    dialogInputMobile(val) {
       setTimeout(function () {
         if (val) {
           let myElements = document.querySelectorAll(".v-menu__content");
           for (let i = 0; i < myElements.length; i++) {
-            myElements[i].style.position = 'fixed';
+            myElements[i].style.position = "fixed";
           }
         } else {
-          let myElements = document.querySelectorAll(".v-menu__content")
+          let myElements = document.querySelectorAll(".v-menu__content");
           for (let i = 0; i < myElements.length; i++) {
-            myElements[i].style.position = 'absolute';
+            myElements[i].style.position = "absolute";
           }
         }
-      }, 300)
+      }, 300);
     },
   },
   methods: {
-    showKySo (file, index) {
-      let vm = this
-      console.log('fileKySo', file)
-      vm.dialogInputMobile = true
-      vm.tepKySo = file
-      vm.indexTepUpload = index
+    handleCancelModalCreate() {
+      const vm = this;
+      vm.showDetail = false;
+      if (vm.menuActive === 5) vm.getCapacity();
     },
-    base64ToPdfBlob (base64String) {
-      let byteArray = atob(base64String)
-      let arrayBuffer = new ArrayBuffer(byteArray.length)
-      let uint8Array = new Uint8Array(arrayBuffer)
+    showKySo(file, index) {
+      let vm = this;
+      console.log("fileKySo", file);
+      vm.dialogInputMobile = true;
+      vm.tepKySo = file;
+      vm.indexTepUpload = index;
+    },
+    base64ToPdfBlob(base64String) {
+      let byteArray = atob(base64String);
+      let arrayBuffer = new ArrayBuffer(byteArray.length);
+      let uint8Array = new Uint8Array(arrayBuffer);
       for (let i = 0; i < byteArray.length; i++) {
-        uint8Array[i] = byteArray.charCodeAt(i)
+        uint8Array[i] = byteArray.charCodeAt(i);
       }
-      let blob = new Blob([uint8Array], { type: 'application/pdf' })
-      return blob
+      let blob = new Blob([uint8Array], { type: "application/pdf" });
+      return blob;
     },
-    convertFileToBase64 (file) {
+    convertFileToBase64(file) {
       return new Promise((resolve, reject) => {
         const fileReader = new FileReader();
         fileReader.readAsDataURL(file);
 
         fileReader.onload = () => {
-          resolve(fileReader.result)
-        }
+          resolve(fileReader.result);
+        };
 
         fileReader.onerror = (error) => {
-          reject(error)
-        }
-      })
+          reject(error);
+        };
+      });
     },
-    viewTepUpload (file) {
-      let vm = this
-      let pdfUrl = ''
+    viewTepUpload(file) {
+      let vm = this;
+      let pdfUrl = "";
       if (file.Signed) {
-        let blob = vm.base64ToPdfBlob(file.FileSigned)
+        let blob = vm.base64ToPdfBlob(file.FileSigned);
         pdfUrl = URL.createObjectURL(blob);
-        console.log('pdfUrl', pdfUrl)
-        vm.pathNameFileESign = pdfUrl
-        vm.dialogViewFileSign = true
+        console.log("pdfUrl", pdfUrl);
+        vm.pathNameFileESign = pdfUrl;
+        vm.dialogViewFileSign = true;
       } else {
-        var selectedFile = file['File'];
+        var selectedFile = file["File"];
         if (selectedFile) {
-          let base64 = ''
+          let base64 = "";
           let getBase64 = async () => {
-            base64 = await vm.convertFileToBase64(selectedFile)
-            let blob = vm.base64ToPdfBlob(base64.split(',')[1])
-            pdfUrl = URL.createObjectURL(blob)
-            console.log('pdfUrl', pdfUrl)
-            vm.pathNameFileESign = pdfUrl
-            vm.dialogViewFileSign = true
-          }
-          getBase64()
+            base64 = await vm.convertFileToBase64(selectedFile);
+            let blob = vm.base64ToPdfBlob(base64.split(",")[1]);
+            pdfUrl = URL.createObjectURL(blob);
+            console.log("pdfUrl", pdfUrl);
+            vm.pathNameFileESign = pdfUrl;
+            vm.dialogViewFileSign = true;
+          };
+          getBase64();
         }
       }
     },
-    getCertMySign () {
-      let vm = this
+    getCertMySign() {
+      let vm = this;
       if (String(vm.userIdMySign).trim()) {
         let user = {
           user_id: String(vm.userIdMySign).trim(),
           ca_name: vm.donViCapCA,
-          serial_number: ''
-        }
-        vm.loadingAction = true
-        vm.$store.dispatch('getCertMySign', user).then(res => {
-          vm.loadingAction = false
-          vm.listCertMySign = []
-          try {
-            vm.listCertMySign = res.data.user_certificates
-          } catch (error) {
-          }
-          if (!vm.listCertMySign.length) {
-            toastr.error('Không có thông tin chứng thư số')
-          }
-        }).catch(function () {
-          vm.loadingAction = false
-          toastr.error('Không có thông tin chứng thư số')
-        })
-      }  
-    },
-    showPdfCoordinate (cert) {
-      let vm = this
-      vm.certSelected = cert
-      let getBase64 = async () => {
-        let base64 = await vm.convertFileToBase64(vm.tepKySo.File)
-        vm.base64Pdf = base64.split(',')[1]
-        vm.dialogPdfCoordinate = true
-        setTimeout(function () {
-          vm.$refs.pdfCoordinate.init()
-        }, 200)
+          serial_number: "",
+        };
+        vm.loadingAction = true;
+        vm.$store
+          .dispatch("getCertMySign", user)
+          .then((res) => {
+            vm.loadingAction = false;
+            vm.listCertMySign = [];
+            try {
+              vm.listCertMySign = res.data.user_certificates;
+            } catch (error) {}
+            if (!vm.listCertMySign.length) {
+              toastr.error("Không có thông tin chứng thư số");
+            }
+          })
+          .catch(function () {
+            vm.loadingAction = false;
+            toastr.error("Không có thông tin chứng thư số");
+          });
       }
-      getBase64()
     },
-    submitCoordinatePdf (position) {
-      let vm = this
-      vm.dialogPdfCoordinate = false
-      console.log('coordSubmit', position)
-      vm.submitMySign(vm.certSelected, position)
+    showPdfCoordinate(cert) {
+      let vm = this;
+      vm.certSelected = cert;
+      let getBase64 = async () => {
+        let base64 = await vm.convertFileToBase64(vm.tepKySo.File);
+        vm.base64Pdf = base64.split(",")[1];
+        vm.dialogPdfCoordinate = true;
+        setTimeout(function () {
+          vm.$refs.pdfCoordinate.init();
+        }, 200);
+      };
+      getBase64();
     },
-    base64ToFileObject (base64String, fileName) {
+    submitCoordinatePdf(position) {
+      let vm = this;
+      vm.dialogPdfCoordinate = false;
+      console.log("coordSubmit", position);
+      vm.submitMySign(vm.certSelected, position);
+    },
+    base64ToFileObject(base64String, fileName) {
       var sliceSize = 1024;
       var byteCharacters = atob(base64String);
       var byteArrays = [];
 
-      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-          var slice = byteCharacters.slice(offset, offset + sliceSize);
-          var byteNumbers = new Array(slice.length);
-          for (var i = 0; i < slice.length; i++) {
-              byteNumbers[i] = slice.charCodeAt(i);
-          }
-          var byteArray = new Uint8Array(byteNumbers);
-          byteArrays.push(byteArray);
+      for (
+        var offset = 0;
+        offset < byteCharacters.length;
+        offset += sliceSize
+      ) {
+        var slice = byteCharacters.slice(offset, offset + sliceSize);
+        var byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+        var byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
       }
 
       let blob = new Blob(byteArrays, { type: "application/pdf" });
       return new File([blob], fileName, { type: "application/pdf" });
     },
-    submitMySign (item, position) {
-      let vm = this
-      vm.certSelected = item
+    submitMySign(item, position) {
+      let vm = this;
+      vm.certSelected = item;
       if (vm.loadingAction) {
         return;
       }
       let dataInsertSignature = {
-        "user_id": String(vm.userIdMySign).trim(),
-        "ca_name": vm.donViCapCA,
-        "serial_number": item.serial_number,
-        "cert_data": item.cert_data,
-        "file": vm.tepKySo.File,
-        "x": position ? position['coordinate'][0] : 0,
-        "y": position ? position['coordinate'][1] : 0,
-        "width": position ? position['coordinate'][2] : 0,
-        "height": position ? position['coordinate'][3] : 0,
-        "page": position ? position['page'] : 1
-      }
-      vm.loadingAction = true
-      toastr.success('Yêu cầu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.')
-      vm.dialogChoKySoBatDongBo = true
-      vm.dialogInputMobile = false
-      vm.$store.dispatch('signatureMySign', dataInsertSignature).then(res => {
-        vm.loadingAction = false
-        toastr.clear()
-        toastr.success('Thực hiện ký số thành công')
-        vm.dialogChoKySoBatDongBo = false
-        vm.tepUpload[vm.indexTepUpload].FileSigned = res.file
-        vm.tepUpload[vm.indexTepUpload].Signed = true
-        vm.tepUpload[vm.indexTepUpload].File = vm.base64ToFileObject(res.file, vm.tepUpload[vm.indexTepUpload]['TenTep'] + "_Signed.pdf")
-        console.log('tepDaKySo', vm.tepUpload[vm.indexTepUpload])
-      }).catch(function () {
-        vm.loadingAction = false
-        vm.dialogChoKySoBatDongBo = false
-        setTimeout(function () {
-          toastr.error('Gửi yêu cầu ký số thất bại')
-        }, 300)
-      })
-      
+        user_id: String(vm.userIdMySign).trim(),
+        ca_name: vm.donViCapCA,
+        serial_number: item.serial_number,
+        cert_data: item.cert_data,
+        file: vm.tepKySo.File,
+        x: position ? position["coordinate"][0] : 0,
+        y: position ? position["coordinate"][1] : 0,
+        width: position ? position["coordinate"][2] : 0,
+        height: position ? position["coordinate"][3] : 0,
+        page: position ? position["page"] : 1,
+      };
+      vm.loadingAction = true;
+      toastr.success(
+        "Yêu cầu đã được gửi. Vui lòng thực hiện ký số trên thiết bị."
+      );
+      vm.dialogChoKySoBatDongBo = true;
+      vm.dialogInputMobile = false;
+      vm.$store
+        .dispatch("signatureMySign", dataInsertSignature)
+        .then((res) => {
+          vm.loadingAction = false;
+          toastr.clear();
+          toastr.success("Thực hiện ký số thành công");
+          vm.dialogChoKySoBatDongBo = false;
+          vm.tepUpload[vm.indexTepUpload].FileSigned = res.file;
+          vm.tepUpload[vm.indexTepUpload].Signed = true;
+          vm.tepUpload[vm.indexTepUpload].File = vm.base64ToFileObject(
+            res.file,
+            vm.tepUpload[vm.indexTepUpload]["TenTep"] + "_Signed.pdf"
+          );
+          console.log("tepDaKySo", vm.tepUpload[vm.indexTepUpload]);
+        })
+        .catch(function () {
+          vm.loadingAction = false;
+          vm.dialogChoKySoBatDongBo = false;
+          setTimeout(function () {
+            toastr.error("Gửi yêu cầu ký số thất bại");
+          }, 300);
+        });
     },
-    cancelProcessKySo () {
-      let vm = this
-      vm.dialogChoKySoBatDongBo = false
-      vm.loadingAction = false
+    cancelProcessKySo() {
+      let vm = this;
+      vm.dialogChoKySoBatDongBo = false;
+      vm.loadingAction = false;
     },
     handleCancelClick() {
-      const vm = this
-      vm.loadingAction = false
+      const vm = this;
+      vm.loadingAction = false;
     },
     handleChangeCheckbox() {
       const vm = this;
@@ -2078,13 +2198,19 @@ export default {
             (vm.convertToGigabyte(data.TongDungLuongDaSuDung + "bytes") * 100) /
             vm.convertToGigabyte(data.TongDungLuongToiDaChoPhep);
           if (data.DungLuongToiDaFileTaiLen)
-            vm.numberData = Math.ceil(
-              vm.convertToByte(data.DungLuongToiDaFileTaiLen)
-            );
+            vm.numberData = data.DungLuongToiDaFileTaiLen;
+          console.log(
+            "respon:...",
+            vm.convertToGigabyte(data.TongDungLuongDaSuDung + "bytes"),
+            vm.convertToGigabyte(data.TongDungLuongToiDaChoPhep)
+          );
           vm.percent = Math.ceil(number);
-          if (vm.percent >= 80) toastr.error("Bạn sắp sử dụng hết dung lượng");
+          if (vm.percent >= 80 && vm.percent <= 90 && !vm.showDetail)
+            toastr.error("Bạn sắp sử dụng hết dung lượng");
+          if (vm.percent >= 100 && !vm.showDetail)
+            toastr.error("Bạn đã sử dụng hết dung lượng");
         })
-        .catch((err) => vm.numberData = '');
+        .catch((err) => (vm.numberData = ""));
     },
     handleClickSelected() {
       const vm = this;
@@ -2186,18 +2312,18 @@ export default {
         { title: "g", value: 1 },
         { title: "gb", value: 1 },
       ];
-      let result = null;
+      let result = 0;
 
       for (let i = 0; i < unit.length; i++) {
         const item = unit[i];
         if (param.toLowerCase().includes(item.title)) {
           const index = param.toLowerCase().indexOf(item.title);
           const number = param.slice(0, index);
-          result = number * item.value;
+          result = +number * item.value;
           break;
         }
       }
-      return result || param;
+      return result;
     },
     convertToByte(param) {
       const unit = [
@@ -2212,7 +2338,7 @@ export default {
         { title: "g", value: 1.342177 * Math.pow(10, 8) },
         { title: "gb", value: 1.342177 * Math.pow(10, 8) },
       ];
-      let result = null;
+      let result = 0;
 
       for (let i = 0; i < unit.length; i++) {
         const item = unit[i];
@@ -2223,7 +2349,7 @@ export default {
           break;
         }
       }
-      return result || param;
+      return result;
     },
     cancelShareDocument() {
       const vm = this;
@@ -2233,9 +2359,10 @@ export default {
       event.preventDefault();
       vm.dragging = false;
       const files = event.dataTransfer.files;
-      console.log('vm.numberData', vm.numberData)
+      const sizeNumberData = Math.ceil(vm.convertToByte(vm.numberData));
+      console.log("vm.numberData", vm.numberData, sizeNumberData);
       if (vm.numberData) {
-        if (files[0].size <= vm.numberData) {
+        if (files[0].size <= sizeNumberData) {
           vm.handleDragFiles(files);
         } else {
           toastr.error("Kích thước tệp không được vượt quá " + vm.numberData);
@@ -2339,11 +2466,13 @@ export default {
     },
     changeMenu(index) {
       let vm = this;
-      vm.selected = [];
       vm.menuActive = index;
-      vm.showDetail = false;
-      vm.resetTimKiem();
-      vm.searchGiayToSoHoa();
+      if (index !== 5) {
+        vm.selected = [];
+        vm.showDetail = false;
+        vm.resetTimKiem();
+        vm.searchGiayToSoHoa();
+      }
     },
     uploadFile() {
       document.getElementById("documentFile").value = "";
@@ -2407,10 +2536,15 @@ export default {
           share = "";
           break;
       }
+      let text = "";
+
+      if (dataSearch)
+        text = dataSearch.soHieuGiayTo || dataSearch.keyword || "";
+
       let filter = {
         page: vm.documentPage,
         size: vm.numberPerPage,
-        keyword: dataSearch.soHieuGiayTo || dataSearch.keyword || "",
+        keyword: text,
         coQuanBanHanh_MaDinhDanh: dataSearch ? dataSearch.govAgencyCode : "",
         mauGiayTo_MaMuc: dataSearch ? dataSearch.fileTemplateNo : "",
         ngayBanHanh_TuNgay: dataSearch
@@ -2608,6 +2742,7 @@ export default {
     },
     cloneMyStorage(item) {
       let vm = this;
+      console.log("item:...", item, vm.documentSelect);
       // let filter = {
       //   "MaDinhDanh": item.MaDinhDanh,
       //   "CCCDMST": vm.applicantIdNo,
@@ -2622,26 +2757,40 @@ export default {
       //   toastr.error('Yêu cầu thực hiện thất bại. Vui lòng thử lại.')
       // })
 
-      let filter = {
-        primKey: vm.documentSelect.primKey,
-        data: Object.assign(vm.documentSelect, { TrangThaiChiaSe: 0 }),
-        collection: "giaytocanhantochuc",
-      };
+      // let filter = {
+      //   primKey: vm.documentSelect.primKey,
+      //   data: Object.assign(vm.documentSelect, { TrangThaiChiaSe: 0 }),
+      //   collection: "giaytocanhantochuc",
+      // };
       // vm.$store.dispatch('updateGiayToLuTru_HeThongKhoGT', filter).then(function (result) {
-      vm.$store
-        .dispatch("updateGiayToLuTru", filter)
-        .then(function (result) {
-          vm.loadingAction = false;
-          toastr.success("Lấy giấy tờ thành công.");
-          vm.showDetail = false;
-          setTimeout(function () {
-            vm.getDanhSachGiayToSoHoa();
-          }, 200);
-        })
-        .catch(function () {
-          vm.loadingAction = false;
-          toastr.error("Lấy giấy tờ thất bại. Vui lòng thử lại.");
-        });
+
+      vm.loadingAction = true;
+
+      const payload = {
+        cb: () => {
+          let filter = {
+            primKey: item.primKey,
+            data: Object.assign(item, { TrangThaiChiaSe: 0 }),
+            collection: "giaytocanhantochuc",
+          };
+          vm.$store
+            .dispatch("updateGiayToLuTru", filter)
+            .then(function (result) {
+              vm.loadingAction = false;
+              toastr.success("Lấy giấy tờ thành công.");
+              vm.showDetail = false;
+              setTimeout(function () {
+                vm.getDanhSachGiayToSoHoa();
+              }, 200);
+            })
+            .catch(function () {
+              vm.loadingAction = false;
+              toastr.error("Lấy giấy tờ thất bại. Vui lòng thử lại.");
+            });
+        },
+        title: "Bạn có chắc chắn lấy giấy tờ này về kho của mình ?",
+      };
+      vm.$store.commit("SET_STATE_DIALOG", payload);
     },
     deleteDocument(item) {
       let vm = this;
@@ -2719,7 +2868,7 @@ export default {
           TenTep: file["name"],
           FileInput: true,
           Signed: false,
-          FileSigned: null
+          FileSigned: null,
         });
       }
       vm.tepUpload = arrTep;
@@ -2741,15 +2890,16 @@ export default {
           });
         }
         vm.tepUpload = arrTep;
-      }
+      };
       if (vm.numberData) {
-        if (files[0].size < vm.numberData) {
-          upload()
+        const sizeNumberData = Math.ceil(vm.convertToByte(vm.numberData));
+        if (files[0].size < sizeNumberData) {
+          upload();
         } else {
-          toastr.error("Kích thước tệp không được vượt quá " + vm.numberData)
+          toastr.error("Kích thước tệp không được vượt quá " + vm.numberData);
         }
       } else {
-        upload()
+        upload();
       }
     },
     showCreatedocument() {
@@ -3189,21 +3339,21 @@ export default {
           });
       }
     },
-    strToJson (inputString) {
-      var keyValuePairs = inputString.split(',');
+    strToJson(inputString) {
+      var keyValuePairs = inputString.split(",");
       var result = {};
 
-      keyValuePairs.forEach(function(keyValuePair) {
-          var parts = keyValuePair.split('=');
-          var key = parts[0].trim();
-          var value = parts[1].trim();
-          if (value.startsWith("U+")) {
-            value = String.fromCharCode(parseInt(value.substring(2), 16));
-          }
-          result[key] = value;
+      keyValuePairs.forEach(function (keyValuePair) {
+        var parts = keyValuePair.split("=");
+        var key = parts[0].trim();
+        var value = parts[1].trim();
+        if (value.startsWith("U+")) {
+          value = String.fromCharCode(parseInt(value.substring(2), 16));
+        }
+        result[key] = value;
       });
       return result;
-    }
+    },
   },
 };
 </script>
