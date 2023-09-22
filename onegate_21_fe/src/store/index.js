@@ -5861,6 +5861,45 @@ export const store = new Vuex.Store({
         })
       })
     },
+    kiemTraDinhDanh ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {}
+        }
+        let urlTraCuu = "/o/rest/v2/qldc/dvcqg"
+        let dataInput = ''
+        dataInput = {
+          "MaYeuCau" : (new Date()).getTime(),
+          "MaDichVu" : "033",
+          "StaffEmail" : filter.StaffEmail,
+          "GovAgencyCode": filter.GovAgencyCode,
+          "HoVaTen" : filter.applicantName,
+          "type": "XacThucThongTinCongDan",
+          "SoCMND": filter.CMND,
+          "SoDinhDanh": filter.CCCD
+        }
+        axios({
+          method: 'POST',
+          url: urlTraCuu,
+          headers: config.headers,
+          params: config.params,
+          data: dataInput
+        }).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.hasOwnProperty('Body') && serializable["Body"].hasOwnProperty('KetQuaXacThuc')) {
+            let data = serializable["Body"]["KetQuaXacThuc"]["TonTai"]
+            resolve(data)
+          } else {
+            resolve(false)
+          }
+        }).catch(function (error) {
+          reject('')
+        })
+      })
+    },
     checkRoleSearchLgsp ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -6362,14 +6401,18 @@ export const store = new Vuex.Store({
               keyword: filter.keyword ? filter.keyword : '',
               ngayBanHanh_TuNgay: filter.ngayBanHanh_TuNgay ? filter.ngayBanHanh_TuNgay : '',
               ngayBanHanh_DenNgay: filter.ngayBanHanh_DenNgay ? filter.ngayBanHanh_DenNgay : '',
+              hoSoDichVuCong: filter.hoSoDichVuCong ? filter.hoSoDichVuCong : '',
               orderFields: 'ThoiGianTao',
               orderType: 'desc',
               cccdmst: filter.cccd ? filter.cccd : '',
-              trangThaiChiaSe: filter.trangThaiChiaSe
+              trangThaiChiaSe: filter.trangThaiChiaSe,
+              soHieuVanBan: filter.soHieuVanBan ? filter.soHieuVanBan : ''
             },
             data: {}
           }
-
+          if (filter.hasOwnProperty('thuongXuyenSuDung')) {
+            param['params']['thuongXuyenSuDung'] = true
+          }
           axios.get(`/o/systemintegration/${filter.collection}`, param).then(function (response) {
             resolve(response.data)
           }, error => {
@@ -6508,6 +6551,27 @@ export const store = new Vuex.Store({
           resolve(response)
         }).catch(function (xhr) {
           reject(data)
+        })
+      })
+    },
+    capNhatTaiSuDungGiayTo ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId(),
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json'
+          },
+          params: {
+            loaiHanhDong: 'tang',
+            maDinhDanh: data.maDinhDanh
+          },
+          data: {}
+        }
+        axios.get('/o/systemintegration/giaytoluutruso/update/solantaisudung', param).then(function (response) {
+          resolve(response.data)
+        }, error => {
+          reject(error)
         })
       })
     },

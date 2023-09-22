@@ -35,7 +35,12 @@
                       <span v-if="!loadingCheckAcc">Kiểm tra thông tin tài khoản</span>
                       <span v-if="loadingCheckAcc">Đang kiểm tra</span>
                     </v-btn> -->
-                    <v-btn v-if="quyenTraCuuLgsp && serviceCheckCsdldc == '037'" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary"
+                    <v-btn v-if="kiemTraDinhDanhCaNhan && quyenTraCuuLgsp && serviceCheckCsdldc && serviceCheckCsdldc.includes('033')" class="mx-0 mr-3" color="primary"
+                    style="margin-top: -8px;" @click.stop="showDialogKiemTraSoDinhDanh()">
+                      <v-icon style="color: #fff">verified</v-icon> &nbsp;
+                      <span style="color: #fff">Xác thực số CCCD/ CMND</span>
+                    </v-btn>
+                    <v-btn v-if="quyenTraCuuLgsp && serviceCheckCsdldc && serviceCheckCsdldc.includes('037')" :style="loadingSearchLgsp ? 'pointer-events: none;margin-top: -8px;' : 'margin-top: -8px;'" class="mx-0" color="primary"
                      @click.stop="showDialogSearchLgspCongDan()">
                       <v-icon v-if="!loadingSearchLgsp">fas fa fa-search-plus</v-icon> 
                       <v-progress-circular :size="24" v-if="loadingSearchLgsp"
@@ -1499,6 +1504,61 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!-- tra cứu LGSP -->
+    <v-dialog v-model="dialogKiemTraDinhDanh" scrollable persistent max-width="1000px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Xác thực số CCCD/ CMND</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogKiemTraDinhDanh = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="formKiemTraDinhDanh" v-model="validKiemTraDinhDanh" class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-0">
+              <v-flex xs12>
+                <v-text-field label="Số Căn cước công dân" v-model="soCanCuocKiemTra"
+                 box clearable :rules="[rules.required, rules.creditCccd]"
+                >
+                </v-text-field>
+                <v-text-field label="Số Chứng minh nhân dân" v-model="soChungMinhKiemTra"
+                 box clearable :rules="[rules.required, rules.creditCmnd]"
+                >
+                </v-text-field>
+                <v-text-field label="Họ và tên" v-model="hoTenDinhDanhKiemTra"
+                 box clearable :rules="[rules.required]" class="mt-2"
+                >
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 class="text-right">
+                <v-btn color="primary"
+                  @click="actionKiemTraDinhDanhCaNhan"
+                  :loading="loadingSearchLgsp"
+                  :disabled="loadingSearchLgsp"
+                  class="mx-0 my-0"
+                >
+                  <v-icon size="20">search</v-icon>
+                  &nbsp;
+                  Kiểm tra
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+              </v-flex>
+              <div v-if="ketQuaXacThucDinhDanh == 'true'" class="mx-1 flex my-3">
+                <v-alert outline color="green" icon="warning" :value="true">
+                  THÔNG TIN XÁC THỰC CHÍNH XÁC
+                </v-alert>
+              </div>
+              <div v-if="ketQuaXacThucDinhDanh == 'false'" class="mx-1 flex mb-3">
+                <v-alert outline color="red" icon="warning" :value="true">
+                  THÔNG TIN XÁC THỰC KHÔNG CHÍNH XÁC
+                </v-alert>
+              </div>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -1702,6 +1762,22 @@ export default {
           return true
         }
       },
+      creditCmnd: (value) => {
+        if (value) {
+          const pattern = /^(([0-9]{9,9}))$/
+          return pattern.test(value) || 'Số chứng minh nhân dân gồm 9 ký tự 0-9'
+        } else {
+          return true
+        }
+      },
+      creditCccd: (value) => {
+        if (value) {
+          const pattern = /^(([0-9]{12,12}))$/
+          return pattern.test(value) || 'Số căn cước công dân gồm 12 ký tự 0-9'
+        } else {
+          return true
+        }
+      },
       varchar50: (val) => {
         if(val){
           val = String(val).trim()
@@ -1787,7 +1863,14 @@ export default {
     serviceCheckCsdldc: '',
     disableEditApplicant: false,
     showNgaySinhApplicant: false,
-    SCAN_QR_CCCD: false
+    SCAN_QR_CCCD: false,
+    kiemTraDinhDanhCaNhan: false,
+    soCanCuocKiemTra: '',
+    soChungMinhKiemTra: '',
+    ketQuaXacThucDinhDanh: null,
+    hoTenDinhDanhKiemTra: '',
+    dialogKiemTraDinhDanh: false,
+    validKiemTraDinhDanh: false
   }),
   computed: {
     loading () {
@@ -1825,6 +1908,10 @@ export default {
     let vm = this
     try {
       vm.disableEditApplicant = disableEditApplicant
+    } catch (error) {
+    }
+    try {
+      vm.kiemTraDinhDanhCaNhan = kiemTraDinhDanhCaNhan
     } catch (error) {
     }
     try {
@@ -2167,7 +2254,7 @@ export default {
             vm.quyenTraCuuLgsp = result.serviceCode
           }
           if (result.hasOwnProperty('serviceDvcqg')) {
-            vm.serviceCheckCsdldc = result.serviceDvcqg
+            vm.serviceCheckCsdldc = result.serviceDvcqg ? result.serviceDvcqg.split(',') : ''
           }
         }).catch(xhr => {
           vm.quyenTraCuuLgsp = false
@@ -2956,6 +3043,38 @@ export default {
       vm.dialog_searchLgsp = true
       if (vm.applicantIdNoLgsp.trim()) {
         vm.searchLgspDoanhNghiep()
+      }
+    },
+    showDialogKiemTraSoDinhDanh () {
+      let vm = this
+      vm.soCanCuocKiemTra = ''
+      vm.soChungMinhKiemTra = ''
+      vm.hoTenDinhDanhKiemTra = ''
+      vm.ketQuaXacThucDinhDanh = null
+      vm.dialogKiemTraDinhDanh = true
+      setTimeout (function () {
+        vm.$refs.formKiemTraDinhDanh.resetValidation()
+      }, 200)
+    },
+    actionKiemTraDinhDanhCaNhan () {
+      let vm = this
+      if (vm.$refs.formKiemTraDinhDanh.validate() && String(vm.soCanCuocKiemTra).trim() && String(vm.hoTenDinhDanhKiemTra).trim()) {
+        let filter = {
+          CCCD: String(vm.soCanCuocKiemTra).trim(),
+          CMND: String(vm.soChungMinhKiemTra).trim(),
+          applicantName: vm.convertString(String(vm.hoTenDinhDanhKiemTra).trim()).toUpperCase(),
+          StaffEmail : vm.userLoginInfomation && vm.userLoginInfomation.hasOwnProperty('employeeEmail') ? vm.userLoginInfomation.employeeEmail : '',
+          GovAgencyCode: vm.detailDossier ? vm.detailDossier.govAgencyCode : ''
+        }
+        vm.loadingSearchLgsp = true
+        vm.$store.dispatch('kiemTraDinhDanh', filter).then(result => {
+          vm.loadingSearchLgsp = false
+          vm.ketQuaXacThucDinhDanh = result
+        }).catch(function () {
+          vm.loadingSearchLgsp = false
+          vm.ketQuaXacThucDinhDanh = null
+          toastr.error('Lỗi hệ thống')
+        })
       }
     },
     showDialogSearchLgspCongDan () {

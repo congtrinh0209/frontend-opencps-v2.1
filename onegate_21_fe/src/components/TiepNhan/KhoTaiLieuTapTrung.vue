@@ -92,28 +92,22 @@
                     </span>
                   </div>
                 </td>
-                <td class="text-center py-2" style="height:36px;min-width:110px">
+                <td class="text-center py-2" style="height:36px;min-width:200px">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
-                  <v-tooltip top v-if="!loadingTable" class="mr-2">
-                    <v-btn title="Xem chi tiết" @click.stop="viewThongTinGiayTo(props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
-                      <v-icon size="22">visibility</v-icon>
-                    </v-btn>
-                    <span>Xem chi tiết</span>
-                  </v-tooltip>
+                  <v-btn v-if="!loadingTable" @click.stop="viewThongTinGiayTo(props.item)" color="#0072bc" class="mx-0 my-0 mr-2">
+                    <v-icon size="16" style="color: #ffffff">visibility</v-icon>&nbsp; <span style="color: #ffffff">Xem</span>
+                  </v-btn>
                   <!-- <v-tooltip top v-if="!loadingTable && props.item.fileEntryId" class="mr-2">
                     <v-btn @click.stop="downloadDocument(props.item)" color="#0072bc" title="Tải xuống" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon size="22">fas fa fa-download</v-icon>
                     </v-btn>
                     <span>Tải xuống</span>
                   </v-tooltip> -->
-                  <v-tooltip top v-if="!loadingTable" class="mr-2">
-                    <v-btn title="Sử dụng giấy tờ này" @click.stop="$emit('trigger-attach', props.item)" color="#0072bc" slot="activator" flat icon class="mx-0 my-0">
-                      <v-icon size="22">fas fa fa-cloud-download</v-icon>
-                    </v-btn>
-                    <span>Sử dụng giấy tờ này</span>
-                  </v-tooltip>
+                  <v-btn v-if="!loadingTable" @click.stop="$emit('trigger-attach', props.item)" color="#0072bc" class="mx-0 my-0 mr-2">
+                    <v-icon size="16" style="color: #ffffff">fas fa fa-cloud-download</v-icon>&nbsp; <span style="color: #ffffff">Sử dụng</span>
+                  </v-btn>
                 </td>
               </tr>
             </template>
@@ -213,12 +207,12 @@
                 <v-icon>close</v-icon>
               </v-btn>
             </v-toolbar>
-            <iframe id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+            <iframe :id="idPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
             </iframe>
           </v-card>
         </v-dialog>
         <div style="display:none">
-          <a id="downloadFile" :href="srcDownload" download></a>
+          <a :id="'downloadFile'+idPreview" :href="srcDownload" download></a>
         </div>
       </v-flex>
     </v-layout>
@@ -241,7 +235,7 @@
       'tim-kiem': Search,
       'pagination': Pagination
     },
-    props: ['index', 'thongTinChuHoSo'],
+    props: ['index', 'thongTinChuHoSo', 'giayToThuongXuyen', 'idPreview'],
     data: () => ({
       valid: false,
       donViList: [],
@@ -427,16 +421,21 @@
         let vm = this
         vm.showDetail = false
         vm.inputSearch = {
-          applicantIdNo: vm.index 
+          applicantIdNo: vm.index,
+          soHieuVanBan: '',
+          hoSoDichVuCong: ''
         }
         vm.searchGiayToSoHoa(vm.inputSearch)
         vm.showAdvanceSearch = true
+        setTimeout(function () {
+          vm.$refs.timkiem.initData()
+        }, 200)
       },
       viewThongTinGiayTo (item) {
         let vm = this
         let filter = {
           primKey: item.primKey,
-          collection: vm.originality == 3 ? 'giaytoluutruso' : 'giaytocanhantochuc'
+          collection: 'giaytocanhantochuc'
         }
 
         vm.$store.dispatch('getChiTietGiayToCaNhan', filter).then(function (result) {
@@ -511,7 +510,12 @@
           orderType: 'desc',
           cccd: dataSearch ? dataSearch.applicantIdNo : '',
           collection: 'giaytocanhantochuc',
-          trangThaiChiaSe: vm.originality == 3 ? '1,2' : ''
+          trangThaiChiaSe: vm.originality == 3 ? '1,2' : '',
+          soHieuVanBan: dataSearch ? dataSearch.soHieuVanBan : '',
+          hoSoDichVuCong: dataSearch ? dataSearch.hoSoDichVuCong : ''
+        }
+        if (vm.giayToThuongXuyen) {
+          filter['thuongXuyenSuDung'] = true
         }
 
         vm.loadingTable = true
@@ -540,7 +544,7 @@
           vm.loadingPdf = false
           vm.srcDownload = result
           setTimeout(function () {
-            document.getElementById('downloadFile').click()
+            document.getElementById('downloadFile' + vm.idPreview).click()
           }, 100)
         }).catch(function () {
           vm.loadingPdf = false
@@ -564,11 +568,11 @@
             fileType === 'tif' || fileType === 'tiff'
           ) {
             vm.dialogPDF = true
-            document.getElementById('dialogPDFPreview').src = result
+            document.getElementById(vm.idPreview).src = result
           } else {
             vm.srcDownload = result
             setTimeout(function () {
-              document.getElementById('downloadFile').click()
+              document.getElementById('downloadFile'+vm.idPreview).click()
             }, 100)
           }
         }).catch(function () {

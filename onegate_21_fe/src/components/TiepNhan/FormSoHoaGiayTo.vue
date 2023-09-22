@@ -235,6 +235,7 @@
         vm.tenGiayToStorage = vm.partKhoGiayTo.partName
         vm.applicantIdNoToStorage = vm.thongTinHoSo['applicantIdNo']
         vm.applicantNameToStorage = vm.thongTinHoSo['applicantName']
+        vm.keywordSearchDonVi = ''
         if (vm.khoTaiLieuTapTrung) {
           vm.searchItemsDonVi()
           vm.getLoaiGiayTo()
@@ -513,11 +514,11 @@
         .then((response) => {
           if (vm.originality == 3) {
             toastr.success('Số hóa giấy tờ thành công')
+            vm.$emit('callBackSoHoaGiayTo', response.data.resp)
           } else {
             toastr.success('Lưu giấy tờ vào kho thành công')
           }
           vm.loading = false
-          vm.$emit('callBackSoHoaGiayTo', response.data.resp)
         })
         .catch((error) => {
           vm.loading = false

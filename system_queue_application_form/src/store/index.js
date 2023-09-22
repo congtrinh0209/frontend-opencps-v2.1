@@ -429,12 +429,17 @@ export const store = new Vuex.Store({
         dataPost.append('url', '/bookings')
         dataPost.append('data', JSON.stringify(dataCreate))
         dataPost.append('bypassCaptcha', true)
+        dataPost.append('body', '')
 
         axios.post('/o/rest/v2/proxy', dataPost, param).then(response => {
           console.log('responseCreateBooking', response)
           if (response['data'] && response['data']['code'] === 203) {
             toastr.clear()
             toastr.error('Mã captcha không chính xác')
+            reject(response)
+          } if (response['data'] && response['data'].hasOwnProperty('errorCode') && response['data']['errorCode'] === 99) {
+            toastr.clear()
+            toastr.error('Đăng ký xếp hàng thất bại. Vui lòng thử lại sau ít phút.')
             reject(response)
           } else {
             resolve(response.data)

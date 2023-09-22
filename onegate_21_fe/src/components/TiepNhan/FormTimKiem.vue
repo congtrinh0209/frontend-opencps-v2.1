@@ -130,7 +130,7 @@
                 <v-date-picker :min="fromReceiveDateFormatted ? getMinMax(fromReceiveDateFormatted) : null" :max="currentDate()" v-model="toReceiveDate" locale="vi" :first-day-of-week="1" no-title @input="changeDate('2')"></v-date-picker>
               </v-menu>
             </v-flex>
-            <v-flex xs12 sm6 class="px-0" v-if="!khoDvcqg">
+            <v-flex xs12 sm3 class="px-0 pr-3" v-if="!khoDvcqg">
               <div class="mb-1">Hiệu lực</div>
               <v-autocomplete
                 :items="statusList"
@@ -141,6 +141,28 @@
                 solo
                 flat
               ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm3 class="px-0" v-if="!khoDvcqg">
+              <div class="mb-1">Số hiệu giấy tờ</div>
+              <v-text-field
+                v-model="dataSearch['soHieuVanBan']"
+                solo
+                flat
+                height="32"
+                min-height="32"
+                clearable
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm3 class="px-0 pr-3" v-if="!khoDvcqg">
+              <div class="mb-1">Mã hồ sơ</div>
+              <v-text-field
+                v-model="dataSearch['hoSoDichVuCong']"
+                solo
+                flat
+                height="32"
+                min-height="32"
+                clearable
+              ></v-text-field>
             </v-flex>
           </v-layout>
         </v-row>
@@ -184,7 +206,8 @@
           dossierNo: '',
           govAgencyCode: '',
           fromReceiveDateFormatted: '',
-          toReceiveDateFormatted: ''
+          toReceiveDateFormatted: '',
+          soHieuVanBan: ''
         },
         isDvc: false,
         disableInput: false,
@@ -301,6 +324,14 @@
       },
     },
     methods: {
+      initData () {
+        let vm = this
+        vm.keywordSearchDonVi = ""
+        vm.keywordSearchSelect = ""
+        if (vm.inputSearch) {
+          vm.dataSearch = Object.assign(vm.dataSearch, vm.inputSearch)
+        }
+      },
       getDataOutPut () {
         let vm = this
         return vm.dataSearch
@@ -317,7 +348,8 @@
           name: '',
           dossierNo: '',
           fromReceiveDateFormatted: '',
-          toReceiveDateFormatted: ''
+          toReceiveDateFormatted: '',
+          soHieuVanBan: ''
         },
         vm.$emit('trigger-cancel', vm.dataSearch)
       },

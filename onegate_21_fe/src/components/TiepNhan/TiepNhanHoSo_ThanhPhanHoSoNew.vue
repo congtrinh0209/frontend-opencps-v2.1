@@ -711,24 +711,32 @@
         <v-card-text class="pa-0" style="min-height: 500px">
           <v-tabs icons-and-text v-model="activeTabKho">
             <v-tabs-slider color="primary"></v-tabs-slider>
-            <v-tab :key="1" href="#tabs-cn" class="px-3">
+            <v-tab v-if="khoTaiLieuTapTrung" :key="1" href="#tabs-cn-tx" class="px-3">
+              <v-btn flat class="px-0 py-0 mx-0 my-0">
+                Giấy tờ sử dụng thường xuyên
+              </v-btn>
+            </v-tab>
+            <v-tab :key="2" href="#tabs-cn" class="px-3" @click="showDocumentGiayToTapTrung">
               <v-btn flat class="px-0 py-0 mx-0 my-0">
                 Giấy tờ trong kho cá nhân
               </v-btn>
             </v-tab>
-            <v-tab :key="2" href="#tabs-dvcqg" class="px-3" v-if="khoTaiLieuDvcqg" @click="showDocumentDvcqg">
+            <v-tab :key="3" href="#tabs-dvcqg" class="px-3" v-if="khoTaiLieuDvcqg" @click="showDocumentDvcqg">
               <v-btn flat class="px-0 py-0 mx-0 my-0">
                 Giấy tờ từ Cổng DVCQG
               </v-btn>
             </v-tab>
             <v-tabs-items v-model="activeTabKho" class="px-3" reverse-transition="fade-transition" transition="fade-transition">
-              <v-tab-item value="tabs-cn" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-                <kho-tai-lieu-tap-trung v-if="khoTaiLieuTapTrung" ref="khotailieutaptrung" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
+              <v-tab-item v-if="khoTaiLieuTapTrung" value="tabs-cn-tx" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+                <kho-tai-lieu-tap-trung ref="khotailieutaptrungthuongxuyen" :idPreview="'khothuongxuyenPreview'" :giayToThuongXuyen="true" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
+              </v-tab-item>
+              <v-tab-item value="tabs-cn" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+                <kho-tai-lieu-tap-trung v-if="khoTaiLieuTapTrung" ref="khotailieutaptrung" :idPreview="'khotaptrungPreview'" :index="applicantId" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageCentralized"></kho-tai-lieu-tap-trung>
                 <kho-tai-lieu v-if="!khoTaiLieuTapTrung"  ref="khotailieu" :index="applicantId" :serverCode="!oneApp && originality == '1' ? thongTinHoSo.serverNo : ''" 
                   :fileTemplateNoScope="fileTemplateNoScope" :status="statusApplicantData" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorage">
                 </kho-tai-lieu>
               </v-tab-item>
-              <v-tab-item v-if="khoTaiLieuDvcqg" value="tabs-dvcqg" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+              <v-tab-item v-if="khoTaiLieuDvcqg" value="tabs-dvcqg" :key="3" reverse-transition="fade-transition" transition="fade-transition">
                 <kho-dvcqg ref="khodvcqg" :index="applicantId" :serivceInfo="{'serviceCode' : serviceCodeDvcqg, 'serviceName': thongTinHoSo.serviceName}"
                  :thanhPhanHoSo="dossierPartAttach" :thongTinChuHoSo="thongTinChuHoSo" v-on:trigger-attach="attachFileFromStorageDvcqg"></kho-dvcqg>
               </v-tab-item>
@@ -884,12 +892,13 @@
               </div>
               <v-flex class="py-2 mt-2" v-for="(item, index) in listCertMySign" :key="index" xs12 
                 style="border: 1px dotted #5a770d; background: #5a770d24;"
-                @click="submitMySign(item)"
+                @click="!chonViTriKySo ? submitMySign(item) : showPdfCoordinate(item)"
               >
-                <p style="cursor: pointer !important;text-decoration: underline;padding-left: 15px;margin-bottom: 0px;">
+                <div style="cursor: pointer !important;text-decoration: underline;padding-left: 15px;margin-bottom: 0px;">
                   <v-icon class="mr-2" size="18">edit</v-icon>
                   <span style="font-size: 14px;">{{item.cert_id}}</span>
-                </p>
+                  <p style="font-size: 14px;">{{strToJson(item.cert_subject)['CN']}} - {{strToJson(item.cert_subject)['L']}} - {{strToJson(item.cert_subject)['ST']}} - {{strToJson(item.cert_subject)['C']}}</p>
+                </div>
               </v-flex>
             </v-flex>
           </v-layout>
@@ -1146,7 +1155,7 @@
         <v-toolbar dark color="primary">
           <v-toolbar-title style="font-size: 14px"> CHỜ KÝ SỐ</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialogChoKySoBatDongBo = false">
+          <v-btn icon dark @click.native="cancelProcessKySo">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
@@ -1163,7 +1172,7 @@
           </v-layout>
         </v-card-text>
         <v-card-actions class="py-3 px-3" style="justify-content: center;">
-          <v-btn v-if="useMySignVT" class="mr-2 white--text" style="width: 125px" color="primary" @click="dialogChoKySoBatDongBo = false">
+          <v-btn v-if="useMySignVT" class="mr-2 white--text" style="width: 125px" color="primary" @click="cancelProcessKySo">
             <v-icon>clear</v-icon> &nbsp;
             HỦY BỎ
             <span slot="loader">Đang kiểm tra</span>
@@ -1381,6 +1390,19 @@
       </v-card>
     </v-dialog>
     <!--  -->
+    <v-dialog v-model="dialogPdfCoordinate" fullscreen transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn vị trí đặt chữ ký số</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPdfCoordinate = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <pdf-coordinate ref="pdfCoordinate" :urlPdf="urlPdf" :bas64Pdf="null" @submitCoordinate="submitCoordinatePdf"></pdf-coordinate>
+      </v-card>
+    </v-dialog>
+    <!--  -->
     <div style="display:none">
       <a id="downloadCaiDatSavis" :href="srcDownloadSavis" download></a>
     </div>
@@ -1398,6 +1420,7 @@ import toastr from 'toastr'
 import KhoTaiLieu from '../TiepNhan/KhoTaiLieu'
 import KhoTaiLieuTapTrung from '../TiepNhan/KhoTaiLieuTapTrung'
 import KhoDVCQG from '../TiepNhan/KhoDVCQG'
+import PdfCoordinate from "../TiepNhan/PdfCoordinate";
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000',
@@ -1441,10 +1464,14 @@ export default {
   components: {
     'kho-tai-lieu': KhoTaiLieu,
     'kho-tai-lieu-tap-trung': KhoTaiLieuTapTrung,
-    'kho-dvcqg': KhoDVCQG
+    'kho-dvcqg': KhoDVCQG,
+    "pdf-coordinate": PdfCoordinate,
   },
   data: () => ({
-    activeTabKho: 'tabs-cn',
+    dialogPdfCoordinate: false,
+    urlPdf: '',
+    chonViTriKySo: false,
+    activeTabKho: 'tabs-cn-tx',
     dialog_add_giayto: false,
     validFormStorage: true,
     partKhoGiayTo: '',
@@ -1669,6 +1696,12 @@ export default {
     }
     try {
       vm.khoTaiLieuTapTrung = khoTaiLieuTapTrung
+    } catch (error) {
+    }
+    try {
+      if (chonViTriKySo) {
+        vm.chonViTriKySo = chonViTriKySo
+      }
     } catch (error) {
     }
     try {
@@ -1937,6 +1970,8 @@ export default {
       vm.soHieuGiayToStorage = ''
       vm.createDateStorage = ''
       vm.expireDateStorage = ''
+      vm.keywordSearchDonVi = ''
+      vm.loaiVanBanCreate = ''
       vm.dialog_add_giayto = true
       vm.partKhoGiayTo = part
       vm.fileKhoGiayTo = file
@@ -2070,6 +2105,10 @@ export default {
           "PhanVungDuLieu": {
             "MaMuc": "",
             "TenMuc": ""
+          },
+          "LoaiNguonDuLieu" : {
+            "MaMuc": "",
+            "TenMuc": ""
           }
         }
         if (vm.originality == 3) {
@@ -2156,6 +2195,10 @@ export default {
             "PhanVungDuLieu": {
               "MaMuc": "",
               "TenMuc": ""
+            },
+            "LoaiNguonDuLieu" : {
+              "MaMuc": "",
+              "TenMuc": ""
             }
           }
         }
@@ -2185,16 +2228,13 @@ export default {
             toastr.success('Lưu giấy tờ vào kho thành công')
           } else {
             toastr.success('Số hóa giấy tờ thành công')
-          }
-
-          let dataSoHoa = response.data.resp
-          let filter = {
-            dossierId: vm.thongTinHoSo.dossierId,
-            referenceUid: vm.fileKhoGiayTo.referenceUid,
-            url: '{urlKhoSoHoa}/' + dataSoHoa.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
-          }
-          vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
-            if (vm.originality == 3) {
+            let dataSoHoa = response.data.resp
+            let filter = {
+              dossierId: vm.thongTinHoSo.dossierId,
+              referenceUid: vm.fileKhoGiayTo.referenceUid,
+              url: '{urlKhoSoHoa}/' + dataSoHoa.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh + '/GiayToLuuTruSo/' + dataSoHoa.MaDinhDanh
+            }
+            vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
               let params = {
                 dossierId: vm.thongTinHoSo.dossierId,
                 referenceUid: vm.fileKhoGiayTo.referenceUid,
@@ -2206,10 +2246,8 @@ export default {
                 vm.loadFiles()
               }).catch(reject => {
               })
-            } else {
-              vm.loadFiles()
-            }
-          })
+            })
+          }
         })
         .catch((error) => {
           vm.progress_sohoa = false
@@ -3515,7 +3553,7 @@ export default {
         window.location.assign(url)
       } else {
         let filter = {
-          id: data.url.split("/").pop(),
+          id: data.url.split("/")[1],
           collection: 'giaytoluutruso'
         }
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
@@ -3633,7 +3671,7 @@ export default {
       } else {
         vm.dialogPDFLoading = true
         let filter = {
-          id: data.url.split("/").pop(),
+          id: data.url.split("/")[1],
           collection: 'giaytoluutruso'
         }
         vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
@@ -3933,8 +3971,6 @@ export default {
         if (fileFind) {
           let url = vm.initDataResource.serviceInfoApi + '/' + vm.serviceInfoId + '/filetemplates/' + fileFind.fileTemplateNo
           window.location.assign(url)
-        } else {
-          console.log('ko thay file')
         }
       }
     },
@@ -4169,7 +4205,7 @@ export default {
             fileType: element.DinhDangTep,
             fileSize: element.KichThuocTep,
             fileTemplateNo: vm.dossierPartAttach.fileTemplateNo,
-            referenceUid: '{urlKhoSoHoa}/' + element.MaDinhDanh
+            referenceUid: '{urlKhoSoHoa}/' + element.MaDinhDanh + '/GiayCaNhanToChuc/' + data.MaDinhDanh
           }
           arrReq.push(vm.$store.dispatch('cloneFileFromStorageCentralized', filter))
         })
@@ -4179,6 +4215,12 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
+          })
+          // capNhatTaiSuDungGiayTo
+          let filter2 = {
+            maDinhDanh: data.MaDinhDanh
+          }
+          vm.$store.dispatch('capNhatTaiSuDungGiayTo', filter2).then(function () {
           })
         }).catch(function () {
           toastr.error('Đính kèm tài liệu thất bại')
@@ -4260,14 +4302,14 @@ export default {
       vm.statusApplicantData = 1
       vm.dossierPartAttach = part
       vm.indexPart = index
-      vm.activeTabKho = 'tabs-cn'
+      vm.activeTabKho = 'tabs-cn-tx'
       vm.dialog_documentApplicant = true
       setTimeout(function () {
         if (vm.$refs.khotailieu) {
           vm.$refs.khotailieu.initData()
         }
-        if (vm.$refs.khotailieutaptrung) {
-          vm.$refs.khotailieutaptrung.initData()
+        if (vm.$refs.khotailieutaptrungthuongxuyen) {
+          vm.$refs.khotailieutaptrungthuongxuyen.initData()
         }
       }, 200)
     },
@@ -4276,6 +4318,14 @@ export default {
       setTimeout(function () {
         if (vm.$refs.khodvcqg) {
           vm.$refs.khodvcqg.initData()
+        }
+      }, 100)
+    },
+    showDocumentGiayToTapTrung () {
+      let vm = this
+      setTimeout(function () {
+        if (vm.$refs.khotailieutaptrung) {
+          vm.$refs.khotailieutaptrung.initData()
         }
       }, 100)
     },
@@ -4550,7 +4600,27 @@ export default {
         })
       }  
     },
-    submitMySign (item) {
+    cancelProcessKySo () {
+      let vm = this
+      vm.dialogChoKySoBatDongBo = false
+      vm.loadingAction = false
+    },
+    showPdfCoordinate (cert) {
+      let vm = this
+      vm.certSelected = cert
+      vm.urlPdf = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.thongTinHoSo['dossierId'] + '/files/' + vm.fileKySo['referenceUid'] + '/preview.pdf'
+      vm.dialogPdfCoordinate = true
+      setTimeout(function () {
+        vm.$refs.pdfCoordinate.init()
+      }, 200)
+    },
+    submitCoordinatePdf (position) {
+      let vm = this
+      vm.dialogPdfCoordinate = false
+      console.log('coordSubmit', position)
+      vm.submitMySign(vm.certSelected, position)
+    },
+    submitMySign (item, position) {
       let vm = this
       vm.certSelected = item
       if (vm.loadingAction) {
@@ -4562,7 +4632,12 @@ export default {
         "serial_number": item.serial_number,
         "dossierId": vm.fileKySo.dossierId,
         "referenceUid": vm.fileKySo.referenceUid,
-        "cert_data": item.cert_data
+        "cert_data": item.cert_data,
+        "x": position ? position['coordinate'][0] : 0,
+        "y": position ? position['coordinate'][1] : 0,
+        "width": position ? position['coordinate'][2] : 0,
+        "height": position ? position['coordinate'][3] : 0,
+        "page": position ? position['page'] : 1
       }
       vm.loadingAction = true
       toastr.success('Yêu cầu đã được gửi. Vui lòng thực hiện ký số trên thiết bị.')
@@ -4591,6 +4666,21 @@ export default {
         vm.dialogChoKySoBatDongBo = false
         toastr.error('Gửi yêu cầu ký số thất bại')
       })
+    },
+    strToJson (inputString) {
+      var keyValuePairs = inputString.split(',');
+      var result = {};
+
+      keyValuePairs.forEach(function(keyValuePair) {
+          var parts = keyValuePair.split('=');
+          var key = parts[0].trim();
+          var value = parts[1].trim();
+          if (value.startsWith("U+")) {
+            value = String.fromCharCode(parseInt(value.substring(2), 16));
+          }
+          result[key] = value;
+      });
+      return result;
     },
     getResultMySign () {
       let vm = this

@@ -276,12 +276,12 @@
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <iframe id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe id="dialogPDFPreviewKho" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>
     <div style="display:none">
-      <a id="downloadFile" :href="srcDownload" download></a>
+      <a id="downloadFileKho" :href="srcDownload" download></a>
     </div>
   </div>
 </template>
@@ -768,7 +768,7 @@ export default {
       vm.$store.dispatch('getFileAttach', filter).then(function (result) {
         vm.srcDownload = result
         setTimeout(function () {
-          document.getElementById('downloadFile').click()
+          document.getElementById('downloadFileKho').click()
         }, 100)
       }).catch(function () {
       })
@@ -787,11 +787,11 @@ export default {
             fileType === 'tif' || fileType === 'tiff'
           ) {
             vm.dialogPDF = true
-            document.getElementById('dialogPDFPreview').src = result
+            document.getElementById('dialogPDFPreviewKho').src = result
           } else {
             vm.srcDownload = result
             setTimeout(function () {
-              document.getElementById('downloadFile').click()
+              document.getElementById('downloadFileKho').click()
             }, 100)
           }
         }).catch(function () {
@@ -803,11 +803,11 @@ export default {
             fileType === 'tif' || fileType === 'tiff'
           ) {
             vm.dialogPDF = true
-            document.getElementById('dialogPDFPreview').src = result
+            document.getElementById('dialogPDFPreviewKho').src = result
           } else {
             vm.srcDownload = result
             setTimeout(function () {
-              document.getElementById('downloadFile').click()
+              document.getElementById('downloadFileKho').click()
             }, 100)
           }
         }).catch(function () {

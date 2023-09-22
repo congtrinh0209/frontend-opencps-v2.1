@@ -412,7 +412,7 @@ export default {
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
         vm.data_payment['paymentFile'] = vm.paymentFile
-        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
+        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : ''
         vm.$store.commit('setPaymentProfile', vm.data_payment)
       })
       if (vm.originality == 1 && vm.thanhToanQuetVietQR) {
@@ -515,7 +515,7 @@ export default {
           paymentAmount: vm.totalFee,
           paymentNote: vm.paymentProfile.paymentNote,
           paymentFile: vm.paymentFile,
-          paymentMethod: vm.isBank ? 'Chuyển khoản' : 'Keypay'
+          paymentMethod: vm.isBank ? 'Chuyển khoản' : ''
         }
         vm.$store.commit('setPaymentProfile', vm.data_payment)
         console.log('vm.data_payment3123123', vm.data_payment)
@@ -529,7 +529,7 @@ export default {
         vm.$store.dispatch('getPaymentFiles', filter).then(result => {
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
-          vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
+          vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : ''
           console.log('vm.data_payment555555', vm.data_payment)
           vm.$store.commit('setPaymentProfile', vm.data_payment)
         })
@@ -561,7 +561,7 @@ export default {
         vm.progressUploadPart = false
         vm.paymentFile = result
         vm.data_payment['paymentFile'] = vm.paymentFile
-        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
+        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : ''
         vm.$store.commit('setPaymentProfile', vm.data_payment)
         vm.$store.dispatch('getPaymentFiles', data).then(result => {
           vm.paymentFile = result

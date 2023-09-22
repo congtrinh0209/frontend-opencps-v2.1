@@ -398,7 +398,7 @@
         } else {
           vm.dialogPDFLoading = true
           let filter = {
-            id: data.url.split("/").pop(),
+            id: data.url.split("/")[1],
             collection: 'giaytoluutruso'
           }
           vm.$store.dispatch('getTepDuLieu', filter).then(function (result) {
@@ -460,7 +460,7 @@
           let filter = {
             dossierId: vm.detailDossier.dossierId,
             referenceUid: vm.fileKhoGiayTo.referenceUid,
-            url: '{urlKhoSoHoa}/' + data.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh
+            url: '{urlKhoSoHoa}/' + data.GiayToCaNhanToChuc.TepDuLieu[0].MaDinhDanh + '/GiayToLuuTruSo/' + data.MaDinhDanh
           }
           vm.$store.dispatch('capNhatGiayToSoHoa', filter).then(resData => {
             setTimeout(function () {

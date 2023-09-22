@@ -31,7 +31,7 @@
         <v-card flat class="">
           <v-card-text class='grey lighten-3 px-0 py-0'>
             <v-expansion-panel class="expand__select__domain" v-model="panelServiceList" expand>
-              <v-expansion-panel-content v-for='(item, index) in serviceInfoList' :key='index' :value="true">
+              <v-expansion-panel-content v-for='(item, index) in serviceInfoList' :key='index' :value="true" v-if="item.templateList && item.templateList.length">
                 <!-- <div class="text-bold" slot='header' style="margin-left: 14px;color:#615d5d">
                     <v-icon class="pr-2" color="#615d5d">navigate_next</v-icon> 
                     <span style="position: absolute;margin-top: 1px;">{{item.serviceCode}}  - {{item.serviceName}} </span>
@@ -73,7 +73,7 @@
         <v-card flat class="">
           <v-card-text class='grey lighten-3 px-0 py-0'>
             <v-expansion-panel class="expand__select__domain" v-model="panelServiceList" expand>
-              <v-expansion-panel-content v-for='(item, index) in serviceInfoList' :key='index' :value="true">
+              <v-expansion-panel-content v-for='(item, index) in serviceInfoList' :key='index' :value="true" v-if="item.templateList && item.templateList.length">
                 <div class="text-bold" slot='header' style="margin-left: 14px;color:#615d5d">
                     <v-icon class="pr-2" color="#615d5d">navigate_next</v-icon> 
                     <span style="position: absolute;margin-top: 1px;">{{item.serviceCode}}  - {{item.serviceName}} </span>
