@@ -159,6 +159,15 @@
                   </v-flex> -->
                   <!-- end -->
                 </v-layout>
+
+                <v-flex xs12>
+                  <div class="d-inline-block py-2 ml-3" v-if="thanhToanQuetVietQR && urlVietQR" style="position:relative;text-align: center;">
+                    <img class="logo" :src="urlVietQR" width="175" style="display: flex">
+                    <v-chip class="my-0 ml-1" color="#3b5ab5" text-color="white" style="width:135px;margin-top:-5px !important">
+                      <span style="font-size:13px !important">Quét để thanh toán</span>
+                    </v-chip>
+                  </div>
+                </v-flex>
               </v-layout>
             </v-card-text>
           </v-card>
@@ -278,6 +287,8 @@ export default {
   },
   components: {},
   data: () => ({
+    urlVietQR: '',
+    thanhToanQuetVietQR: false,
     loading: true,
     loadingAction: false,
     paymentFile: '',
@@ -341,6 +352,10 @@ export default {
   },
   created () {
     let vm = this
+    try {
+      vm.thanhToanQuetVietQR = thanhToanQuetVietQR
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       vm.paymentNote = vm.payments['paymentNote']
       if (vm.payments.paymentStatus == 5) {
@@ -490,6 +505,22 @@ export default {
         vm.paymentFile = result
         console.log('paymentFile', vm.paymentFile)
         console.log('payment', vm.payments)
+        if (vm.thanhToanQuetVietQR && vm.payments.paymentStatus != 3 && vm.payments.paymentStatus != 5) {
+          var settings = {
+            "url": "/o/pgi/vietqr/qrcode?dossierId=" + vm.dossierDetail.dossierId,
+            "method": "GET",
+            "headers": {
+              "groupId": window.themeDisplay.getScopeGroupId(),
+              "Accept": "application/json"
+            }
+          };
+
+          $.ajax(settings).done(function (response) {
+            vm.urlVietQR = response && response.qrcode_url ? response.qrcode_url : ''
+          }).catch(function () {
+            vm.urlVietQR = ""
+          })
+        }
       }).catch(function(){})
     },
     currency (value) {

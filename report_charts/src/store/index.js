@@ -136,7 +136,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getReportTotal ({commit, state}, year) {
+    getReportTotal ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let groupBy = 1
         try {
@@ -150,11 +150,11 @@ export const store = new Vuex.Store({
               Accept: 'application/json'
             },
             params: {
-              year: year,
+              year: filter.year,
               month: 0,
-              groupBy: groupBy,
+              groupBy: filter.groupBy ? filter.groupBy : groupBy,
               groupId: window.themeDisplay.getScopeGroupId(),
-              system: year == 0 ? 'allSystemTotal' : 'yearSum'
+              system: filter.year == 0 ? 'allSystemTotal' : 'yearSum'
             }
           }
           param.params['govAgencyCode'] = param.params['agency']
@@ -164,7 +164,7 @@ export const store = new Vuex.Store({
             if (urlApiConfig && groupIdConfig) {
               urlStatistic = urlApiConfig
               param.params = {
-                year: year,
+                year: filter.year,
                 month: 0,
                 domainCode: 'total',
                 govAgencyCode: 'total',
@@ -229,11 +229,6 @@ export const store = new Vuex.Store({
     },
     getAgencyReportLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        let groupBy = 1
-        try {
-          groupBy = groupByConfig
-        } catch (error) {
-        }
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
@@ -242,10 +237,9 @@ export const store = new Vuex.Store({
             },
             params: {
               year: filter.year,
-              month: !filter.hasOwnProperty('month') && groupBy == 2 ? '1,2,3,4,5,6,7,8,9,10,11,12' : filter.month,
-              // group: filter.group,
-              // agency: filter['agency'],
-              groupBy: groupBy,
+              // month: !filter.hasOwnProperty('month') && filter.groupBy == 2 ? '1,2,3,4,5,6,7,8,9,10,11,12' : filter.month,
+              month: filter.month,
+              groupBy: filter.groupBy,
               groupId: groupIdConfig ? groupIdConfig : window.themeDisplay.getScopeGroupId()
             }
           }

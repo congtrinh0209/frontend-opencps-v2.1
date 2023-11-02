@@ -574,7 +574,7 @@ export default {
         })
         vm.showTableTotal = false
         vm.itemTotal = null
-        vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
+        vm.$store.dispatch('getReportTotal', {year: vm.year, groupBy: vm.chartView ? 1 : 2}).then(function (result) {
           let agencyListsTotal = result
           for (let key in agencyListsTotal) {
             let currentData = agencyListsTotal[key]
@@ -703,13 +703,21 @@ export default {
     },
     doStaticsReport () {
       let vm = this
+      let groupBy = vm.chartView ? 1 : 2
+      try {
+        if (groupByConfig) {
+          groupBy = groupByConfig
+        }
+      } catch (error) {
+      }
       let filter = {
         year: vm.year,
         month: vm.month,
         group: vm.group,
         reporting: true,
         agency: vm.govAgencyCode,
-        report: vm.chartView ? false : 'linemonth'
+        report: vm.chartView ? false : 'linemonth',
+        groupBy: groupBy
       }
       let tempGov = vm.govAgencyCode
       if (vm.chartView) {
@@ -753,6 +761,7 @@ export default {
       vm.totalCounter['total_24'] = 0
       vm.totalCounter['total_25'] = 0
       vm.showTable = false
+      console.log('filter', filter)
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result === null || result === undefined || result === 'undefined') {
           vm.noReportData = true
@@ -796,7 +805,8 @@ export default {
           year: vm.year,
           group: vm.group,
           agency: tempGov,
-          report: vm.chartView ? true : 'linemonth'
+          report: vm.chartView ? true : 'linemonth',
+          groupBy: groupBy
         }
         if (!vm.chartView) {
           filter.agency = 'total'
@@ -826,7 +836,9 @@ export default {
       vm.year = item
       vm.showTableTotal = false
       vm.itemTotal = null
-      vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
+      vm.$store.dispatch('getReportTotal', 
+        {year: vm.year, groupBy: vm.chartView ? 1 : 2}
+      ).then(function (result) {
         let agencyListsTotal = result
         for (let key in agencyListsTotal) {
           let currentData = agencyListsTotal[key]

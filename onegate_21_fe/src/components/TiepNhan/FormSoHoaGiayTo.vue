@@ -296,6 +296,8 @@
       },
       addApplicantData () {
         let vm = this
+        console.log('vm.partKhoGiayTo', vm.partKhoGiayTo)
+        console.log('vm.fileKhoGiayTo', vm.fileKhoGiayTo)
         vm.loading = true
         let param = {
           headers: {
@@ -306,7 +308,7 @@
         }
         let dataCreateFile = new FormData()
         let url = '/o/rest/v2/applicantdatas'
-        dataCreateFile.append('fileTemplateNo', vm.partKhoGiayTo.fileTemplateNo)
+        dataCreateFile.append('fileTemplateNo', vm.partKhoGiayTo.fileTemplateNo ? vm.partKhoGiayTo.fileTemplateNo : vm.partKhoGiayTo.templateFileNo)
         dataCreateFile.append('status', 1)
         dataCreateFile.append('fileNo', vm.soHieuGiayToStorage)
         dataCreateFile.append('fileName', vm.tenGiayToStorage)
@@ -316,21 +318,20 @@
         dataCreateFile.append('applicantName', vm.applicantNameToStorage)
         dataCreateFile.append('govAgencyName', vm.coQuanBanHanhStorage)
         dataCreateFile.append('serviceCode', vm.thongTinHoSo['serviceCode'])
-        dataCreateFile.append('templateNo', vm.partKhoGiayTo.fileTemplateNo)
+        dataCreateFile.append('templateNo', vm.partKhoGiayTo.fileTemplateNo ? vm.partKhoGiayTo.fileTemplateNo : vm.partKhoGiayTo.templateFileNo)
         dataCreateFile.append('issueDate', vm.createDateStorage)
         dataCreateFile.append('expireDate', vm.expireDateStorage)
         dataCreateFile.append('desciption', '')
-        dataCreateFile.append('dossierNo', '')
+        dataCreateFile.append('dossierNo', vm.thongTinHoSo.dossierNo)
           
         axios.post(url, dataCreateFile, param).then(result1 => {
           vm.loading = false
-          vm.dialog_add_giayto = false
           if (vm.originality == 3) {
             toastr.success('Số hóa giấy tờ thành công')
           } else {
             toastr.success('Lưu giấy tờ vào kho thành công')
           }
-          vm.$emit('callBackSoHoaGiayTo', response.data.resp)
+          vm.$emit('callBackSoHoaGiayTo', result1.data)
         }).catch(xhr => {
           vm.loading = false
           if (vm.originality == 3) {
@@ -347,6 +348,10 @@
           return
         }
         let dataCreate = {
+          "NguoiTaoLap": {
+            "MaDinhDanh": vm.applicantIdNoToStorage,
+            "TenGoi": vm.applicantNameToStorage
+          },
           "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
           "TenGiayTo": vm.partKhoGiayTo.partName,
           "SoHieuVanBan": String(vm.soHieuGiayToStorage).trim(),
@@ -361,7 +366,7 @@
             "TenMuc": vm.statusCreate ? vm.statusCreate['TenMuc'] : ''
           },
           "MaMauGiayTo": {
-            "MaMuc": vm.partKhoGiayTo.fileTemplateNo,
+            "MaMuc": vm.partKhoGiayTo.fileTemplateNo ? vm.partKhoGiayTo.fileTemplateNo : vm.partKhoGiayTo.templateFileNo,
             "TenMuc": vm.partKhoGiayTo.partName
           },
           "ChuHoSo": {
@@ -376,7 +381,7 @@
             "MaDinhDanh": "",
             "TenGoi": ""
           },
-          "TrangThaiChiaSe": 2,
+          "TrangThaiChiaSe": 0,
           "TepDuLieu": [],
           "MaDinhDanh": "",
           "HoSoDichVuCong": {

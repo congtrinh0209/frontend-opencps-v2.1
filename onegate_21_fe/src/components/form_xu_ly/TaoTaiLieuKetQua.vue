@@ -622,7 +622,7 @@
                   template['pdfSigned'] = vm.createFileSignedSync['createFiles'][index]['pdfSigned']
                 } else {
                   template['isSigned'] = false
-                  template['fileEntryId'] = ''
+                  // template['fileEntryId'] = ''
                   template['pdfSigned'] = ''
                 }
               })
@@ -2027,12 +2027,12 @@
               vm.dossierFilesItems[index]['pdfSigned'] = file['pdfSigned']
             } else {
               vm.dossierFilesItems[index]['isSigned'] = false
-              vm.dossierFilesItems[index]['fileEntryId'] = ''
+              // vm.dossierFilesItems[index]['fileEntryId'] = ''
               vm.dossierFilesItems[index]['pdfSigned'] = ''
             }
           } else {
             vm.dossierFilesItems[index]['isSigned'] = false
-            vm.dossierFilesItems[index]['fileEntryId'] = ''
+            // vm.dossierFilesItems[index]['fileEntryId'] = ''
             vm.dossierFilesItems[index]['pdfSigned'] = ''
           }
         })
@@ -2448,6 +2448,8 @@
         setTimeout(function () {
           vm.$refs.formSoHoaGiayTo.initData()
         }, 100)
+        console.log('part', vm.partKhoGiayTo)
+        console.log('fileKhoGiayTo', vm.fileKhoGiayTo)
       },
       callBackSoHoa(data) {
         let vm = this

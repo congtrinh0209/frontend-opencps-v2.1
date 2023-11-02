@@ -2002,7 +2002,7 @@ export default {
       dataCreateFile.append('status', 1)
       dataCreateFile.append('fileNo', vm.soHieuGiayToStorage)
       dataCreateFile.append('fileName', vm.partKhoGiayTo.partName)
-      dataCreateFile.append('applicantIdNo', vm.applicantId)
+      dataCreateFile.append('applicantIdNo', vm.originality == 3 ? vm.applicantIdNoToStorage : vm.applicantId)
       dataCreateFile.append('file', '')
       dataCreateFile.append('fileEntryId', vm.fileKhoGiayTo.hasOwnProperty('fileEntryId') ? vm.fileKhoGiayTo.fileEntryId : '')
       dataCreateFile.append('applicantName', vm.thongTinChuHoSo['applicantName'] ? vm.thongTinChuHoSo['applicantName'] : '')
@@ -2012,7 +2012,7 @@ export default {
       dataCreateFile.append('issueDate', vm.createDateStorage)
       dataCreateFile.append('expireDate', vm.expireDateStorage)
       dataCreateFile.append('desciption', '')
-      dataCreateFile.append('dossierNo', '')
+      dataCreateFile.append('dossierNo', vm.thongTinHoSo.dossierNo)
       
       axios.post(url, dataCreateFile, param).then(result1 => {
         vm.progress_sohoa = false
@@ -2049,6 +2049,10 @@ export default {
       let action = function () {
         vm.progress_sohoa = true
         let dataCreate = {
+          "NguoiTaoLap": {
+            "MaDinhDanh": vm.applicantIdNoToStorage,
+            "TenGoi": vm.applicantNameToStorage
+          },
           "dossierFileId": vm.fileKhoGiayTo.dossierFileId,
           "TenGiayTo": vm.partKhoGiayTo.partName,
           "SoHieuVanBan": String(vm.soHieuGiayToStorage).trim(),
@@ -3638,9 +3642,9 @@ export default {
       var vm = this
       let fileKhoSoHoa = data.hasOwnProperty('url') && data.url && data.url.indexOf('{urlKhoSoHoa}/') == 0
       if (!fileKhoSoHoa) {
-        if (data.fileSize === 0) {
-          return
-        }
+        // if (data.fileSize === 0) {
+        //   return
+        // }
         if (data['eForm']) {
           vm.pdfEform = true
         } else {
@@ -3715,9 +3719,9 @@ export default {
     },
     viewGiayToDaNop (data) {
       var vm = this
-      if (data.fileSize === 0) {
-        return
-      }
+      // if (data.fileSize === 0) {
+      //   return
+      // }
       if (data['eForm']) {
         vm.pdfEform = true
       } else {
@@ -4302,13 +4306,13 @@ export default {
       vm.statusApplicantData = 1
       vm.dossierPartAttach = part
       vm.indexPart = index
-      vm.activeTabKho = 'tabs-cn-tx'
+      vm.activeTabKho = vm.khoTaiLieuTapTrung ? 'tabs-cn-tx' : 'tabs-cn'
       vm.dialog_documentApplicant = true
       setTimeout(function () {
         if (vm.$refs.khotailieu) {
           vm.$refs.khotailieu.initData()
         }
-        if (vm.$refs.khotailieutaptrungthuongxuyen) {
+        if (vm.khoTaiLieuTapTrung && vm.$refs.khotailieutaptrungthuongxuyen) {
           vm.$refs.khotailieutaptrungthuongxuyen.initData()
         }
       }, 200)
@@ -4367,7 +4371,7 @@ export default {
       dataCreateFile.append('issueDate', '')
       dataCreateFile.append('expireDate', '')
       dataCreateFile.append('desciption', '')
-      dataCreateFile.append('dossierNo', '')
+      dataCreateFile.append('dossierNo', vm.thongTinHoSo.dossierNo)
       
       axios.post(url, dataCreateFile, param).then(result1 => {
         vm.progress_sohoa = false

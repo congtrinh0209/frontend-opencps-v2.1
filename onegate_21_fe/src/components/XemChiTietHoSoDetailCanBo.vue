@@ -284,6 +284,18 @@
                   >
                     {{ item.title }}
                   </v-btn>
+                  <!--  -->
+                  <v-btn color="primary" class="ml-0 mr-2 on-hover-btn" 
+                    v-if="originality == 3 && soHoaHoSoHoanThanh && thongTinChiTietHoSo['dossierStatus'] == 'done'"
+                    v-on:click.native="soHoaKetQuaHoanThanh" 
+                    :loading="loadingAction"
+                    :disabled="loadingAction"
+                  >
+                    Số hóa kết quả
+                    <span slot="loader">Loading...</span>
+                  </v-btn>
+                  <!--  -->
+                  
                   <!-- Thao tác thu hồi hồ sơ -->
                   <!-- <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
                   && thongTinChiTietHoSo['dossierStatus'] !== 'new' && originality === 3"
@@ -1004,6 +1016,7 @@ export default {
     'danh-sach-bien-lai': DanhSachBienLai
   },
   data: () => ({
+    soHoaHoSoHoanThanh: false,
     votingResult: null,
     dossierDetailMotcua: '',
     splitBienLai: false,
@@ -1397,6 +1410,10 @@ export default {
       if (traoDoiCanBoCongDan !== undefined) {
         vm.viewTraoDoiCanBoCongDan = traoDoiCanBoCongDan
       }
+    } catch (error) {
+    }
+    try {
+      vm.soHoaHoSoHoanThanh = soHoaHoSoHoanThanh
     } catch (error) {
     }
     window.toastr = toastr
@@ -2023,6 +2040,7 @@ export default {
           } else {
             vm.returnFiles = [result.returnFiles]
           }
+          console.log('vm.returnFiles', vm.returnFiles)
           vm.showTraKetQua = true
         }
         if (result.hasOwnProperty('dossierParts') && result.dossierParts !== null && result.dossierParts !== undefined && result.dossierParts !== 'undefined') {
@@ -2262,6 +2280,46 @@ export default {
         // vm.doActionSpecial(result)
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       }
+    },
+    soHoaKetQuaHoanThanh () {
+      let vm = this
+      vm.$store.dispatch('loadDossierTemplates', vm.thongTinChiTietHoSo).then(function (res) {
+        let dossierParts = res['dossierParts'].filter(function (item) {
+          return item.partType == 2
+        })
+        let createFiles = []
+        let returnFiles = []
+        if (dossierParts.length) {
+          dossierParts.forEach(element => {
+            returnFiles.push({
+              "dossierPartId": "",
+              "referenceUid": "",
+              "partNo": element['partNo'],
+              "dossierPartNo": element['partNo'],
+              "partTip": element['partTip'],
+              "partName": element['partName'],
+              "templateFileNo": element['fileTemplateNo'],
+              "eForm": element['hasForm'],
+              "multiple": element['multiple'],
+              "formScript": "",
+              "formData": "",
+              "counter": 0,
+              "dossierFileId": 0,
+              "partType": 2,
+              "deliverableType": ""
+            })
+          })
+          createFiles = [].concat(returnFiles)
+          vm.btnIndex = 4444
+          let result = {
+            actionCode: 4444,
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            returnFiles: returnFiles,
+            createFiles: createFiles
+          }
+          vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
+        }
+      })
     },
     doPrint01 (dossierItem, item, index) {
       let vm = this
@@ -2534,6 +2592,10 @@ export default {
           paymentsOut.serviceAmount = paymentsOut.serviceAmount*vm.payments.counter
           paymentsOut.shipAmount = paymentsOut.shipAmount*vm.payments.counter
           paymentsOut.paymentNote = dataNote ? JSON.stringify(dataNote) : paymentsOut.paymentNote
+        }
+        if (!vm.payments['paymentMethod']) {
+          alert('Vui lòng lựa chọn hình thức thanh toán')
+          return;
         }
         filter['payment'] = paymentsOut
         console.log('payment99999', filter['payment'])

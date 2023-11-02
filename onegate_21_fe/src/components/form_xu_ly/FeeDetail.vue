@@ -103,7 +103,7 @@
               <!-- Cập nhật hình thức thanh toán -->
               <v-flex xs12></v-flex>
               <v-flex xs12 md2 v-if="getDataSource('paymentMethod') && data_payment.requestPayment == 5 && (data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3)">
-                <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
+                <v-subheader class="pl-0 text-right">Hình thức thanh toán <span style="color:red">(*)</span>: </v-subheader>
               </v-flex>
               <v-flex xs12 md3 v-if="getDataSource('paymentMethod') && data_payment.requestPayment == 5 && (data_payment.editable === 1 || data_payment.editable === 2 || data_payment.editable === 3)">
                 <v-flex>
@@ -285,6 +285,9 @@ export default {
   created () {
     var vm = this
     vm.data_payment = vm.payments
+    if (vm.getDataSource('paymentMethod') && vm.data_payment.requestPayment == 5 && (vm.data_payment.editable === 1 || vm.data_payment.editable === 2 || vm.data_payment.editable === 3)) {
+      vm.data_payment.paymentMethod = ''
+    }
     vm.showCounterFee = vm.payments.hasOwnProperty('counter')
     if (vm.payments) {
       setTimeout(function () {

@@ -624,6 +624,7 @@
             <v-icon>save</v-icon> &nbsp;
             Đồng ý
           </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <!--  -->
@@ -697,6 +698,7 @@ export default {
     year: (new Date()).getFullYear() + '',
     months: [],
     month: 0,
+    groupIdsHeThong: [],
     agencyLists: [],
     govAgency: 0,
     danhSachBaoCao: [],
@@ -2420,8 +2422,23 @@ export default {
       } else {
         filter['exportVoting'] = false
       }
-      let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
+      // 
+      if (vm.api.indexOf('/o/statistic/applicantData') >= 0 && filter.data['listGroupId']) {
+        let govName = vm.groupIdsHeThong.find(function (item) {
+          return item.value == filter.data['listGroupId']
+        })
+        filter.data['govAgencyName'] = govName ? govName.text : ''
+      }
+      if (vm.api.indexOf('/o/statistic/applicantData') >= 0 && !filter.data['listGroupId']) {
+        let govName = vm.groupIdsHeThong.find(function (item) {
+          return item.value == window.themeDisplay.getScopeGroupId()
+        })
+        filter.data['govAgencyName'] = govName ? govName.text : ''
+      }
+      // 
+      let dispatchUse = vm.api.indexOf('/o/statistic/dossier') >= 0 || vm.api.indexOf('/o/statistic/applicantData') >= 0 ? 'getAgencyReportLists' : 'getAgencyReportListsOld'
       vm.$store.dispatch(dispatchUse, filter).then(function (result) {
+        console.log('result', result)
         vm.showTableVoting = false
         if (returnTable) {
           vm.showTableVoting = true
@@ -2524,9 +2541,15 @@ export default {
           })]
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('notSumkey')) {
             resultDataTotal = resultData
+            // không sử dụng bản ghi tổng từ api, tổng sẽ được tính bằng cách tổng các hàng dữ liệu
+            if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow')) {
+              resultDataTotal = resultData.filter(function (item) {
+                return item[sumKey]
+              })
+            }
           }
-         console.log('resultDataTotal4444', resultDataTotal)
-         console.log('resultData111', resultData)
+          console.log('resultDataTotal4444', resultDataTotal)
+          console.log('resultData111', resultData)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -2627,6 +2650,8 @@ export default {
                     } else {
                       dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                     }
+                  } else {
+                    dataText = ' '
                   }
                   // console.log('dataText1', dataText)
                 }
@@ -2663,7 +2688,7 @@ export default {
               } else {
                 index = index + 1
               }
-              // console.log('dataRow123123123', dataRow)
+              console.log('dataRow123123123', dataRow)
               vm.dataRowRenderHtmlTable.push(dataRow)
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
@@ -2671,7 +2696,7 @@ export default {
             }
           }
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
-            // console.log('resultDataTotal777', resultDataTotal)
+            console.log('resultDataTotal777', resultDataTotal)
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
@@ -2715,20 +2740,26 @@ export default {
                   }
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
+                } else {
+                  dataTextXXTT = ' '
                 }
                 // Sum tổng các hàng báo cáo STATISTIC_
+                console.log('dataTextXXTT', dataTextXXTT)
                 if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('sumRow') && vm.itemsReports[vm.index]['filterConfig']['sumRow']) {
                   if (isNaN(parseInt(dataRowTotal[indexTotalXXTT]['text']))) {
                     dataRowTotal[indexTotalXXTT]['text'] = 0
                   }
                   dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? parseInt(dataRowTotal[indexTotalXXTT]['text']) : parseInt(dataRowTotal[indexTotalXXTT]['text']) + parseInt(dataTextXXTT)
+                  console.log('x1', isNaN(parseInt(dataTextXXTT)))
                 } else {
                   dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0' : parseInt(dataTextXXTT) + ' '
+                  console.log('x2', isNaN(parseInt(dataTextXXTT)))
                 }
                 //
                 if (currentConfigXXTT['value'] === 'note' || currentConfigXXTT.hasOwnProperty('notSum')) {
                   dataRowTotal[indexTotalXXTT]['text'] = ' '
                 }
+                console.log('dataRowTotal[indexTotalXXTT]', dataRowTotal[indexTotalXXTT]['text'])
                 indexTotalXXTT = indexTotalXXTT + 1
               }
             }
@@ -2894,7 +2925,7 @@ export default {
     viewListHoSo (item, first) {
       let vm = this
       vm.hasVoting = []
-      try {s
+      try {
         vm.hasVoting = vm.filters.filter(function (item1) {
           return item1.key !== 'rate'
         })
@@ -3477,6 +3508,7 @@ export default {
         let configs = JSON.parse(serializable.configs)
         console.log('configs', vm.configs)
         let agencySiteList = configs['groupIds']
+        vm.groupIdsHeThong = configs['groupIds']
         try {
           vm.govAgencyCodeCurrentSite = agencySiteList.filter(function(item) {
             return item.value == window.themeDisplay.getScopeGroupId()

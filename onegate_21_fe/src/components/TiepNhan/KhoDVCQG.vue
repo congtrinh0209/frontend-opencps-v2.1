@@ -211,7 +211,8 @@
       optionSearch: '',
       fileTemplateListSearch: [],
       fileTemplateNo: '',
-      dossierNoSearch: ''
+      dossierNoSearch: '',
+      oneApp: false,
     }),
     computed: {
       originality () {
@@ -233,6 +234,10 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
+        try {
+          vm.oneApp = oneApp
+        } catch (error) {
+        }
         let current = vm.$router.history.current
         let query = vm.$router.history.current.query
         vm.applicantIdNo = vm.index
@@ -258,7 +263,7 @@
   
         vm.loadingTable = true
         let endPoint = 'getGiayToDvcqg'
-        if (vm.originality == 3) {
+        if (vm.originality == 3 && !vm.oneApp) {
           endPoint = 'getGiayToDvcqgProxy'
         }
         vm.$store.dispatch(endPoint, filter).then(function (result) {

@@ -453,7 +453,7 @@
       },
       callBackSoHoa(data) {
         let vm = this
-        vm.dialog_add_giayto = false
+        vm.dialog_add_giayto_trakq = false
         console.log('fileKhoGiayTo', vm.fileKhoGiayTo)
         console.log('dossierFilesItems', vm.dossierFilesItems)
         if (vm.khoTaiLieuTapTrung) {

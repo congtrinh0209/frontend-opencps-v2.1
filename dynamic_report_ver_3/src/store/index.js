@@ -434,6 +434,15 @@ export const store = new Vuex.Store({
                       timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T23:59`)).getTime()
                     }
                     param.params[key] = timeStampDate
+                  } else if (day && month && year && filter.hasOwnProperty('formatDate') && filter.formatDate === 'isoDate') {
+                    let timeStampDate = (new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)).getTime()
+                    if (key === 'fromDate') {
+                      timeStampDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+                    }
+                    if (key === 'toDate') {
+                      timeStampDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+                    }
+                    param.params[key] = timeStampDate
                   } else {
                     param.params[key] = currentVal
                   }                  
