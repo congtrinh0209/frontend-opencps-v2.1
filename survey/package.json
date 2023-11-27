@@ -14,7 +14,7 @@
     "file-saver": "^2.0.0-rc.4",
     "idempotent-babel-polyfill": "^7.0.0",
     "json-mapper-json": "^1.3.0",
-    "json2csv": "^3.0.0",
+    "json2csv": "^4.3.5",
     "jstoxml": "^1.4.4",
     "moment": "^2.22.2",
     "pdfjs": "^2.1.0",
