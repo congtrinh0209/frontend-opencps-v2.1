@@ -20,7 +20,7 @@
     "mobile-device-detect": "^0.2.3",
     "moment": "^2.22.2",
     "pdfjs": "^2.1.0",
-    "pdfjs-dist": "^2.0.943",
+    "pdfjs-dist": "^4.2.67",
     "pdfmake": "^0.1.54",
     "roboto-fontface": "*",
     "toastr": "^2.1.4",
