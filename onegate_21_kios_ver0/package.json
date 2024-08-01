@@ -17,7 +17,7 @@
     "axios": "^0.18.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-polyfill": "^6.26.0",
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^5.0.0",
     "compression-webpack-plugin": "^1.1.11",
     "glyphicons": "^0.2.0",
     "handlebars": "^4.4.3",
