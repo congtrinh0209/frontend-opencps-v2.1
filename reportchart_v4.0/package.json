@@ -11,7 +11,7 @@
     "@inotom/vue-go-top": "^1.0.2",
     "apexcharts": "^2.2.4",
     "axios": "^0.18.1",
-    "chart.js": "^2.7.2",
+    "chart.js": "^3.0.0",
     "chart.piecelabel.js": "^0.12.0",
     "file-saver": "^2.0.0-rc.4",
     "idempotent-babel-polyfill": "^7.0.0",
