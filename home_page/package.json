@@ -12,7 +12,7 @@
     "bootstrap": "^4.1.1",
     "jquery": "^3.3.1",
     "vue-apexcharts": "^1.2.6",
-    "vue-ctk-date-time-picker": "^1.1.19",
+    "vue-ctk-date-time-picker": "^2.0.5",
     "mobile-device-detect": "^0.2.3",
     "vue-datetime-2": "^0.6.1",
     "vue-simple-progress": "^1.1.0",
