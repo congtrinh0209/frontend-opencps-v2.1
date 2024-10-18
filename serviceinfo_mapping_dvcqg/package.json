@@ -25,7 +25,7 @@
     "pdfmake": "^0.1.54",
     "roboto-fontface": "*",
     "toastr": "^2.1.4",
-    "vue": "^2.5.9",
+    "vue": "^3.0.0",
     "vue-content-placeholders": "^0.2.1",
     "vue-friendly-iframe": "^0.9.0",
     "vue-router": "^3.0.1",
