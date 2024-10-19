@@ -13,7 +13,7 @@
     "idempotent-babel-polyfill": "^7.0.0",
     "jquery": "^3.4.1",
     "toastr": "^2.1.4",
-    "vue": "^2.5.9",
+    "vue": "^3.0.0",
     "vue-router": "^3.0.1",
     "vuetify": "^1.4.2",
     "vuex": "^3.0.1"
