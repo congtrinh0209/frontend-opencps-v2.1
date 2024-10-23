@@ -16,7 +16,7 @@
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
     "toastr": "^2.1.4",
-    "vue": "^2.5.9",
+    "vue": "^3.0.0",
     "vue-content-placeholders": "^0.2.1",
     "vue-router": "^3.0.1",
     "vue2-editor": "^2.6.6",
