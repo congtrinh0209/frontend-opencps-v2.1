@@ -11,7 +11,7 @@
   "dependencies": {
     "@inotom/vue-go-top": "^1.0.2",
     "apexcharts": "^2.2.4",
-    "axios": "^0.18.1",
+    "axios": "^1.8.3",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "chart.js": "^2.7.2",
     "chart.piecelabel.js": "^0.12.0",
