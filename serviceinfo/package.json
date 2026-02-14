@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@inotom/vue-go-top": "^1.0.2",
-    "axios": "^0.18.0",
+    "axios": "^1.13.5",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "file-saver": "^2.0.0-rc.4",
     "idempotent-babel-polyfill": "^7.0.0",
@@ -20,7 +20,7 @@
     "mobile-device-detect": "^0.2.3",
     "moment": "^2.22.2",
     "pdfjs": "^2.1.0",
-    "pdfjs-dist": "^2.0.943",
+    "pdfjs-dist": "^2.4.456",
     "pdfmake": "^0.1.54",
     "roboto-fontface": "*",
     "toastr": "^2.1.4",
